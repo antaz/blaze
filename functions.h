@@ -17,6 +17,8 @@
 #define SQ64TO120(sq) ((((sq) >> 3)+2)*10 + ((sq) & 7) + 1)
 
 /* fen.c */
+extern void parseFEN(char *fen, Board *board);
+
 /* board.c */
 extern void clearBoard(Board *board);
 
