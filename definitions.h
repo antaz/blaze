@@ -1,5 +1,5 @@
-#ifndef DEFINITIONS_H_INCLUDED
-#define DEFINITIONS_H_INCLUDED
+#ifndef DEFINITIONS_H
+#define DEFINITIONS_H
 
 /* A couple of constants for our chess engine */
 

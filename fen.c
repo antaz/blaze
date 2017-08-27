@@ -6,10 +6,12 @@
  */
 
 #include <stdio.h>
-#include "definitions.h"
 #include <assert.h>
+#include "definitions.h"
+#include "functions.h"
 
-void parseFEN(const char* fen, Board* board) {
+
+void parseFEN(const char *fen, Board *board) {
 	/* setting counters and variables */
 
 	int rank = RANK_8;
@@ -65,7 +67,7 @@ void parseFEN(const char* fen, Board* board) {
 		/* Putting pieces on the board */
 		for(i = 0; i < count; i++) {
 			sq64 = rank * 8 + file;
-			sq120 = SQ120(sq64); /* Converting sq64 to a sq120, to be written */
+			sq120 = SQ64TO120(sq64); /* Converting sq64 to a sq120, to be written */
 			if(piece != EMPTY)
 				board->pieces[sq120] = piece;
 			file++;
@@ -101,10 +103,10 @@ void parseFEN(const char* fen, Board* board) {
 				assert(file >= FILE_A && file <= FILE_H);
 				assert(rank >= RANK_1 && rank <= RANK_8);
 
-				board->enPassant = FR2SQ(file, rank); /* (file, rank) to sq120 conversion, to be written */
+				board->enPassant = FR2SQ64(file, rank); /* (file, rank) to sq120 conversion, to be written */
 			}
 
-		board->hashKey = generateHashKey(board);
+		/*board->hashKey = generateHashKey(board);*/
 	}
 }
 

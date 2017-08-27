@@ -1,7 +1,7 @@
 CXX = gcc
 BIN = trappist
-INC = main.c fen.c
-OBJ = main.o fen.o
+INC = main.c fen.c board.c
+OBJ = main.o fen.o board.o
 FLAGS = -Wall -Wextra
 
 all: $(BIN)
