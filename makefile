@@ -1,7 +1,7 @@
 CXX = gcc
 BIN = trappist
-INC = main.c fen.c board.c
-OBJ = main.o fen.o board.o
+INC = main.c board.c move.c 
+OBJ = main.o board.o move.o
 FLAGS = -Wall -Wextra
 
 all: $(BIN)
@@ -14,4 +14,4 @@ main:
 
 
 clean:
-	rm *.o trappist.exe
+	rm -f *.o trappist

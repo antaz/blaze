@@ -1,20 +1,27 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
-/* A couple of constants for our chess engine */
+#include <stdbool.h>
+
+// A couple of constants for our chess engine
 
 #define NAME "Trappist"
-#define SQNUM 120 /* Number of squares on the board */
+#define SQNUM 120 // Number of squares on the board
 #define U64 unsigned long long
 
-enum { EMPTY, wP, wN, wB, wR, wQ, wK, bP, bN, bB, bR, bQ, bK }; /* Pieces */
 
-enum { FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H, FILE_NONE }; /* Files */
+//pieces
+enum { EMPTY, wP, wN, wB, wR, wQ, wK, bP, bN, bB, bR, bQ, bK }; 
 
-enum { RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8, RANK_NONE }; /* Ranks */
+// files
+enum { FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H, FILE_NONE };
 
-enum { WHITE, BLACK, BOTH }; /* Colors */
+// ranks
+enum { RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8, RANK_NONE };
+// colors
+enum { WHITE, BLACK, BOTH };
 
+// square numbers
 enum {
 	A1 = 21, B1, C1, D1, E1, F1, G1, H1,
 	A2 = 31, B2, C2, D2, E2, F2, G2, H2,
@@ -25,13 +32,12 @@ enum {
 	A7 = 81, B7, C7, D7, E7, F7, G7, H7,
 	A8 = 91, B8, C8, D8, E8, F8, G8, H8,
 	NO_SQ, OFFBOARD
-}; /* Square numbers */
+};
 
-enum { FALSE, TRUE }; /* Convenient boolean constants */
+// Castling permission constants
+enum { WKCA = 1, WQCA = 2, BKCA = 4, BQCA = 8 };
 
-enum { WKCA = 1, WQCA = 2, BKCA = 4, BQCA = 8 }; /* Castling permission constants */
-
-/* The main board structure for our chess engine */
+// The main board structure for our chess engine
 typedef struct {
 	int pieces[SQNUM];
 
@@ -43,4 +49,13 @@ typedef struct {
 
 } Board;
 
+typedef struct {
+	char from; // move from
+	char to; // move destination
+	char captured; // captured piece
+	char promoted; // promoted piece
+	bool enPassant; // en-passant flag 
+	bool pawnStart; // pawn start flag
+	bool castle; // castling flag
+} Move;
 #endif
