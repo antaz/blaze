@@ -110,6 +110,7 @@ void parseFEN(char *fen, Board *board) {
 
 		board->enPassant = FR2SQ120(file, rank);
 	}
+	updatePieceList(board);
 
 }
 
@@ -122,12 +123,32 @@ void clearBoard(Board *board) {
 	for(i = 0; i < 64; i++) {
 		board->pieces[SQ64TO120(i)] = EMPTY;
 	}
+	for(i = 0; i < 13; i++)
+		board->pieceCount[i] = 0;
+	
 	board->turn = 0;
 	board->ply = 0;
 	board->castling = 0;
 	board->enPassant = NO_SQ;
-	board->kingSq[WHITE] = board->kingSq[BLACK] = NO_SQ;
+	board->kingSquare[WHITE] = board->kingSquare[BLACK] = NO_SQ;
 	board->fiftyMove = 0;
+}
+
+// updating the piece counts and piece list
+void updatePieceList(Board *board) {
+	int piece, i;
+
+	for(i = 0; i < SQNUM; i++) {
+		piece = board->pieces[i];
+		if(piece != OFFBOARD && piece != EMPTY) {
+			board->pieceList[piece][board->pieceCount[piece]] = i;
+			board->pieceCount[piece]++;
+
+			if(piece == wK) board->kingSquare[WHITE] = i;
+			if(piece == bK) board->kingSquare[BLACK] = i;
+
+		}
+	}
 }
 
 // printing the board in std algebraic notation
@@ -149,4 +170,16 @@ void printBoardSAN(Board *board) {
 		for(file = FILE_A; file <= FILE_H; file++)
 			printf("%3c", 'a' + file);
 	printf("\n");
+}
+
+// printing the move list
+
+void printMoveList(MoveList *list) {
+	int i;
+	printf("\nMove list: \n");
+	for(i = 0; i < list->count; i++) {
+		printf("%d. ", i+1);
+		moveSAN(list->moves[i]);
+		printf("\n");
+		}
 }

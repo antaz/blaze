@@ -8,7 +8,7 @@
 #define NAME "Trappist"
 #define SQNUM 120 // Number of squares on the board
 #define U64 unsigned long long
-
+#define MAX 256
 
 //pieces
 enum { EMPTY, wP, wN, wB, wR, wQ, wK, bP, bN, bB, bR, bQ, bK }; 
@@ -40,8 +40,9 @@ enum { WKCA = 1, WQCA = 2, BKCA = 4, BQCA = 8 };
 // The main board structure for our chess engine
 typedef struct {
 	int pieces[SQNUM];
-
-	int kingSq[2];
+	int pieceCount[13]; // The count of pieces on the board
+	int pieceList[13][10]; // The squares of where pieces are
+	int kingSquare[2];
 	int turn, enPassant, fiftyMove;
 	int ply, castling;
 
@@ -58,4 +59,9 @@ typedef struct {
 	bool pawnStart; // pawn start flag
 	bool castle; // castling flag
 } Move;
+
+typedef struct {
+	Move moves[MAX];
+	int count;
+} MoveList;
 #endif
