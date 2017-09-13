@@ -25,11 +25,13 @@
 #define isKing(piece) (piece == 6 || piece == 12)
 #define pieceColor(piece) ((piece > 0 && piece <= 6) ? 0 : 1)
 #define isSlidePiece(piece) (isBishop(piece) | isRook(piece) | isQueen(piece))
+
 // board.c
 extern void clearBoard(Board *board);
 extern void printBoard(Board *board);
 extern void parseFEN(char *fen, Board *board);
 extern void updatePieceList(Board *board);
+
 // move.c
 extern void moveSAN(Move move);
 
@@ -39,4 +41,11 @@ extern void generateMoves(Board *board, MoveList *list);
 // makemove.c
 extern int makeMove(Board *board, Move move);
 extern void takeMove(Board *board);
+
+// evaluation.c
+extern int evaluate(Board *board);
+
+// search.c
+
+extern void search(Board *board);
 #endif

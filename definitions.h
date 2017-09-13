@@ -7,6 +7,7 @@
 #define SQNUM 120 // Number of squares on the board
 #define U64 unsigned long long
 #define MAX 256
+#define MAXDEPTH 64
 
 //pieces
 enum { EMPTY, wP, wN, wB, wR, wQ, wK, bP, bN, bB, bR, bQ, bK }; 
@@ -49,7 +50,7 @@ typedef struct {
 typedef struct {
 	Move move;
 	int castling, enPassant, fiftyMove;
-	U64 hashkey;
+	// U64 hashkey;
 } Undo;
 
 // The main board structure for our chess engine
@@ -60,8 +61,9 @@ typedef struct {
 	int kingSquare[2];
 	int turn, enPassant, fiftyMove;
 	int ply, hisPly, castling;
+	int material[2];
 	Undo history[MAX];
-	U64 hashKey;
+	// U64 hashKey;
 
 } Board;
 
@@ -69,4 +71,9 @@ typedef struct {
 	Move moves[MAX];
 	int count;
 } MoveList;
+
+typedef struct {
+	Move moves[MAXDEPTH];
+	int movesCount;
+} PvLine;
 #endif

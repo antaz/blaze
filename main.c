@@ -4,9 +4,9 @@
 
 void main() {
 	int i;
-	char *fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1";
+	char *fen = "2rr2k1/5pp1/5b2/pb1BqP1Q/8/1P5P/P5P1/3R3K w - - 3 39";
 	Board board[1];
 	MoveList list[1];
 	parseFEN(fen, board);
-	perftTest(board, 3);
+	search(board);
 }

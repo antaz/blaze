@@ -11,6 +11,9 @@
 #include "definitions.h"
 #include "functions.h"
 
+// value of various pieces (needed to set the material)
+int pieceValue[13] = { 0, 100, 325, 325, 550, 1000, 50000, 100, 325, 325, 550, 1000, 50000 };
+
 // parsing an FEN string 
 void parseFEN(char *fen, Board *board) {
 	int rank = RANK_8;
@@ -136,14 +139,15 @@ void clearBoard(Board *board) {
 
 // updating the piece counts and piece list
 void updatePieceList(Board *board) {
-	int piece, i;
+	int piece, color, i;
 
 	for(i = 0; i < SQNUM; i++) {
 		piece = board->pieces[i];
 		if(piece != OFFBOARD && piece != EMPTY) {
+			color = pieceColor(piece);
 			board->pieceList[piece][board->pieceCount[piece]] = i;
 			board->pieceCount[piece]++;
-
+			board->material[color] += pieceValue[piece];
 			if(piece == wK) board->kingSquare[WHITE] = i;
 			if(piece == bK) board->kingSquare[BLACK] = i;
 

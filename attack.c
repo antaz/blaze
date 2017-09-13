@@ -9,7 +9,7 @@ const int rookDir[4] = { -1, -10, 1, 10 };
 const int bishopDir[4] = { -9, -11, 11, 9 };
 const int kingDir[8] = { -1, -10, 1, 10, -9, -11, 11, 9 };
 
-bool isAttacked(int square, Board *board, int turn) {
+int isAttacked(int square, Board *board, int turn) {
 	int i, piece, t_square, dir;
 	assert(square != OFFBOARD);
 	assert(turn == WHITE || turn == BLACK);
@@ -17,10 +17,10 @@ bool isAttacked(int square, Board *board, int turn) {
 	// Checking pawn attacks	
 	if(turn == WHITE) {
 		if(board->pieces[square - 11] == wP || board->pieces[square - 9] == wP)
-			return true;
+			return 1;
 	} else {
 		if(board->pieces[square + 11] == bP || board->pieces[square + 9] == bP)
-			return true;
+			return 1;
 		
 	}
 	// Checking knight attacks
@@ -28,7 +28,7 @@ bool isAttacked(int square, Board *board, int turn) {
 	for(i = 0; i < 8; i++) {
 		piece = board->pieces[square + knightDir[i]];
 		if(piece != OFFBOARD && isKnight(piece) && pieceColor(piece) == turn)
-			return true;
+			return 1;
 	}
 	
 	// Checking Rooks and Queens attacks
@@ -39,7 +39,7 @@ bool isAttacked(int square, Board *board, int turn) {
 		while(piece != OFFBOARD) {
 			if(piece != EMPTY) {
 				if((isRook(piece) || isQueen(piece)) && pieceColor(piece) == turn) {
-					return true;
+					return 1;
 				}
 				break;
 			}
@@ -56,7 +56,7 @@ bool isAttacked(int square, Board *board, int turn) {
 		while(piece != OFFBOARD) {
 			if(piece != EMPTY) {
 				if((isBishop(piece) || isQueen(piece)) && pieceColor(piece) == turn) {
-					return true;
+					return 1;
 				}
 				break;
 			}
@@ -69,10 +69,10 @@ bool isAttacked(int square, Board *board, int turn) {
 	for(i = 0; i < 8; i++) {
 		piece = board->pieces[square + kingDir[i]];
 		if(piece != OFFBOARD && isKing(piece) && pieceColor(piece) == turn) {
-			return true;
+			return 1;
 		}
 	}
 
-	return false;
+	return 0;
 
 }
