@@ -1,8 +1,6 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
-#include <stdbool.h>
-
 // A couple of constants for our chess engine
 
 #define NAME "Trappist"
@@ -37,6 +35,23 @@ enum {
 // Castling permission constants
 enum { WKCA = 1, WQCA = 2, BKCA = 4, BQCA = 8 };
 
+typedef struct {
+	char from; // move from
+	char to; // move destination
+	char captured; // captured piece
+	char promoted; // promoted piece
+	char enPassant; // en-passant flag 
+	char pawnStart; // pawn start flag
+	char castle; // castling flag
+} Move;
+
+// The undo move sturcture
+typedef struct {
+	Move move;
+	int castling, enPassant, fiftyMove;
+	U64 hashkey;
+} Undo;
+
 // The main board structure for our chess engine
 typedef struct {
 	int pieces[SQNUM];
@@ -44,21 +59,11 @@ typedef struct {
 	int pieceList[13][10]; // The squares of where pieces are
 	int kingSquare[2];
 	int turn, enPassant, fiftyMove;
-	int ply, castling;
-
+	int ply, hisPly, castling;
+	Undo history[MAX];
 	U64 hashKey;
 
 } Board;
-
-typedef struct {
-	char from; // move from
-	char to; // move destination
-	char captured; // captured piece
-	char promoted; // promoted piece
-	bool enPassant; // en-passant flag 
-	bool pawnStart; // pawn start flag
-	bool castle; // castling flag
-} Move;
 
 typedef struct {
 	Move moves[MAX];

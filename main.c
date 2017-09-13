@@ -8,7 +8,5 @@ void main() {
 	Board board[1];
 	MoveList list[1];
 	parseFEN(fen, board);
-	printBoardSAN(board);
-	generateMoves(board, list);
-	printMoveList(list);
+	perftTest(board, 3);
 }

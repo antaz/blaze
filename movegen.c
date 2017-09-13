@@ -6,8 +6,7 @@
 #include "definitions.h"
 #include "functions.h"
 
-// {empty, wp, wn, wb, wr, wq, wk, bp, bn, bb, br, bq, bk}
-
+// direction of pieces
 int pieceDirs[13][8] = {
 	{ 0, 0, 0, 0, 0, 0, 0 },
 	{ 0, 0, 0, 0, 0, 0, 0 },
@@ -23,12 +22,14 @@ int pieceDirs[13][8] = {
 	{ -1, -10,1, 10, -9, -11, 11, 9 },
 	{ -1, -10,1, 10, -9, -11, 11, 9 }
 };
+// number of directions of each pieces (used with pieceDirs)
 int numDirs[13] = { 0, 0, 8, 4, 4, 8, 8, 0, 8, 4, 4, 8, 8 };
 
+// slider pieces and non-slider pieces used in the loop to generate moves
 int sliderPieces[8] = {wB, wR, wQ, 0, bB, bR, bQ, 0};
 int nonSliderPieces[6] = {wN, wK, 0, bN, bK, 0};
 
-// add move to list of moves
+// add move to list of moves (if pawn then addPawnMove())
 void addMove(MoveList *list, char from, char to, char captured, char promoted, bool enPassant, bool pawnStart, bool castle) {
 	Move move;
 	move.from = from;
@@ -41,7 +42,7 @@ void addMove(MoveList *list, char from, char to, char captured, char promoted, b
 	list->moves[list->count] = move;
 	list->count++;
 }
-
+// adding a pawn move
 void addPawnMove(Board *board, MoveList *list, char from, char to, char captured, bool enPassant, bool pawnStart, bool castle) {
 	// checking for promotion
 	if(board->pieces[from] == wP && RANK120(from) == RANK_7) {
@@ -58,8 +59,11 @@ void addPawnMove(Board *board, MoveList *list, char from, char to, char captured
 		addMove(list, from, to, captured, EMPTY, enPassant, pawnStart, castle);
 	}
 }
-// TODO later, give different scoring to quiet, capture and enpassant moves by means of routines 
+// TODO later, give different scoring to quiet and capture moves
+
 void generateMoves(Board *board, MoveList *list) {
+	
+	// setting some variables
 	list->count = 0;
 	int piece = EMPTY;
 	int turn = board->turn;
@@ -69,6 +73,7 @@ void generateMoves(Board *board, MoveList *list) {
 	int index;
 	int dir;
 	int targetSquare;
+	
 	// generating pawn moves
 	if(turn == WHITE) {
 		// Adding white pawn moves
@@ -205,20 +210,3 @@ void generateMoves(Board *board, MoveList *list) {
 		piece = nonSliderPieces[pieceIndex++];
 	}
 }
-
-/* int * vector = dirs[<piece>];
-
-while (*vector != 0) {
-    int nextsq = currsq + *vector;
-    
-    while (board[nextsq] != OFFBOARD) {
-        AddMove(currsq, nextsq, <whatever>);
-        
-        if (board[nextsq] != EMPTY || !slide[<piece>]) 
-            break;
-        
-        nextsq += *vector;
-    }
-    
-    *vector++;
-} */

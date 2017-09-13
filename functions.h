@@ -35,4 +35,8 @@ extern void moveSAN(Move move);
 
 // movegen.c
 extern void generateMoves(Board *board, MoveList *list);
+
+// makemove.c
+extern int makeMove(Board *board, Move move);
+extern void takeMove(Board *board);
 #endif
