@@ -64,7 +64,7 @@ void search(Board *board) {
 	for(currentDepth = 0; currentDepth <= depth; currentDepth++) {
 		bestScore = alphaBeta(-INFINITE, INFINITE, currentDepth, board, line);
 	}
-	printf("\Moves in PV table: \n");
+	printf("\nMoves in PV table: \n");
 	for(i = 0; i < line->movesCount; i++) {
 		moveSAN(line->moves[i]);
 		printf(" ");

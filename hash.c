@@ -51,3 +51,67 @@ U64 generateHash(Board *board) {
 
 	return zobrist;
 }
+
+// initialization of TT
+
+const int TTSize = 0x100000 * 2;
+
+void clearTTable(TTable *table) {
+	TTEntry *entry;
+	for(entry = table->table; entry < table->table + table->size; entry++) {
+		entry->zobristHash = 0ULL;
+		entry->depth = 0;
+		entry->score = 0;
+		entry->flags = 0;
+	}
+	table->newWrite = 0;
+}
+void initTTable(TTable *table) {
+	table->size = TTSize / sizeof(TTEntry);
+	table->size -= 2;
+	if(table->table != NULL) {
+		free(table->table);
+	}
+	table->table = (TTEntry *) malloc(table->size * sizeof(TTEntry));
+	clearTTable(table);
+	printf("init of TTable complete with %d entries\n", table->size);
+}
+
+void probeTable(Board *board, Move move, int *score, int alpha, int beta, int depth) {
+	int index = board->zobristHash % board->table->size;
+	
+	if(board->table->table[index].zobristHash == board->zobristHash) {
+		move = board->table->table[index].move;
+		if(board->table->table[index].depth >= depth) {
+			board->table->hit++;
+			*score = board->table->table[index].score;
+			
+			switch(board->table->table[index].flags) {
+				case HFALPHA: if(*score <= alpha) {
+						*score = alpha;
+						return 1;
+					}
+				break;
+				case HFBETA: if(*score >= beta) {
+						*score = beta;
+						return 1;
+					}
+				break;
+				case HFEXACT: return 1; break;
+				default: break;
+
+			}
+		}
+	}
+	
+	return 0;
+}
+
+void storeTable(Board *board, Move move, int score, int flags, int depth) {
+	int index = board->zobristHash % board->table->size;
+	board->table->table[index].move = move;
+	board->table->table[index].score = score;
+	board->table->table[index].depth = depth;
+	board->table->table[index].flags = flags;
+	board->table->table[index].zobristHash = board->zobristHash;
+}

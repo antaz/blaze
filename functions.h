@@ -53,4 +53,8 @@ extern void search(Board *board);
 
 extern void initZobrist();
 extern void setBoardHash(Board *board);
+extern void initTTable(TTable *table);
+extern void probeTable(Board *board, Move move, int *score, int alpha, int beta, int depth);
+extern void storeTable(Board *board, Move move, int score, int flags, int depth);
+
 #endif

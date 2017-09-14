@@ -36,6 +36,9 @@ enum {
 // Castling permission constants
 enum { WKCA = 1, WQCA = 2, BKCA = 4, BQCA = 8 };
 
+// TT entry flags
+enum {HFNONE, HFALPHA, HFBETA, HFEXACT};
+
 typedef struct {
 	char from; // move from
 	char to; // move destination
@@ -53,6 +56,20 @@ typedef struct {
 	U64 zobristHash;
 } Undo;
 
+// Transposition Table entry
+typedef struct {
+	Move move;
+	int score, depth, flags;
+	U64 zobristHash;
+} TTEntry;
+
+// Transposition table
+typedef struct {
+	TTEntry *table;
+	int newWrite, overWrite, hit, cut;
+	U64 size;
+} TTable;
+
 // The main board structure for our chess engine
 typedef struct {
 	int pieces[SQNUM];
@@ -64,14 +81,24 @@ typedef struct {
 	int material[2];
 	Undo history[MAX];
 	U64 zobristHash;
+	TTable table[1];
 
 } Board;
 
+// search driver
+typedef struct {
+	int startTime, stopTime, depth, timeSet, movesToGo;
+	Board root[1];
+	long nodes;
+} Search;
+
+// Move list sructure and store the generated moves
 typedef struct {
 	Move moves[MAX];
 	int count;
 } MoveList;
 
+// principal variation  structure
 typedef struct {
 	Move moves[MAXDEPTH];
 	int movesCount;
