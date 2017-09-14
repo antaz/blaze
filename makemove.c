@@ -2,6 +2,13 @@
 #include "definitions.h"
 #include "functions.h"
 
+#define HASH_PIECE(piece, square) (board->zobristHash ^= (pieceHash[piece][square]))
+#define HASH_CASTLE (board->zobristHash ^= (castleHash[board->castling]))
+#define HASH_TURN (board->zobristHash ^= turnHash)
+#define HASH_EP (board->zobristHash ^= (pieceHash[EMPTY][board->enPassant]))
+
+
+// for updating castling permissions
 const int castlePerm[120] = {
 	15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
 	15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
@@ -22,6 +29,9 @@ static void clearPiece(Board *board, int square) {
 	int index = 0;
 	int pieceNum = -1;
 	
+	// hashing the piece out
+	HASH_PIECE(piece, square);
+	
 	// removing the piece from the board->pieces
 	board->pieces[square] = EMPTY;
 	
@@ -40,6 +50,9 @@ static void clearPiece(Board *board, int square) {
 
 static void addPiece(Board *board, int square, int piece) {
 	
+	// Hashing the piece in
+	HASH_PIECE(piece, square);
+
 	// adding the piece to the board->pieces
 	board->pieces[square] = piece;
 	// adding the piece to the board->pieceList
@@ -50,11 +63,17 @@ static void movePiece(Board *board, int from, int to) {
 	int index = 0;
 	int piece = board->pieces[from];
 	
+	// Hashing the piece out of from
+	HASH_PIECE(piece, from);
+	
         // remove piece from and it to to
 	board->pieces[from] = EMPTY;
-	board->pieces[to] = piece;
 	
-	// move the piece from -> to in the board->pieceList
+	// Hashing the piece in to to
+	HASH_PIECE(piece, to);
+	
+	// move the piece from -> to into the pieceList
+	board->pieces[to] = piece;
 	for(index = 0; index < board->pieceCount[piece]; index++) {
 		if(board->pieceList[piece][index] == from) {
 			board->pieceList[piece][index] = to;
@@ -71,6 +90,9 @@ int makeMove(Board *board, Move move) {
 	int captured = move.captured;
 	int promoted = move.promoted;
 	int turn = board->turn;
+	
+	// save the hash in the history structure
+	board->history[board->hisPly].zobristHash = board->zobristHash;
 	
 	// if enpassant move remove the pawn captured
 	if(move.enPassant) {
@@ -90,6 +112,10 @@ int makeMove(Board *board, Move move) {
 		}
 	}
 	
+	// Hashing enpassant square and castling
+	if(board->enPassant != NO_SQ) HASH_EP;
+	HASH_CASTLE;
+	
 	// updating the history array with history information
 	board->history[board->hisPly].move = move;
 	board->history[board->hisPly].fiftyMove = board->fiftyMove;
@@ -99,6 +125,10 @@ int makeMove(Board *board, Move move) {
 	// changing the castling permission after a castle is made
 	board->castling &= castlePerm[from];
 	board->castling &= castlePerm[to];
+
+	// Hashing castling and incrementing the fiftymove counter
+	HASH_CASTLE;
+	board->fiftyMove++;
 	
 	// resetting the enpassant square
 	board->enPassant = NO_SQ;
@@ -121,6 +151,8 @@ int makeMove(Board *board, Move move) {
 			} else {
 				board->enPassant = from - 10;
 			}
+			// hashing in ep
+			HASH_EP;
 		}
 	}
 	
@@ -140,6 +172,9 @@ int makeMove(Board *board, Move move) {
 	
 	// switch turn
 	board->turn ^= 1;
+	
+	// Hash turn
+	HASH_TURN;
 
 	// if in check take back the move
 	if(isAttacked(board->kingSquare[turn], board, board->turn)){
@@ -156,6 +191,9 @@ void takeMove(Board *board) {
 	board->hisPly--;
 	board->ply--;
 	
+	if(board->enPassant != NO_SQ) HASH_EP;
+	HASH_CASTLE;
+	
 	// setting the history move variables
 	Move move = board->history[board->hisPly].move;
 	int from = move.from;
@@ -167,10 +205,14 @@ void takeMove(Board *board) {
 	board->castling = board->history[board->hisPly].castling;
 	board->fiftyMove = board->history[board->hisPly].fiftyMove;
 	board->enPassant = board->history[board->hisPly].enPassant;
-
+	
+	if(board->enPassant != NO_SQ) HASH_EP;
+	HASH_CASTLE;
+	
 	// switch the turn
 	board->turn ^= 1;
-
+	HASH_TURN;
+	
 	// if enpassant add the pawn back
 	if(move.enPassant) {
 		if(board->turn == WHITE) {

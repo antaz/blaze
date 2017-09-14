@@ -48,4 +48,9 @@ extern int evaluate(Board *board);
 // search.c
 
 extern void search(Board *board);
+
+// hash.c
+
+extern void initZobrist();
+extern void setBoardHash(Board *board);
 #endif

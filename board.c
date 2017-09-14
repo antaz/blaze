@@ -114,7 +114,7 @@ void parseFEN(char *fen, Board *board) {
 		board->enPassant = FR2SQ120(file, rank);
 	}
 	updatePieceList(board);
-
+	board->zobristHash = generateHash(board);
 }
 
 // clearing the board function
@@ -174,6 +174,9 @@ void printBoardSAN(Board *board) {
 		for(file = FILE_A; file <= FILE_H; file++)
 			printf("%3c", 'a' + file);
 	printf("\n");
+	printf("Turn: %d\n", board->turn);
+	printf("Castle: %d\n", board->castling);
+	printf("Zobrist Hash: %x\n", board->zobristHash);
 }
 
 // printing the move list
@@ -185,5 +188,5 @@ void printMoveList(MoveList *list) {
 		printf("%d. ", i+1);
 		moveSAN(list->moves[i]);
 		printf("\n");
-		}
+	}
 }

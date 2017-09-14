@@ -50,7 +50,7 @@ typedef struct {
 typedef struct {
 	Move move;
 	int castling, enPassant, fiftyMove;
-	// U64 hashkey;
+	U64 zobristHash;
 } Undo;
 
 // The main board structure for our chess engine
@@ -63,7 +63,7 @@ typedef struct {
 	int ply, hisPly, castling;
 	int material[2];
 	Undo history[MAX];
-	// U64 hashKey;
+	U64 zobristHash;
 
 } Board;
 
@@ -76,4 +76,8 @@ typedef struct {
 	Move moves[MAXDEPTH];
 	int movesCount;
 } PvLine;
+
+extern U64 pieceHash[13][120];
+extern U64 turnHash;
+extern U64 castleHash[16];
 #endif
