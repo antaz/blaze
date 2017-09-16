@@ -3,9 +3,8 @@
 #include "definitions.h"
 #include "functions.h"
 
-void parseMove(Board *board, char *move, Move move) {
+int parseMove(Board *board, char *move, Move *m) {
 	int from, to;
-	Move m;
 	int moveNum = 0, Move = 0, promoted = EMPTY;
 	MoveList list[1];
 
@@ -19,25 +18,30 @@ void parseMove(Board *board, char *move, Move move) {
 	
 	generateMoves(board, list);
 	for(moveNum = 0; moveNum < list->count; moveNum++) {
-		m = list->moves[moveNum];
-		if(m.from == from && m.to == to) {
-			promoted = m.promoted;
+		m->from = list->moves[moveNum].from;
+		m->to = list->moves[moveNum].to;
+		m->captured = list->moves[moveNum].captured;	
+		m->promoted = list->moves[moveNum].promoted;
+		m->enPassant = list->moves[moveNum].enPassant;
+		m->pawnStart = list->moves[moveNum].pawnStart;
+		m->castle = list->moves[moveNum].castle;
+		if(m->from == from && m->to == to) {
+			promoted = m->promoted;
 			if(promoted != EMPTY) {
 				if(isRook(promoted) && move[4] == 'r') {
-					return m;
+					return 1;
 				} else if(isBishop(promoted) && move[4] == 'b') {
-					return m;
+					return 1;
 				} else if(isQueen(promoted) && move[4] == 'q') {
-					return m;
+					return 1;
 				} else if(isKnight(promoted) && move[4] == 'n') {
-					return m;
+					return 1;
 				}
 				continue;
 			}
 			return 1;
 		}
 	}
-	
 	return 0;
 }
 

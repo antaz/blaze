@@ -101,8 +101,8 @@ typedef struct {
 // principal variation  structure
 typedef struct {
 	Move moves[MAXDEPTH];
-	int movesCount;
-} PvLine;
+	int count;
+} PV;
 
 extern U64 pieceHash[13][120];
 extern U64 turnHash;

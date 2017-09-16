@@ -77,11 +77,17 @@ void initTTable(TTable *table) {
 	printf("init of TTable complete with %d entries\n", table->size);
 }
 
-void probeTable(Board *board, Move move, int *score, int alpha, int beta, int depth) {
+int probeTable(Board *board, Move *move, int *score, int alpha, int beta, int depth) {
 	int index = board->zobristHash % board->table->size;
 	
 	if(board->table->table[index].zobristHash == board->zobristHash) {
-		move = board->table->table[index].move;
+		move->from = board->table->table[index].move.from;
+		move->to = board->table->table[index].move.to;
+		move->captured = board->table->table[index].move.captured;	
+		move->promoted = board->table->table[index].move.promoted;
+		move->enPassant = board->table->table[index].move.enPassant;
+		move->pawnStart = board->table->table[index].move.pawnStart;
+		move->castle = board->table->table[index].move.castle;		
 		if(board->table->table[index].depth >= depth) {
 			board->table->hit++;
 			*score = board->table->table[index].score;

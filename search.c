@@ -2,73 +2,77 @@
 #include "definitions.h"
 #include "functions.h"
 
-#define INFINITE 99999
+#define MATE 99999
 static int quiscence(int alpha, int beta, int depth, Board *board) { return 0; }
 
-static int alphaBeta(int alpha, int beta, int depth, Board *board, PvLine *pLine) {
+static int alphaBeta(int alpha, int beta, int depth, Board *board, PV *pv) {
 
 	Move bestMove;
-	int bestScore = -INFINITE;
-	int score = -INFINITE;
-	PvLine line;
+	int bestScore = -2*MATE;
+	int score = -2*MATE;
+	PV childpv;
 	int moveNum = 0;
 	int legal = 0;
 	int inCheck;
 	
 	if(depth == 0) {
-		pLine->movesCount = 0;
+		pv->count = 0;
 		return evaluate(board);
 	}
 	
 	MoveList list[1];
 	generateMoves(board, list);
-	
 	inCheck = isAttacked(board->kingSquare[board->turn], board, board->turn ^ 1);
 	
 	for(moveNum = 0; moveNum < list->count; moveNum++) {
+		
 		if(!makeMove(board, list->moves[moveNum])) {
 			continue;
 		}
+
 		legal++;
-		score = -alphaBeta(-beta, -alpha, depth - 1, board, &line);
+		score = -alphaBeta(-beta, -alpha, depth - 1, board, &childpv);
 		takeMove(board);
 		
-		if(score >= beta) return beta;
-		if(score > alpha) {
-			alpha = score;
-			pLine->moves[0] = list->moves[moveNum];
-			memcpy(pLine->moves + 1, line.moves, line.movesCount * sizeof(Move));
-			pLine->movesCount = line.movesCount + 1;
+		if(score > bestScore) {
+			if(score > alpha) {
+				if(score >= beta) return beta;
+				alpha = score;
+				pv->moves[0] = list->moves[moveNum];
+				memcpy(pv->moves + 1, childpv.moves, childpv.count * sizeof(Move));
+				pv->count = childpv.count + 1;
+				
+			}
+			bestScore = score;
+			bestMove = list->moves[moveNum];
 		}
 	}
 	
 	if(legal == 0) {
 		if(inCheck) {
-			return -INFINITE + board->ply;
+			return -MATE + board->ply;
 		} else {
 			return 0;
 		}
 	}
 	
+	storeTable(board, bestMove, bestScore, HFEXACT, depth);
 	return alpha;
 
 }
 
-void search(Board *board) {
+void search(Board *board, PV *pv) {
 
-	PvLine line[1];
+	PV *line;
 	int i;
 	int depth = 4;
-	int bestScore = -INFINITE;
+	int alpha, beta, score;
+	
+	alpha = -2*MATE;
+	beta = +2*MATE;
 	int currentDepth = 0;
-	for(currentDepth = 0; currentDepth <= depth; currentDepth++) {
-		bestScore = alphaBeta(-INFINITE, INFINITE, currentDepth, board, line);
-	}
-	printf("\nMoves in PV table: \n");
-	for(i = 0; i < line->movesCount; i++) {
-		moveSAN(line->moves[i]);
-		printf(" ");
-	}
-	printf("\nScore is: %d\n", bestScore);
 
+	for(currentDepth = 0; currentDepth <= depth; currentDepth++) {
+		score = alphaBeta(alpha, beta, currentDepth, board, pv);
+	}
 }

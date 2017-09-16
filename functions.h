@@ -31,6 +31,7 @@ extern void clearBoard(Board *board);
 extern void printBoard(Board *board);
 extern void parseFEN(char *fen, Board *board);
 extern void updatePieceList(Board *board);
+extern void printPV(PV *pv);
 
 // move.c
 extern void moveSAN(Move move);
@@ -47,14 +48,14 @@ extern int evaluate(Board *board);
 
 // search.c
 
-extern void search(Board *board);
+extern void search(Board *board, PV *pv);
 
 // hash.c
 
 extern void initZobrist();
 extern void setBoardHash(Board *board);
 extern void initTTable(TTable *table);
-extern void probeTable(Board *board, Move move, int *score, int alpha, int beta, int depth);
+extern int probeTable(Board *board, Move *move, int *score, int alpha, int beta, int depth);
 extern void storeTable(Board *board, Move move, int score, int flags, int depth);
 
 #endif

@@ -4,12 +4,14 @@
 
 void main() {
 	int i;
-	char *fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+	char *fen = "2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - -";
 	Board board[1];
 	Move move;
+	int score;
 	initZobrist();
 	board->table->table = NULL;
 	MoveList list[1];
+	PV pv;
 	parseFEN(fen, board);
 	initTTable(board->table);
 	
@@ -24,9 +26,13 @@ void main() {
 			break;
 		} else if(input[0] == 't') {
 			takeMove(board);
+		} else if (input[0] == 's') {
+			search(board, &pv);
+			printPV(&pv);
 		} else {
-			parseMove(board, input);
-			moveSAN(move);
+			if(parseMove(board, input, &move)) {
+				makeMove(board, move);
+			}
 		}
 
 		fflush(stdin);

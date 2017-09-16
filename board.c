@@ -190,3 +190,16 @@ void printMoveList(MoveList *list) {
 		printf("\n");
 	}
 }
+
+// printing PV table
+
+void printPV(PV *pv) {
+	int i;
+		
+	for(i = 0; i < pv->count; i++) {
+		printf("%d. ", i+1);
+		moveSAN(pv->moves[i]);
+		printf(" ");
+	}	
+
+}
