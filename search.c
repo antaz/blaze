@@ -50,11 +50,11 @@ static int alphaBeta(int alpha, int beta, int depth, Board *board, PV *pv) {
 	
 	if(legal == 0) {
 		if(inCheck) {
+			pv->count = 0;
 			return -MATE + board->ply;
-			pv->count = 0;
 		} else {
-			return 0;
 			pv->count = 0;
+			return 0;
 		}
 	}
 	
