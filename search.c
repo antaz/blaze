@@ -64,16 +64,18 @@ static int alphaBeta(int alpha, int beta, int depth, Board *board, PV *pv) {
 
 void search(Board *board, PV *pv) {
 
-	PV *line;
 	int i;
 	int depth = 4;
 	int alpha, beta, score;
 	
 	alpha = -2*MATE;
 	beta = +2*MATE;
-	int currentDepth = 0;
+	int currentDepth;
 
-	for(currentDepth = 0; currentDepth <= depth; currentDepth++) {
+	for(currentDepth = 1; currentDepth <= depth; currentDepth++) {
 		score = alphaBeta(alpha, beta, currentDepth, board, pv);
+		printf("depth: %d, score: %d ", currentDepth, score);
+		printPV(pv);
+		printf("\n");
 	}
 }
