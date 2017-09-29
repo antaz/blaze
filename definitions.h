@@ -8,6 +8,7 @@
 #define U64 unsigned long long
 #define MAX 256
 #define MAXDEPTH 64
+#define START_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 //pieces
 enum { EMPTY, wP, wN, wB, wR, wQ, wK, bP, bN, bB, bR, bQ, bK }; 
@@ -87,8 +88,8 @@ typedef struct {
 
 // search driver
 typedef struct {
-	int startTime, stopTime, depth, timeSet, movesToGo;
-	Board root[1];
+	long long starttime, stoptime; 
+	int depth, timeset, movestogo, infinite, stop;
 	long nodes;
 } Search;
 

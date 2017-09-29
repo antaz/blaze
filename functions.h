@@ -49,7 +49,7 @@ extern int evaluate(Board *board);
 
 // search.c
 
-extern void search(Board *board, PV *pv);
+void search(Board *board, Search *search, PV *pv);
 
 // hash.c
 
@@ -59,4 +59,8 @@ extern void initTTable(TTable *table);
 extern int probeTable(Board *board, Move *move, int *score, int alpha, int beta, int depth);
 extern void storeTable(Board *board, Move move, int score, int flags, int depth);
 
+// uci.c
+
+extern void uci_loop(Board *board);
+extern long long current_timestamp();
 #endif

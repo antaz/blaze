@@ -12,10 +12,10 @@ void main() {
 	initZobrist();
 	board->table->table = NULL;
 	MoveList list[1];
-	PV pv;
+	//PV pv;
 	parseFEN(fen, board);
 	initTTable(board->table);
-	
+	/*
 	char input[6];
 	
 	while(1) {
@@ -37,5 +37,6 @@ void main() {
 		}
 
 		fflush(stdin);
-	}
+	}*/
+	uci_loop(board);
 }
