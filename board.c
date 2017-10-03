@@ -12,7 +12,7 @@
 #include "functions.h"
 
 // value of various pieces (needed to set the material)
-int pieceValue[13] = { 0, 100, 325, 325, 550, 1000, 50000, 100, 325, 325, 550, 1000, 50000 };
+int pieceValue[13] = { 0, 100, 320, 330, 500, 900, 20000, 100, 320, 330, 500, 900, 20000 };
 
 // parsing an FEN string 
 void parseFEN(char *fen, Board *board) {
@@ -131,10 +131,12 @@ void clearBoard(Board *board) {
 	
 	board->turn = 0;
 	board->ply = 0;
+	board->hisPly = 0;
 	board->castling = 0;
 	board->enPassant = NO_SQ;
 	board->kingSquare[WHITE] = board->kingSquare[BLACK] = NO_SQ;
 	board->fiftyMove = 0;
+	board->material[WHITE] = board->material[BLACK] = 0;
 }
 
 // updating the piece counts and piece list
@@ -156,7 +158,7 @@ void updatePieceList(Board *board) {
 }
 
 // printing the board in std algebraic notation
-void printBoardSAN(Board *board) {
+void printBoard(Board *board) {
 	int file, rank, sq, piece;
 	char pieceChar[] = ".PNBRQKpnbrqk";
 
@@ -186,7 +188,7 @@ void printMoveList(MoveList *list) {
 	printf("\nMove list: \n");
 	for(i = 0; i < list->count; i++) {
 		printf("%d. ", i+1);
-		moveSAN(list->moves[i]);
+		printMove(list->moves[i]);
 		printf("\n");
 	}
 }
@@ -197,7 +199,7 @@ void printPV(PV *pv) {
 	int i;
 		
 	for(i = 0; i < pv->count; i++) {
-		moveSAN(pv->moves[i]);
+		printMove(pv->moves[i]);
 		printf(" ");
 	}	
 

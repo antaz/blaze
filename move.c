@@ -45,7 +45,7 @@ int parseMove(Board *board, char *move, Move *m) {
 	return 0;
 }
 
-void moveSAN(Move move) {
+void printMove(Move move) {
 	char *pieces = ".pnbrq";
 	int promoted = move.promoted;
 	assert(move.from != OFFBOARD);

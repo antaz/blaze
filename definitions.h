@@ -4,6 +4,7 @@
 // A couple of constants for our chess engine
 
 #define NAME "Trappist"
+#define AUTHOR "Antar Azri"
 #define SQNUM 120 // Number of squares on the board
 #define U64 unsigned long long
 #define MAX 256
@@ -41,13 +42,13 @@ enum { WKCA = 1, WQCA = 2, BKCA = 4, BQCA = 8 };
 enum {HFNONE, HFALPHA, HFBETA, HFEXACT};
 
 typedef struct {
-	char from; // move from
-	char to; // move destination
-	char captured; // captured piece
-	char promoted; // promoted piece
-	char enPassant; // en-passant flag 
-	char pawnStart; // pawn start flag
-	char castle; // castling flag
+	unsigned char from; // move from
+	unsigned char to; // move destination
+	unsigned char captured; // captured piece
+	unsigned char promoted; // promoted piece
+	unsigned char enPassant; // en-passant flag 
+	unsigned char pawnStart; // pawn start flag
+	unsigned char castle; // castling flag
 } Move;
 
 // The undo move sturcture

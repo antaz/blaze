@@ -4,7 +4,7 @@
 #include "functions.h"
 #include <sys/time.h>
 
-#define INPUTBUFFER 400
+#define INPUTBUFFER 1000
 
 long long current_timestamp() {
     struct timeval te; 
@@ -12,9 +12,8 @@ long long current_timestamp() {
     return te.tv_sec * 1000LL + te.tv_usec/1000; // caculate milliseconds
 }
 
-void go(Board *board, char * line) {
+void go(Board *board, Search *s, char * line) {
 	PV pv;
-	Search s[1];
 	s->nodes = 0;
 	s->stop = 0;
 	
@@ -59,9 +58,8 @@ void go(Board *board, char * line) {
 	if(depth == -1)
 		s->depth = MAXDEPTH;
 
-	printf("time:%d start:%lld stop:%lld depth:%d timeset:%d\n",
-		time, s->starttime, s->stoptime, s->depth, s->timeset);
-	
+	printf("time:%d start:%lld stop:%lld depth:%d timeset:%d\n",time, s->starttime, s->stoptime, s->depth, s->timeset);
+		
 	search(board, s, &pv);
 }
 
@@ -99,15 +97,12 @@ void position(char *lineIn, Board *board) {
 	}
 	//printBoardSAN(board);
 }
-void uci_loop(Board *board) {
-	setbuf(stdin, _IONBF);
-	setbuf(stdout, _IONBF);
-	
+void uci_loop(Board *board, Search *search) {
+
+	setbuf(stdin, NULL);
+	setbuf(stdout, NULL);
+
 	char line[INPUTBUFFER];
-	printf("id name Trappist\n");
-	printf("id author Antar Azri\n");
-	printf("uci ok\n");
-	
 	while(1) {
 		memset(&line[0], 0, sizeof(line));
 		fflush(stdout);
@@ -123,12 +118,14 @@ void uci_loop(Board *board) {
 		} else if (!strncmp(line, "ucinewgame", 10)) {
 			position("position startpos\n", board);
 		} else if (!strncmp(line, "go", 2)) {
-			go(board, line);
+			go(board, search, line);
 		} else if (!strncmp(line, "quit", 4)) {
 			break;
+		} else if (!(strncmp(line, "stop", 4))) {
+			search->stop = 1;
 		} else if (!strncmp(line, "uci", 3)) {
-			printf("id name Trappist\n");
-			printf("id author Antar Azri\n");
+			printf("id name %s\n", NAME);
+			printf("id author %s\n", AUTHOR);
 			printf("uciok\n");
 		}
 	}	

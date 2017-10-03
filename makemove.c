@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "definitions.h"
 #include "functions.h"
+#include "assert.h"
 
 #define HASH_PIECE(piece, square) (board->zobristHash ^= (pieceHash[piece][square]))
 #define HASH_CASTLE (board->zobristHash ^= (castleHash[board->castling]))
@@ -24,16 +25,24 @@ const int castlePerm[120] = {
 	15, 15, 15, 15, 15, 15, 15, 15, 15, 15
 };
 
+// piece values
+const int piece_values[13] = { 0, 100, 320, 330, 500, 900, 20000, 100, 320, 330, 500, 900, 20000 };
+
 static void clearPiece(Board *board, int square) {
 	int piece = board->pieces[square];
+	int colour = pieceColor(piece);
 	int index = 0;
 	int pieceNum = -1;
 	
+	assert(onBoard(square));
+	assert(pieceValid(piece));	
 	// hashing the piece out
 	HASH_PIECE(piece, square);
 	
 	// removing the piece from the board->pieces
 	board->pieces[square] = EMPTY;
+	// decrementing the material score
+	board->material[colour] -= piece_values[piece];
 	
 	// removing the piece from the board->pieceList
 	for(index = 0; index < board->pieceCount[piece]; index++) {
@@ -50,11 +59,17 @@ static void clearPiece(Board *board, int square) {
 
 static void addPiece(Board *board, int square, int piece) {
 	
+	assert(onBoard(square));
+	assert(pieceValid(piece));
+	
 	// Hashing the piece in
 	HASH_PIECE(piece, square);
 
 	// adding the piece to the board->pieces
 	board->pieces[square] = piece;
+	// incrementing the material score
+	board->material[pieceColor(piece)] += piece_values[piece];
+
 	// adding the piece to the board->pieceList
 	board->pieceList[piece][board->pieceCount[piece]++] = square;
 }
@@ -63,6 +78,8 @@ static void movePiece(Board *board, int from, int to) {
 	int index = 0;
 	int piece = board->pieces[from];
 	
+	assert(onBoard(from));
+	assert(onBoard(to));
 	// Hashing the piece out of from
 	HASH_PIECE(piece, from);
 	
@@ -87,6 +104,10 @@ int makeMove(Board *board, Move move) {
 	// setting the move variables
 	int from = move.from;
 	int to = move.to;
+
+	assert(onBoard(from));
+	assert(onBoard(to));
+
 	int captured = move.captured;
 	int promoted = move.promoted;
 	int turn = board->turn;
@@ -177,7 +198,7 @@ int makeMove(Board *board, Move move) {
 	HASH_TURN;
 
 	// if in check take back the move
-	if(isAttacked(board->kingSquare[turn], board, board->turn)){
+	if(board, isAttacked(board, board->kingSquare[turn], board->turn)){
 		takeMove(board);
 		return 0;
 	}
@@ -187,7 +208,7 @@ int makeMove(Board *board, Move move) {
 
 void takeMove(Board *board) {
 	
-	// decrementing the game play and current search ply
+	// decrementing the game ply and current search ply
 	board->hisPly--;
 	board->ply--;
 	
@@ -198,6 +219,10 @@ void takeMove(Board *board) {
 	Move move = board->history[board->hisPly].move;
 	int from = move.from;
 	int to = move.to;
+
+	assert(onBoard(from));
+	assert(onBoard(to));
+
 	int captured = move.captured;
 	int promoted = move.promoted;
 

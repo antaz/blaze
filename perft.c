@@ -28,7 +28,7 @@ void perft(Board *board, int depth) {
 
 
 void perftTest(Board *board, int depth) {
-	printBoardSAN(board);
+	//printBoardSAN(board);
 	printf("\nStarting Test To Depth:%d\n",depth);	
 	leafNodes = 0;
 	
@@ -43,15 +43,15 @@ void perftTest(Board *board, int depth) {
             continue;
         }
         long cumnodes = leafNodes;
-        perft(board, depth - 1);
+        perft(board, depth);
         takeMove(board);        
         long oldnodes = leafNodes - cumnodes;
-        printf("move %d : ",MoveNum+1);
-	moveSAN(move);
-	printf(" : %ld\n", oldnodes);
+       // printf("move %d : ",MoveNum+1);
+	//moveSAN(move);
+	// printf(" : %ld\n", oldnodes);
     }
 	
-	printf("\nTest Complete : %ld nodes visited\n",leafNodes);
+	printf("\n%ld nodes visited\n",leafNodes);
 
     return;
 }

@@ -26,6 +26,9 @@
 #define isKing(piece) (piece == 6 || piece == 12)
 #define pieceColor(piece) ((piece > 0 && piece <= 6) ? 0 : 1)
 #define isSlidePiece(piece) (isBishop(piece) | isRook(piece) | isQueen(piece))
+#define onBoard(square) (square > 20 && square < 99 && square % 10 > 0 && square % 10 < 9 ? 1 : 0)
+#define pieceValid(piece) (piece > 0 && piece < 13 ? 1 : 0)
+#define uci_print(...); printf(__VA_ARGS__); fflush(stdout);
 
 // board.c
 extern void clearBoard(Board *board);
@@ -35,10 +38,11 @@ extern void updatePieceList(Board *board);
 extern void printPV(PV *pv);
 
 // move.c
-extern void moveSAN(Move move);
+extern void printMove(Move move);
 
 // movegen.c
 extern void generateMoves(Board *board, MoveList *list);
+extern void generateCaptures(Board *board, MoveList *list);
 
 // makemove.c
 extern int makeMove(Board *board, Move move);
@@ -51,6 +55,10 @@ extern int evaluate(Board *board);
 
 void search(Board *board, Search *search, PV *pv);
 
+// attacks.c
+
+//extern int isAttacked(Board *board, int square, int turn);
+
 // hash.c
 
 extern void initZobrist();
@@ -61,6 +69,6 @@ extern void storeTable(Board *board, Move move, int score, int flags, int depth)
 
 // uci.c
 
-extern void uci_loop(Board *board);
+extern void uci_loop(Board *board, Search *search);
 extern long long current_timestamp();
 #endif

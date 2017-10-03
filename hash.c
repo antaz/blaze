@@ -74,7 +74,7 @@ void initTTable(TTable *table) {
 	}
 	table->table = (TTEntry *) malloc(table->size * sizeof(TTEntry));
 	clearTTable(table);
-	printf("init of TTable complete with %d entries\n", table->size);
+	//printf("init of TTable complete with %d entries\n", table->size);
 }
 
 int probeTable(Board *board, Move *move, int *score, int alpha, int beta, int depth) {

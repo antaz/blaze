@@ -149,8 +149,6 @@ int mirror64[64] = {
 	0,	1,	2,	3,	4,	5,	6,	7
 };
 
-const int piece_values[6] = {100, 320, 330, 500, 900, 20000};
-
 int phase(Board *board) {
 	int knight_phase = 1;
 	int bishop_phase = 1;
@@ -170,7 +168,7 @@ int phase(Board *board) {
 int evaluate(Board *board) {
 	int i, piece, square;	
 	int v = 0;
-	v += board->material[WHITE] - board->material[BLACK];
+	v = board->material[WHITE] - board->material[BLACK];
 	
 	piece = wP;
 	for(i = 0; i < board->pieceCount[piece]; i++) {
