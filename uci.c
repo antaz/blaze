@@ -2,14 +2,25 @@
 #include "string.h"
 #include "definitions.h"
 #include "functions.h"
-#include <sys/time.h>
 
 #define INPUTBUFFER 1000
 
+#ifdef WIN32
+#include <Windows.h>
+#include <io.h>
+#else
+#include <sys/time.h>
+#include <unistd.h>
+#endif
+
 long long current_timestamp() {
-    struct timeval te; 
-    gettimeofday(&te, NULL); // get current time
-    return te.tv_sec * 1000LL + te.tv_usec/1000; // caculate milliseconds
+#ifdef WIN32
+	return GetTickCount64();
+#else
+	struct timeval te;
+	gettimeofday(&te, NULL);
+	return te.tv_sec * 1000 + te.tv_usec / 1000;
+#endif
 }
 
 void go(Board *board, Search *s, char * line) {
