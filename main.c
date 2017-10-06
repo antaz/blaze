@@ -5,7 +5,7 @@
 void main() {
 	int i;
 	char *start_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-	char *fen = "3qkbnr/3b1p2/4p2p/7Q/3P1Q2/8/PPP2KPP/RNB3NR w k - 2 13";
+	char *fen = "r1b1k2r/ppppnppp/2n2q2/2b5/3NP3/2P1B3/PP3PPP/RN1QKB1R w KQkq - 0 1";
 	Board board[1];
 	Search s[1];
 	Move move;
@@ -14,15 +14,16 @@ void main() {
 	board->table->table = NULL;
 	MoveList list[1];
 	PV pv;
-	parseFEN(start_fen, board);
+	parseFEN(fen, board);
 	initTTable(board->table);
+	clearTTable(board->table);
 	// generateCaptures(board, list);
 	// printMoveList(list);
 	/*
 	char input[6];
 	
 	while(1) {
-		printBoardSAN(board);
+		printBoard(board);
 		printf("Enter a move > ");
 		fgets(input, 6, stdin);
 		
@@ -42,8 +43,9 @@ void main() {
 		fflush(stdin);
 	}
 	*/
-	//printf("static evaluation is: %d", evaluate(board));
-	//search(board, s, &pv);
-	printf("\nWelcome to Trappist 1.0: Trappist on uci mode\n");
+	//printf("\nWelcome to Trappist 1.0: Trappist on uci mode\n");
 	uci_loop(board, s);
+	//generateMoves(board, list);
+	//qsort(list->moves, list->count, sizeof(Move), compareMoves);
+	//printMoveList(list);
 }

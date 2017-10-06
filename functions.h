@@ -55,6 +55,12 @@ extern int evaluate(Board *board);
 
 void search(Board *board, Search *search, PV *pv);
 
+// order.c
+
+int mvvlva(int victim, int attacker);
+int compareMoves(const Move *m1, const Move *m2);
+int moveScore(Board *board, Move move);
+
 // attacks.c
 
 //extern int isAttacked(Board *board, int square, int turn);
@@ -64,8 +70,8 @@ void search(Board *board, Search *search, PV *pv);
 extern void initZobrist();
 extern void setBoardHash(Board *board);
 extern void initTTable(TTable *table);
-extern int probeTable(Board *board, Move *move, int *score, int alpha, int beta, int depth);
-extern void storeTable(Board *board, Move move, int score, int flags, int depth);
+extern int probeTT(Board *board, Move *move);
+extern void storeTT(Board *board, Move move);
 
 // uci.c
 

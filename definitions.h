@@ -49,6 +49,7 @@ typedef struct {
 	unsigned char enPassant; // en-passant flag 
 	unsigned char pawnStart; // pawn start flag
 	unsigned char castle; // castling flag
+	int score;
 } Move;
 
 // The undo move sturcture
@@ -82,6 +83,10 @@ typedef struct {
 	int ply, hisPly, castling;
 	int material[2];
 	Undo history[MAX];
+
+	int his[13][SQNUM];
+	Move kill[2][MAXDEPTH];
+
 	U64 zobristHash;
 	TTable table[1];
 

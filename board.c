@@ -178,7 +178,7 @@ void printBoard(Board *board) {
 	printf("\n");
 	printf("Turn: %d\n", board->turn);
 	printf("Castle: %d\n", board->castling);
-	printf("Zobrist Hash: %x\n", board->zobristHash);
+	printf("Zobrist Hash: %0llx\n", board->zobristHash);
 }
 
 // printing the move list
@@ -189,6 +189,7 @@ void printMoveList(MoveList *list) {
 	for(i = 0; i < list->count; i++) {
 		printf("%d. ", i+1);
 		printMove(list->moves[i]);
+		printf(" %d", list->moves[i].score);
 		printf("\n");
 	}
 }

@@ -15,7 +15,7 @@
 
 long long current_timestamp() {
 #ifdef WIN32
-	return GetTickCount64();
+	return GetTickCount();
 #else
 	struct timeval te;
 	gettimeofday(&te, NULL);

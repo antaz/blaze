@@ -77,47 +77,20 @@ void initTTable(TTable *table) {
 	//printf("init of TTable complete with %d entries\n", table->size);
 }
 
-int probeTable(Board *board, Move *move, int *score, int alpha, int beta, int depth) {
+int probeTT(Board *board, Move *move) {
 	int index = board->zobristHash % board->table->size;
 	
 	if(board->table->table[index].zobristHash == board->zobristHash) {
 		move->from = board->table->table[index].move.from;
-		move->to = board->table->table[index].move.to;
-		move->captured = board->table->table[index].move.captured;	
-		move->promoted = board->table->table[index].move.promoted;
-		move->enPassant = board->table->table[index].move.enPassant;
-		move->pawnStart = board->table->table[index].move.pawnStart;
-		move->castle = board->table->table[index].move.castle;		
-		if(board->table->table[index].depth >= depth) {
-			board->table->hit++;
-			*score = board->table->table[index].score;
-			
-			switch(board->table->table[index].flags) {
-				case HFALPHA: if(*score <= alpha) {
-						*score = alpha;
-						return 1;
-					}
-				break;
-				case HFBETA: if(*score >= beta) {
-						*score = beta;
-						return 1;
-					}
-				break;
-				case HFEXACT: return 1; break;
-				default: break;
-
-			}
-		}
+		move->to = 	board->table->table[index].move.to;
+		return 1;
 	}
 	
 	return 0;
 }
 
-void storeTable(Board *board, Move move, int score, int flags, int depth) {
+void storeTT(Board *board, Move move) {
 	int index = board->zobristHash % board->table->size;
 	board->table->table[index].move = move;
-	board->table->table[index].score = score;
-	board->table->table[index].depth = depth;
-	board->table->table[index].flags = flags;
 	board->table->table[index].zobristHash = board->zobristHash;
 }
