@@ -77,4 +77,6 @@ extern void storeTT(Board *board, Move move);
 
 extern void uci_loop(Board *board, Search *search);
 extern long long current_timestamp();
+extern void readInput(Search *search);
+
 #endif

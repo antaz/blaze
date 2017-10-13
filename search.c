@@ -7,14 +7,25 @@
 static void checkTime(Search *search) {
 	if(search->timeset && current_timestamp() > search->stoptime)
 		search->stop = 1;
+
+	readInput(search);
 }
 
-void clear_heuristics(Board *board) {
+static void clear_heuristics(Board *board) {
 	int i, j;
 
 	for(i = 0; i < 13; ++i)
 		for(j = 0; j < SQNUM; ++j)
 			board->his[i][j] = 0;
+}
+
+static int isRep(Board *board) {
+	int i;
+	for(i = board->hisPly - board->fiftyMove; i < board->hisPly; ++i) {
+		if(board->zobristHash == board->history[i].zobristHash)
+			return 1;
+	}
+	return 0;
 }
 
 static int qSearch(int alpha, int beta, Board *board, Search *search) {
@@ -74,6 +85,9 @@ static int alphaBeta(int alpha, int beta, int depth, Board *board, Search *searc
 	
 	search->nodes++;
 	
+	if((isRep(board) || board->fiftyMove >= 100) && board->ply)
+		return 0;
+
 	if(depth == 0) {
 		pv->count = 0;
 		//return qSearch(alpha, beta, board, search);

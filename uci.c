@@ -28,7 +28,7 @@ void go(Board *board, Search *s, char * line) {
 	s->nodes = 0;
 	s->stop = 0;
 	
-	int depth = -1, movestogo = 30,movetime = -1;
+	int depth = -1, movestogo = 40,movetime = -1;
 	int time = -1, inc = 0;
 	char *ptr = NULL;
 	s->timeset = 0;
@@ -62,7 +62,7 @@ void go(Board *board, Search *s, char * line) {
 	if(time != -1) {
 		s->timeset = 1;
 		time /= movestogo;
-		time -= 50;	
+		time -= 20;	
 		s->stoptime = s->starttime + time + inc;
 	}
 
@@ -140,4 +140,63 @@ void uci_loop(Board *board, Search *search) {
 			printf("uciok\n");
 		}
 	}	
+}
+
+int inputWaiting()
+{
+#ifndef WIN32
+	struct timeval tv;
+	fd_set readfds;
+
+	FD_ZERO (&readfds);
+	FD_SET (fileno(stdin), &readfds);
+	tv.tv_sec=0; tv.tv_usec=0;
+	select(16, &readfds, 0, 0, &tv);
+
+	return (FD_ISSET(fileno(stdin), &readfds));
+#else
+	static int init = 0, pipe;
+	static HANDLE inh;
+	DWORD dw;
+
+	if (!init) {
+		init = 1;
+		inh = GetStdHandle(STD_INPUT_HANDLE);
+		pipe = !GetConsoleMode(inh, &dw);
+		if (!pipe) {
+			SetConsoleMode(inh, dw & ~(ENABLE_MOUSE_INPUT|ENABLE_WINDOW_INPUT));
+			FlushConsoleInputBuffer(inh);
+		}
+	}
+	if (pipe) {
+		if (!PeekNamedPipe(inh, NULL, 0, NULL, &dw, NULL))
+			return 1;
+		return dw;
+	} else {
+		GetNumberOfConsoleInputEvents(inh, &dw);
+		return dw <= 1 ? 0 : dw;
+	}
+#endif
+}
+
+void readInput(Search *search) {
+	int bytes;
+	char input[256] = "", *endc;
+
+	if(inputWaiting()) {
+		search->stop = 1;
+		do {
+			bytes=read(fileno(stdin), input, 256);
+		} while (bytes<0);
+		endc = strchr(input, '\n');
+		if (endc)
+			*endc = 0;
+
+		if (strlen(input) > 0) {
+			if (!strncmp(input, "quit", 4))	{
+				//search->quit = 1;
+			}
+		}
+		return;
+	}
 }

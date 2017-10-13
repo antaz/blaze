@@ -41,7 +41,7 @@ void addMove(Board *board, MoveList *list, char from, char to, char captured, ch
 	move.enPassant = enPassant;
 	move.pawnStart = pawnStart;
 	move.castle = castle;
-	move.score = moveScore(board, move);
+	move.score = mvvlva(move.captured, board->pieces[move.from]);
 	list->moves[list->count] = move;
 	list->count++;
 }
