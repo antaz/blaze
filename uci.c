@@ -3,7 +3,7 @@
 #include "definitions.h"
 #include "functions.h"
 
-#define INPUTBUFFER 1000
+#define INPUTBUFFER 2400
 
 #ifdef WIN32
 #include <Windows.h>
@@ -138,6 +138,9 @@ void uci_loop(Board *board, Search *search) {
 			printf("id name %s\n", NAME);
 			printf("id author %s\n", AUTHOR);
 			printf("uciok\n");
+		} else if(!strncmp(line, "perft", 5)) {
+			int depth = atoi(strstr(line, "perft") + 6);
+			perft_divide(board, depth);
 		}
 	}	
 }

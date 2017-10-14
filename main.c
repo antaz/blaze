@@ -14,7 +14,7 @@ void main() {
 	board->table->table = NULL;
 	MoveList list[1];
 	PV pv;
-	parseFEN(fen, board);
+	parseFEN(start_fen, board);
 	initTTable(board->table);
 	clearTTable(board->table);
 	// generateCaptures(board, list);
@@ -45,6 +45,7 @@ void main() {
 	*/
 	//printf("\nWelcome to Trappist 1.0: Trappist on uci mode\n");
 	uci_loop(board, s);
+
 	//generateMoves(board, list);
 	//qsort(list->moves, list->count, sizeof(Move), compareMoves);
 	//printMoveList(list);
