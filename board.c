@@ -7,7 +7,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 #include "definitions.h"
 #include "functions.h"
 
@@ -24,8 +23,8 @@ void parseFEN(char *fen, Board *board) {
 	int sq64 = 0;
 	int sq120 = 0;
 
-	assert(fen != NULL);
-	assert(board != NULL);
+	ASS(fen != NULL);
+	ASS(board != NULL);
 
 	clearBoard(board); // clearing and resetting the board
 
@@ -81,7 +80,7 @@ void parseFEN(char *fen, Board *board) {
 		fen++;
 	}
 
-	assert(*fen == 'w' || *fen == 'b');
+	ASS(*fen == 'w' || *fen == 'b');
 	
 	// setting the side to move
 	board->turn = (*fen == 'w') ? WHITE : BLACK;
@@ -101,15 +100,15 @@ void parseFEN(char *fen, Board *board) {
 	}
 	fen++;
 
-	assert(board->castling >= 0 && board->castling <= 15);
+	ASS(board->castling >= 0 && board->castling <= 15);
 
 	// setting the en-passant square
 	if(*fen != '-') {
 		file = fen[0] - 'a';
 		rank = fen[1] - '1';
 
-		assert(file >= FILE_A && file <= FILE_H);
-		assert(rank >= RANK_1 && rank <= RANK_8);
+		ASS(file >= FILE_A && file <= FILE_H);
+		ASS(rank >= RANK_1 && rank <= RANK_8);
 
 		board->enPassant = FR2SQ120(file, rank);
 	}

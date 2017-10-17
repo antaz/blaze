@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "definitions.h"
 #include "functions.h"
-#include "assert.h"
 
 #define HASH_PIECE(piece, square) (board->zobristHash ^= (pieceHash[piece][square]))
 #define HASH_CASTLE (board->zobristHash ^= (castleHash[board->castling]))
@@ -34,8 +33,8 @@ static void clearPiece(Board *board, int square) {
 	int index = 0;
 	int pieceNum = -1;
 	
-	assert(onBoard(square));
-	assert(pieceValid(piece));	
+	ASS(onBoard(square));
+	ASS(pieceValid(piece));	
 	// hashing the piece out
 	HASH_PIECE(piece, square);
 	
@@ -59,8 +58,8 @@ static void clearPiece(Board *board, int square) {
 
 static void addPiece(Board *board, int square, int piece) {
 	
-	assert(onBoard(square));
-	assert(pieceValid(piece));
+	ASS(onBoard(square));
+	ASS(pieceValid(piece));
 	
 	// Hashing the piece in
 	HASH_PIECE(piece, square);
@@ -78,8 +77,8 @@ static void movePiece(Board *board, int from, int to) {
 	int index = 0;
 	int piece = board->pieces[from];
 	
-	assert(onBoard(from));
-	assert(onBoard(to));
+	ASS(onBoard(from));
+	ASS(onBoard(to));
 	// Hashing the piece out of from
 	HASH_PIECE(piece, from);
 	
@@ -105,8 +104,8 @@ int makeMove(Board *board, Move move) {
 	int from = move.from;
 	int to = move.to;
 
-	assert(onBoard(from));
-	assert(onBoard(to));
+	ASS(onBoard(from));
+	ASS(onBoard(to));
 
 	int captured = move.captured;
 	int promoted = move.promoted;
@@ -220,8 +219,8 @@ void takeMove(Board *board) {
 	int from = move.from;
 	int to = move.to;
 
-	assert(onBoard(from));
-	assert(onBoard(to));
+	ASS(onBoard(from));
+	ASS(onBoard(to));
 
 	int captured = move.captured;
 	int promoted = move.promoted;

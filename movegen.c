@@ -1,7 +1,6 @@
 // Move generation functions
 
 #include <stdio.h>
-#include <assert.h>
 #include "definitions.h"
 #include "functions.h"
 
@@ -30,8 +29,8 @@ int nonSliderPieces[6] = {wN, wK, 0, bN, bK, 0};
 
 // add move to list of moves (if pawn then addPawnMove())
 void addMove(Board *board, MoveList *list, char from, char to, char captured, char promoted, char enPassant, char pawnStart, char castle) {
-	assert(onBoard(from));
-	assert(onBoard(to));
+	ASS(onBoard(from));
+	ASS(onBoard(to));
 
 	Move move;
 	move.from = from;
@@ -47,8 +46,8 @@ void addMove(Board *board, MoveList *list, char from, char to, char captured, ch
 }
 // adding a pawn move
 void addPawnMove(Board *board, MoveList *list, char from, char to, char captured, char enPassant, char pawnStart, char castle) {
-	assert(onBoard(from));
-	assert(onBoard(to));
+	ASS(onBoard(from));
+	ASS(onBoard(to));
 	
 	// checking for promotion
 	if(board->pieces[from] == wP && RANK120(from) == RANK_7) {

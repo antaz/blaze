@@ -148,7 +148,7 @@ int mirror64[64] = {
 	8,	9,	10,	11,	12,	13,	14,	15,
 	0,	1,	2,	3,	4,	5,	6,	7
 };
-
+/*
 int phase(Board *board) {
 	int knight_phase = 1;
 	int bishop_phase = 1;
@@ -164,7 +164,7 @@ int phase(Board *board) {
 
 	return (phase *256 + (total_phase / 2))	/ total_phase;
 }
-
+*/
 int evaluate(Board *board) {
 	int i, piece, square;	
 	int v = 0;
@@ -253,6 +253,7 @@ int evaluate(Board *board) {
 		return -v;
 	}
 }
+
 /*int evaluate(Board *board) {
 	int mg_eval = mg_eval(Board *board);
 	int eg_eval = eg_eval(Board *board);
