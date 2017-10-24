@@ -1,3 +1,5 @@
-Make ?
+This chess engine is still under developement!
 
-on Linux sure: ```make main```
+Make:
+
+```make main```
