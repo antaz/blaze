@@ -90,8 +90,8 @@ static int alphaBeta(int alpha, int beta, int depth, Board *board, Search *searc
 
 	if(depth == 0) {
 		pv->count = 0;
-		//return qSearch(alpha, beta, board, search);
-		return evaluate(board);
+		return qSearch(alpha, beta, board, search);
+		//return evaluate(board);
 	}
 
 	
