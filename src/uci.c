@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include "string.h"
+#include <stdlib.h>
+#include <string.h>
 #include "definitions.h"
 #include "functions.h"
 
@@ -25,6 +26,7 @@ long long current_timestamp() {
 
 void go(Board *board, Search *s, char * line) {
 	PV pv;
+	pv.count = 0;
 	s->nodes = 0;
 	s->stop = 0;
 	
@@ -32,8 +34,6 @@ void go(Board *board, Search *s, char * line) {
 	int time = -1, inc = 0;
 	char *ptr = NULL;
 	s->timeset = 0;
-
-	if((ptr = strstr(line,"INF")));
 
 	if((ptr = strstr(line,"binc")) && board->turn == BLACK)
 		inc = atoi(ptr + 5);
@@ -68,9 +68,7 @@ void go(Board *board, Search *s, char * line) {
 
 	if(depth == -1)
 		s->depth = MAXDEPTH;
-
-	printf("time:%d start:%lld stop:%lld depth:%d timeset:%d\n",time, s->starttime, s->stoptime, s->depth, s->timeset);
-		
+	
 	search(board, s, &pv);
 }
 
