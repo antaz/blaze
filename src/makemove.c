@@ -197,7 +197,7 @@ int makeMove(Board *board, Move move) {
 	HASH_TURN;
 
 	// if in check take back the move
-	if(board, isAttacked(board, board->kingSquare[turn], board->turn)){
+	if(isAttacked(board, board->kingSquare[turn], board->turn)){
 		takeMove(board);
 		return 0;
 	}
