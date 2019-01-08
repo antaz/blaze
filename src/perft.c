@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "definitions.h"
+#include "functions.h"
 
 long leafNodes;
 
@@ -40,13 +41,11 @@ long perftTest(Board *board, int depth) {
         if ( !makeMove(board,move))  {
             continue;
         }
-        long cumnodes = leafNodes;
         perft(board, depth - 1);
         takeMove(board);        
-        long oldnodes = leafNodes - cumnodes;
     }
 	
-	printf("info depth %d nodes %d\n",depth, leafNodes);
+	printf("info depth %d nodes %ld\n",depth, leafNodes);
 
     return leafNodes;
 }
@@ -57,5 +56,5 @@ void perft_divide(Board *board, int depth) {
 	for(i = 1; i <= depth; i++) {
 		nodes = perftTest(board, i);
 	}
-	printf("nodes %d\n", nodes);
+	printf("nodes %ld\n", nodes);
 }
