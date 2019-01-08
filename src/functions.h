@@ -39,6 +39,7 @@ extern void printPV(PV *pv);
 
 // move.c
 extern void printMove(Move move);
+extern int parseMove(Board *board, char *move, Move *m);
 
 // movegen.c
 extern void generateMoves(Board *board, MoveList *list);
@@ -53,30 +54,34 @@ extern int evaluate(Board *board);
 
 // search.c
 
-void search(Board *board, Search *search, PV *pv);
+extern void search(Board *board, Search *search, PV *pv);
+extern int count_nps(long nodes, long long time);
 
 // order.c
 
 int mvvlva(int victim, int attacker);
-int compareMoves(const Move *m1, const Move *m2);
+int compareMoves(const void *m1, const void *m2);
 int moveScore(Board *board, Move move);
 
 // attacks.c
 
-//extern int isAttacked(Board *board, int square, int turn);
+extern int isAttacked(Board *board, int square, int turn);
 
 // hash.c
 
 extern void initZobrist();
 extern void setBoardHash(Board *board);
 extern void initTTable(TTable *table);
+extern void clearTTable(TTable *table);
 extern int probeTT(Board *board, Move *move);
 extern void storeTT(Board *board, Move move);
+extern U64 generateHash(Board *board);
 
 // uci.c
 
 extern void uci_loop(Board *board, Search *search);
 extern long long current_timestamp();
 extern void readInput(Search *search);
+extern void perft_divide(Board *board, int depth);
 
 #endif
