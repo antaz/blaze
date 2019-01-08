@@ -8,9 +8,12 @@ int mvvlva(int victim, int attacker) {
 	return scores[victim] + 6 - (scores[attacker] / 100);
 }
 
-int compareMoves(const Move *m1, const Move *m2) {
-	if (m1->score > m2->score) return -1;
-    if (m1->score < m2->score) return +1;
+int compareMoves(const void *m1, const void *m2) {
+	Move *mv1 = (Move*) m1;
+	Move *mv2 = (Move*) m2;
+
+	if (mv1->score > mv2->score) return -1;
+    if (mv1->score < mv2->score) return +1;
     return 0;
 }
 
