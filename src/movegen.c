@@ -28,7 +28,7 @@ int sliderPieces[8] = {wB, wR, wQ, 0, bB, bR, bQ, 0};
 int nonSliderPieces[6] = {wN, wK, 0, bN, bK, 0};
 
 // add move to list of moves (if pawn then addPawnMove())
-void addMove(Board *board, MoveList *list, char from, char to, char captured, char promoted, char enPassant, char pawnStart, char castle) {
+void addMove(Board *board, MoveList *list, unsigned char from, unsigned char to, unsigned char captured, unsigned char promoted, unsigned char enPassant, unsigned char pawnStart, unsigned char castle) {
 	ASS(onBoard(from));
 	ASS(onBoard(to));
 
@@ -45,7 +45,7 @@ void addMove(Board *board, MoveList *list, char from, char to, char captured, ch
 	list->count++;
 }
 // adding a pawn move
-void addPawnMove(Board *board, MoveList *list, char from, char to, char captured, char enPassant, char pawnStart, char castle) {
+void addPawnMove(Board *board, MoveList *list, unsigned char from, unsigned char to, unsigned char captured, unsigned char enPassant, unsigned char pawnStart, unsigned char castle) {
 	ASS(onBoard(from));
 	ASS(onBoard(to));
 	
@@ -179,7 +179,7 @@ void generateMoves(Board *board, MoveList *list) {
 				
 				while(board->pieces[targetSquare] != OFFBOARD) {
 					if(board->pieces[targetSquare] != EMPTY) {
-						if(pieceColor(board->pieces[targetSquare]) == turn ^ 1) {
+						if(pieceColor(board->pieces[targetSquare]) == (turn ^ 1)) {
 							addMove(board, list, square, targetSquare, board->pieces[targetSquare], EMPTY, 0, 0, 0);
 						}
 						break;
@@ -204,7 +204,7 @@ void generateMoves(Board *board, MoveList *list) {
 					continue;
 				}	
 				if(board->pieces[targetSquare] != EMPTY) {
-					if(pieceColor(board->pieces[targetSquare]) == turn ^ 1) {
+					if(pieceColor(board->pieces[targetSquare]) == (turn ^ 1)) {
 						addMove(board, list, square, targetSquare, board->pieces[targetSquare], EMPTY, 0, 0, 0);
 					}
 					continue;
@@ -286,7 +286,7 @@ void generateCaptures(Board *board, MoveList *list) {
 				
 				while(board->pieces[targetSquare] != OFFBOARD) {
 					if(board->pieces[targetSquare] != EMPTY) {
-						if(pieceColor(board->pieces[targetSquare]) == turn ^ 1) {
+						if(pieceColor(board->pieces[targetSquare]) == (turn ^ 1)) {
 							addMove(board, list, square, targetSquare, board->pieces[targetSquare], EMPTY, 0, 0, 0);
 						}
 						break;
@@ -310,7 +310,7 @@ void generateCaptures(Board *board, MoveList *list) {
 					continue;
 				}	
 				if(board->pieces[targetSquare] != EMPTY) {
-					if(pieceColor(board->pieces[targetSquare]) == turn ^ 1) {
+					if(pieceColor(board->pieces[targetSquare]) == (turn ^ 1)) {
 						addMove(board, list, square, targetSquare, board->pieces[targetSquare], EMPTY, 0, 0, 0);
 					}
 					continue;
