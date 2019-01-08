@@ -4,7 +4,7 @@
 
 int parseMove(Board *board, char *move, Move *m) {
 	int from, to;
-	int moveNum = 0, Move = 0, promoted = EMPTY;
+	int moveNum = 0, promoted = EMPTY;
 	MoveList list[1];
 
 	if(move[1] > '8' || move[1] < '1') return 0;
