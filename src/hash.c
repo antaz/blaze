@@ -8,7 +8,11 @@ U64 turnHash;
 U64 castleHash[16];
 
 static U64 rand64() {
-	return (rand() | rand() << 15 | rand() << 30 | rand() << 45 | rand() & 0xf << 60);
+	U64 r = 0;
+	for (int i=0; i<64; i++) {
+		r = r*2 + rand()%2;
+	}
+	return r;
 }
 
 void initZobrist() {
