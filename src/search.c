@@ -134,7 +134,7 @@ void search(Board *board, Search *search, PV *pv) {
 	Move bestmove;
 	
 	for(current_depth = 1; current_depth <= search->depth; current_depth++) {
-		score = alphaBeta(alpha, beta, currentDepth, board, search, pv);
+		score = alphaBeta(alpha, beta, current_depth, board, search, pv);
 		if(search->stop)
 			break;
 		bestmove = pv->moves[0];
