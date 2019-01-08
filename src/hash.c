@@ -9,7 +9,8 @@ U64 castleHash[16];
 
 static U64 rand64() {
 	U64 r = 0;
-	for (int i=0; i<64; i++) {
+	int i;
+	for (i=0; i<64; i++) {
 		r = r*2 + rand()%2;
 	}
 	return r;
