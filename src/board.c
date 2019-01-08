@@ -197,6 +197,8 @@ void printMoveList(MoveList *list) {
 
 void printPV(PV *pv) {
 	int i;
+	
+	printf("pv ");
 		
 	for(i = 0; i < pv->count; i++) {
 		printMove(pv->moves[i]);
