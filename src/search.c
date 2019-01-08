@@ -130,15 +130,15 @@ void search(Board *board, Search *search, PV *pv) {
 
 	alpha = -2*MATE;
 	beta = +2*MATE;
-	int currentDepth;
+	int current_depth;
 	Move bestmove;
 	
-	for(currentDepth = 1; currentDepth <= search->depth; currentDepth++) {
+	for(current_depth = 1; current_depth <= search->depth; current_depth++) {
 		score = alphaBeta(alpha, beta, currentDepth, board, search, pv);
 		if(search->stop)
 			break;
 		bestmove = pv->moves[0];
-		printf("info depth %d score cp %d nodes %ld nps %d time %lld ", score, currentDepth, search->nodes, count_nps(search->nodes, current_timestamp() - search->starttime), current_timestamp() - search->starttime);
+		printf("info depth %d score cp %d nodes %ld nps %d time %lld ", current_depth, score, search->nodes, count_nps(search->nodes, current_timestamp() - search->starttime), current_timestamp() - search->starttime);
 		printPV(pv);
 		printf("\n");
 	}
