@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/antaraz/Trappist-c.svg?branch=master)](https://travis-ci.org/antaraz/Trappist-c)
+[![Build Status](https://travis-ci.org/flurt/Trappist.svg?branch=master)](https://travis-ci.org/flurt/Trappist)
 
 # Trappist
 
