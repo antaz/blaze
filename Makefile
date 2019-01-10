@@ -2,16 +2,17 @@ CC = gcc
 BIN = trappist
 SRC = $(wildcard src/*.c)
 OBJ = $(SRC:.c=.o)
-FLAGS = -DNDEBUG -g -Wall -Wextra
+OPT = -march=native -O3
+FLAGS = -Wall -Wextra
 
 all: $(BIN)
 
 $(BIN): $(OBJ)
-	$(CC) $(FLAGS) -o $(BIN) $(OBJ)
+	$(CC) $(OPT) $(FLAGS) -o $(BIN) $(OBJ)
 
 .PHONY: debug
 debug:
-	$(CC) $(FLAGS) $(SRC) -g
+	$(CC) $(SRC) -g -DNDEBUG $(FLAGS)
 
 .PHONY: clean
 clean:
