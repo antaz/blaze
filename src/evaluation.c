@@ -148,24 +148,8 @@ int mirror64[64] = {
 	8,	9,	10,	11,	12,	13,	14,	15,
 	0,	1,	2,	3,	4,	5,	6,	7
 };
-/*
-int phase(Board *board) {
-	int knight_phase = 1;
-	int bishop_phase = 1;
-	int rook_phase = 2;
-	int queen_phase = 4;
-	int total_phase =  knight_phase*4 + bishop_phase*4 + rook_phase*4 + queen_phase*2;
-	int phase = total_phase;
-	
-	phase -= knight_phase*(board->pieceCount[wN] + board->pieceCount[bN]);
-	phase -= bishop_phase*(board->pieceCount[wB] + board->pieceCount[bB]);
-	phase -= rook_phase*(board->pieceCount[wR] + board->pieceCount[bR]);
-	phase -= queen_phase*(board->pieceCount[wQ] + board->pieceCount[bQ]);
 
-	return (phase *256 + (total_phase / 2))	/ total_phase;
-}
-*/
-int evaluate(Board *board) {
+int mg_eval(Board *board) {
 	int i, piece, square;	
 	int v = 0;
 	v = board->material[WHITE] - board->material[BLACK];
@@ -254,11 +238,117 @@ int evaluate(Board *board) {
 	}
 }
 
-/*int evaluate(Board *board) {
-	int mg_eval = mg_eval(Board *board);
-	int eg_eval = eg_eval(Board *board);
-	int p = phase(Board *board);
-	int t = tempo(Board *board);
-	eg_eval = eg_eval * scale_factor(Board *board, eg_eval) / 64;
-	return ((((mg_eval * p + eg_eval * (128 - p)) << 0) / 128 << 0) + t;
-}*/
+int eg_eval(Board *board) {
+	int i, piece, square;	
+	int v = 0;
+	v = board->material[WHITE] - board->material[BLACK];
+	
+	piece = wP;
+	for(i = 0; i < board->pieceCount[piece]; i++) {
+		square = board->pieceList[piece][i];
+		v += piece_square_table[1][0][SQ120TO64(square)];
+		
+	}
+	piece = bP;
+	for(i = 0; i < board->pieceCount[piece]; i++) {
+		square = board->pieceList[piece][i];
+		v -= piece_square_table[1][0][mirror64[SQ120TO64(square)]];
+		
+	}
+	
+	piece = wN;
+	for(i = 0; i < board->pieceCount[piece]; i++) {
+		square = board->pieceList[piece][i];
+		v += piece_square_table[1][1][SQ120TO64(square)];
+		
+	}
+	piece = bN;
+	for(i = 0; i < board->pieceCount[piece]; i++) {
+		square = board->pieceList[piece][i];
+		v -= piece_square_table[1][1][mirror64[SQ120TO64(square)]];
+		
+	}
+	
+	piece = wB;
+	for(i = 0; i < board->pieceCount[piece]; i++) {
+		square = board->pieceList[piece][i];
+		v += piece_square_table[1][2][SQ120TO64(square)];
+		
+	}
+	piece = bB;
+	for(i = 0; i < board->pieceCount[piece]; i++) {
+		square = board->pieceList[piece][i];
+		v -= piece_square_table[1][2][mirror64[SQ120TO64(square)]];
+		
+	}
+	
+	piece = wR;
+	for(i = 0; i < board->pieceCount[piece]; i++) {
+		square = board->pieceList[piece][i];
+		v += piece_square_table[1][3][SQ120TO64(square)];
+		
+	}
+	piece = bR;
+	for(i = 0; i < board->pieceCount[piece]; i++) {
+		square = board->pieceList[piece][i];
+		v -= piece_square_table[1][3][mirror64[SQ120TO64(square)]];
+		
+	}
+	
+	piece = wQ;
+	for(i = 0; i < board->pieceCount[piece]; i++) {
+		square = board->pieceList[piece][i];
+		v += piece_square_table[1][4][SQ120TO64(square)];
+		
+	}
+	piece = bQ;
+	for(i = 0; i < board->pieceCount[piece]; i++) {
+		square = board->pieceList[piece][i];
+		v -= piece_square_table[1][4][mirror64[SQ120TO64(square)]];
+		
+	}
+	piece = wK;
+	for(i = 0; i < board->pieceCount[piece]; i++) {
+		square = board->pieceList[piece][i];
+		v += piece_square_table[1][5][SQ120TO64(square)];
+		
+	}
+	
+	piece = bK;
+	for(i = 0; i < board->pieceCount[piece]; i++) {
+		square = board->pieceList[piece][i];
+		v -= piece_square_table[1][5][mirror64[SQ120TO64(square)]];
+	}
+	
+	if(board->turn == WHITE) {
+		return v;	
+	} else {
+		return -v;
+	}
+}
+
+
+int phase(Board *board) {
+	int pawn_phase = 0;
+	int knight_phase = 1;
+	int bishop_phase = 1;
+	int rook_phase = 2;
+	int queen_phase = 4;
+	int total_phase =  pawn_phase*16 + knight_phase*4 + bishop_phase*4 + rook_phase*4 + queen_phase*2;
+	int phase = total_phase;
+	
+	phase -= knight_phase*(board->pieceCount[wN] + board->pieceCount[bN]);
+	phase -= bishop_phase*(board->pieceCount[wB] + board->pieceCount[bB]);
+	phase -= rook_phase*(board->pieceCount[wR] + board->pieceCount[bR]);
+	phase -= queen_phase*(board->pieceCount[wQ] + board->pieceCount[bQ]);
+
+	return (phase *256 + (total_phase / 2))	/ total_phase;
+}
+
+
+int evaluate(Board *board) {
+	int mg = mg_eval(board);
+	int eg = eg_eval(board);
+	int p = phase(board);
+	return ((mg * (256 - p)) + (eg * p)) / 256;
+}
