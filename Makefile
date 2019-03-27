@@ -3,7 +3,7 @@ BIN = trappist
 SRC = $(wildcard src/*.c)
 OBJ = $(SRC:.c=.o)
 OPT = -march=native -O3
-FLAGS = -Wall -Wextra
+FLAGS = -std=c11 -Wall -Wextra
 
 all: $(BIN)
 
