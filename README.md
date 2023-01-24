@@ -1,14 +1,8 @@
 [![Build Status](https://travis-ci.org/flurt/Trappist.svg?branch=master)](https://travis-ci.org/flurt/Trappist)
 
-# Trappist
+# Blaze (formerly Trappist)
 
-This a little chess engine AI written in C, not the strongest, not the weakest.
-
-## How it works?
-
-Trappist uses a bruteforce algorithm for solving perfect information / zero-sum games called minimax with alphabeta prunning (kinda like an enhancement).
-
-Trappist is also UCI compatible but probably not fully compatible yet
+A UCI compatible chess engine written in C
 
 ## Build
 
