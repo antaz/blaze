@@ -24,7 +24,7 @@ static int isRep(Board *board) {
 static int qSearch(int alpha, int beta, Board *board, Search *search) {
 
 	int movenum = 0;
-	int legal = 0;
+	// int legal = 0;
 	int score;
 
 	if((search->nodes & 0x3FF) == 0) {
@@ -47,7 +47,7 @@ static int qSearch(int alpha, int beta, Board *board, Search *search) {
 	for(movenum = 0; movenum < list->count; movenum++) {
 		if(!makeMove(board, list->moves[movenum])) continue;
 
-		legal++;
+		// legal++;
 		score = -qSearch(-beta, -alpha, board, search);
 		takeMove(board);
 

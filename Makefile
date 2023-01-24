@@ -1,19 +1,24 @@
-CC = gcc
-BIN = trappist
-SRC = $(wildcard src/*.c)
-OBJ = $(SRC:.c=.o)
-OPT = -march=native -O3
-FLAGS = -std=c11 -Wall -Wextra
+#-*-mode:makefile-gmake;indent-tabs-mode:t;tab-width:8;coding:utf-8-*-#
+.PHONY: o all clean test tags
 
-all: $(BIN)
+o:      o/blaze
 
-$(BIN): $(OBJ)
-	$(CC) $(OPT) $(FLAGS) -o $(BIN) $(OBJ)
+test:   o       \
+        o/test
 
-.PHONY: debug
-debug:
-	$(CC) $(SRC) -g -DNDEBUG $(FLAGS)
+tags: TAGS
 
-.PHONY: clean
 clean:
-	rm -f $(OBJ) $(BIN) *.exe *.out
+	rm -rf o
+
+include build/config.mk
+include build/rules.mk
+include blaze/blaze.mk
+include test/test.mk
+
+OBJS	 = $(foreach x,$(PKGS),$($(x)_OBJS))
+SRCS	:= $(foreach x,$(PKGS),$($(x)_SRCS))
+HDRS	:= $(foreach x,$(PKGS),$($(x)_HDRS))
+INCS	 = $(foreach x,$(PKGS),$($(x)_INCS))
+BINS	 = $(foreach x,$(PKGS),$($(x)_BINS))
+TESTS	 = $(foreach x,$(PKGS),$($(x)_TESTS))
