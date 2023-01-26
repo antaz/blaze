@@ -135,11 +135,8 @@ void uci_loop(Board *board, Search *search) {
 		} else if (!strncmp(line, "uci", 3)) {
 			printf("id name %s\n", NAME);
 			printf("id author %s\n", AUTHOR);
-			printf("uciok\n");
-		} else if(!strncmp(line, "perft", 5)) {
-			int depth = atoi(strstr(line, "perft") + 6);
-			perft_divide(board, depth);
-		}
+                        printf("uciok\n");
+                }
 	}	
 }
 
