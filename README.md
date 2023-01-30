@@ -14,6 +14,5 @@ make -j4
 
 ```
 o/blaze/blaze
-
 ```
 
