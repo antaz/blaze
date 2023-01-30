@@ -16,3 +16,8 @@ make -j4
 o/blaze/blaze
 ```
 
+## Testing
+WIP WIP
+
+## Benchmarks
+WIP WIP
