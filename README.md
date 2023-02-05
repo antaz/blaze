@@ -5,6 +5,7 @@ A UCI compatible chess engine written in C
 ## Build
 
 `CC` defaults to `clang`, but it can be changed to `gcc`
+
 `MODE` can be set to `rel` for release build or `dbg` for debug
 
 ```
