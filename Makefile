@@ -1,10 +1,15 @@
-#-*-mode:makefile-gmake;indent-tabs-mode:t;tab-width:8;coding:utf-8-*-#
+ifneq ($(m),)
+ifeq ($(MODE),)
+MODE := $(m)
+endif
+endif
+
 .PHONY: o all clean test tags
 
-o:      o/blaze
+o:      o/$(MODE)/blaze
 
 test:   o       \
-        o/test
+        o/$(MODE)/test
 
 tags: TAGS
 

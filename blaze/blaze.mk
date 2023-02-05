@@ -3,10 +3,10 @@ BLAZE_FILES := $(wildcard blaze/*)
 BLAZE_SRCS = $(filter %.c,$(BLAZE_FILES))
 BLAZE_HDRS = $(filter %.h,$(BLAZE_FILES))
 
-o/blaze/blaze.a: $(filter-out %/blaze.o,$(BLAZE_SRCS:%.c=o/%.o))
+o/$(MODE)/blaze/blaze.a: $(filter-out %/blaze.o,$(BLAZE_SRCS:%.c=o/$(MODE)/%.o))
 
-o/blaze/blaze: o/blaze/blaze.o o/blaze/blaze.a
+o/$(MODE)/blaze/blaze: o/$(MODE)/blaze/blaze.o o/$(MODE)/blaze/blaze.a
 	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
 
-o/blaze:		\
-	o/blaze/blaze	\
+o/$(MODE)/blaze:			\
+	o/$(MODE)/blaze/blaze		\
