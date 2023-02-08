@@ -1,5 +1,6 @@
-#include "blaze/definitions.h"
-#include "blaze/functions.h"
+#include "../blaze/definitions.h"
+#include "../blaze/functions.h"
+#include "test.h"
 #include <stdio.h>
 
 long leafNodes;
@@ -59,4 +60,10 @@ void perft_divide(Board *board, int depth)
                 nodes = perftTest(board, i);
         }
         printf("nodes %ld\n", nodes);
+}
+
+int main()
+{
+	// TODO: change this with a unit testing framework
+	return 0;
 }

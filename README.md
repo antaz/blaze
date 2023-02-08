@@ -1,12 +1,10 @@
-# Blaze (formerly Trappist)
+Blaze (formerly Trappist)
+=========================
 
-A UCI compatible chess engine written in C
+Blaze is a UCI compatible chess engine written in C
 
 ## Build
-
-`CC` defaults to `clang`, but it can be changed to `gcc`
-
-`MODE` can be set to `rel` for release build or `dbg` for debug
+Build on release mode `rel` for best performance or `dbg` for debugging
 
 ```
 make -j4 MODE=rel
@@ -18,7 +16,7 @@ make -j4 MODE=rel
 o/blaze/blaze
 ```
 
-## Test
+## Tests
 WIP WIP
 
 ## Benchmarks

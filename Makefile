@@ -1,17 +1,8 @@
-ifneq ($(m),)
-ifeq ($(MODE),)
-MODE := $(m)
-endif
-endif
+all: blaze
 
-.PHONY: o all clean test tags
+blaze: o/$(MODE)/blaze
 
-o:      o/$(MODE)/blaze
-
-test:   o       \
-        o/$(MODE)/test
-
-tags: TAGS
+test: o/$(MODE)/test
 
 clean:
 	rm -rf o
@@ -21,9 +12,4 @@ include build/rules.mk
 include blaze/blaze.mk
 include test/test.mk
 
-OBJS	 = $(foreach x,$(PKGS),$($(x)_OBJS))
-SRCS	:= $(foreach x,$(PKGS),$($(x)_SRCS))
-HDRS	:= $(foreach x,$(PKGS),$($(x)_HDRS))
-INCS	 = $(foreach x,$(PKGS),$($(x)_INCS))
-BINS	 = $(foreach x,$(PKGS),$($(x)_BINS))
-TESTS	 = $(foreach x,$(PKGS),$($(x)_TESTS))
+.PHONY: o all test clean
