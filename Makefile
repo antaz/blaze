@@ -1,15 +1,47 @@
-all: blaze
+# Toolchain
+CC		= clang
+LD		= ld
+AR		= ar
+TAR		= tar
 
-blaze: o/$(MODE)/blaze
+# Flags
+CFLAGS		= 
+CPPFLAGS	=
+LDFLAGS		=
 
-test: o/$(MODE)/test
+# Arch
+ARCH		= -march=native
+
+# Misc
+BUILDDIR	= build
+
+all: $(BUILDDIR)/blaze/blaze
+
+$(BUILDDIR)/blaze/blaze: $(BUILDDIR)/blaze/blaze.o $(BUILDDIR)/blaze/blaze.a
+	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
+
+$(BUILDDIR)/test/perft: $(BUILDDIR)/test/perft.o $(BUILDDIR)/blaze/blaze.a
+	$(CC) $(LDFLAGS) $(ARCH) $^ $(LDLIBS) -o $@
+
+$(BUILDDIR)/blaze/blaze.a: $(filter-out %/blaze.o,$(patsubst blaze/%.c,$(BUILDDIR)/blaze/%.o,$(wildcard blaze/*.c)))
+
+$(BUILDDIR)/%.a:
+	rm -f $@
+	$(AR) rcs $@ $^
+
+$(BUILDDIR)/%.o: %.c
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(ARCH) -c -o $@ $<
+
+test: $(BUILDDIR)/test/perft
+
+bench:
+
+dist:
+
+install:
 
 clean:
-	rm -rf o
+	rm -rf $(BUILDDIR)
 
-include build/config.mk
-include build/rules.mk
-include blaze/blaze.mk
-include test/test.mk
-
-.PHONY: o all test clean
+.PHONY: all test bench dist install clean
