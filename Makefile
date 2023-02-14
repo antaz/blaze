@@ -1,13 +1,15 @@
 # Toolchain
 CC		= clang
-LD		= ld
+LD		= ld.lld
 AR		= ar
 TAR		= tar
 
 # Flags
-CFLAGS		= 
-CPPFLAGS	=
+CFLAGS		= -O3 -Wall -Werror -Wextra
+CPPFLAGS	= -DNDEBUG
 LDFLAGS		=
+
+# TODO: allow for seperate debug and release builds
 
 # Arch
 ARCH		= -march=native
