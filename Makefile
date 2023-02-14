@@ -35,7 +35,8 @@ $(BUILDDIR)/%.o: %.c
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(ARCH) -c -o $@ $<
 
-test: $(BUILDDIR)/test/perft
+check: $(BUILDDIR)/test/perft
+	$(BUILDDIR)/test/perft
 
 bench:
 

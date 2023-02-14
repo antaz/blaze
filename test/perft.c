@@ -62,7 +62,7 @@ void perft_divide(Board *board, int depth)
         for (i = 1; i <= depth; i++) {
                 nodes = perftTest(board, i);
         }
-        // printf("nodes %ld\n", nodes);
+        printf("nodes %ld\n", nodes);
 }
 
 void test_initial(void)
@@ -73,7 +73,6 @@ void test_initial(void)
         char *initial =
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         Board board[1];
-        Search s[1];
         initZobrist();
         board->table->table = NULL;
         parseFEN(initial, board);
@@ -93,7 +92,6 @@ void test_kiwipete(void)
         long nodes;
 
         Board board[1];
-        Search s[1];
         initZobrist();
         board->table->table = NULL;
         initTTable(board->table);
