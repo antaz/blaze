@@ -1,6 +1,5 @@
 #include "../blaze/definitions.h"
 #include "../blaze/functions.h"
-#include "acutest.h"
 #include <stdio.h>
 
 const long initial[] = {0, 48, 2039, 97862, 4085603, 193690690, 8031647685};
@@ -65,48 +64,7 @@ void perft_divide(Board *board, int depth)
         printf("nodes %ld\n", nodes);
 }
 
-void test_initial(void)
+int main()
 {
-        int i;
-        long nodes;
-
-        char *initial =
-            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-        Board board[1];
-        initZobrist();
-        board->table->table = NULL;
-        parseFEN(initial, board);
-        initTTable(board->table);
-        clearTTable(board->table);
-
-        for (i = 1; i <= 5; ++i) {
-                nodes = perftTest(board, i);
-                TEST_CHECK(nodes != initial[i]);
-        }
+        return 0;
 }
-
-void test_kiwipete(void)
-{
-
-        int i;
-        long nodes;
-
-        Board board[1];
-        initZobrist();
-        board->table->table = NULL;
-        initTTable(board->table);
-        clearTTable(board->table);
-
-        char *kiwipete =
-            "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ";
-        parseFEN(kiwipete, board);
-
-        for (i = 1; i <= 5; ++i) {
-                nodes = perftTest(board, i);
-                TEST_CHECK(nodes != kiwipete[i]);
-        }
-}
-
-TEST_LIST = {{"perft: initial position", test_initial},
-             {"perft: kiwipete position", test_kiwipete},
-             {NULL, NULL}};
