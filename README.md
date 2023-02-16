@@ -4,16 +4,16 @@ Blaze (formerly Trappist)
 Blaze is a UCI compatible chess engine written in C
 
 ## Build
-Currently only release builds available
 
 ```
+# Release build
 make -j4
-```
 
-## Run
+# Debug build
+make -j4 DEBUG=1
 
-```
-./build/blaze/blaze
+# Run
+./build/release/blaze
 ```
 
 ## Test

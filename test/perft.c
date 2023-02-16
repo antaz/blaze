@@ -1,70 +1,39 @@
 #include "../blaze/definitions.h"
 #include "../blaze/functions.h"
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-const long initial[] = {0, 48, 2039, 97862, 4085603, 193690690, 8031647685};
-const long kiwipete[] = {0, 14, 191, 2812, 43238, 674624, 11030083};
-
-long leafNodes;
-
-void perft(Board *board, int depth)
+static uint64_t perft(Board *board, int depth)
 {
-
-        if (depth == 0) {
-                leafNodes++;
-                return;
-        }
+        uint8_t i;
+        uint64_t nodes = 0;
 
         MoveList list[1];
         generateMoves(board, list);
 
-        int MoveNum = 0;
-        for (MoveNum = 0; MoveNum < list->count; ++MoveNum) {
+        if (depth == 0)
+                return 1;
 
-                if (!makeMove(board, list->moves[MoveNum])) {
+        if (depth == 1)
+                return list->count;
+
+        for (i = 0; i < list->count; ++i) {
+                if (!makeMove(board, list->moves[i]))
                         continue;
-                }
-                perft(board, depth - 1);
+                nodes += perft(board, depth - 1);
                 takeMove(board);
         }
 
-        return;
+        return nodes;
 }
 
-long perftTest(Board *board, int depth)
-{
-        leafNodes = 0;
-
-        MoveList list[1];
-        generateMoves(board, list);
-
-        Move move;
-        int MoveNum = 0;
-        for (MoveNum = 0; MoveNum < list->count; ++MoveNum) {
-                move = list->moves[MoveNum];
-                if (!makeMove(board, move)) {
-                        continue;
-                }
-                perft(board, depth - 1);
-                takeMove(board);
-        }
-
-        // printf("info depth %d nodes %ld\n", depth, leafNodes);
-
-        return leafNodes;
-}
-
-void perft_divide(Board *board, int depth)
+int main(int argc, char *argv[])
 {
         int i;
-        long nodes;
-        for (i = 1; i <= depth; i++) {
-                nodes = perftTest(board, i);
-        }
-        printf("nodes %ld\n", nodes);
-}
-
-int main()
-{
-        return 0;
+        Board board[1];
+        printf("%s\n", argv[1]);
+        parseFEN(argv[1], board);
+        for (i = 1; i <= atoi(argv[2]); ++i)
+                printf("%-8d%lu\n", i, perft(board, i));
 }

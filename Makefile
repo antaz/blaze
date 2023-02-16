@@ -1,15 +1,15 @@
 # Toolchain
 CC		= clang
-LD		= ld.lld
+LD		= clang
 AR		= ar
 TAR		= tar
+AWK		= awk
+DIFF		= diff
 
 # Flags
-CFLAGS		= -O3 -Wall -Werror -Wextra
-CPPFLAGS	= -DNDEBUG
+CFLAGS		= -Wall -Wextra
+CPPFLAGS	=
 LDFLAGS		=
-
-# TODO: allow for seperate debug and release builds
 
 # Arch
 ARCH		= -march=native
@@ -17,13 +17,24 @@ ARCH		= -march=native
 # Misc
 BUILDDIR	= build
 
+# Test for build mode
+ifeq ($(DEBUG),1)
+	CFLAGS  	+= -O0 -g
+	CPPFLAGS	+= -DDEBUG
+	BUILDDIR	 = build/debug
+else
+	CFLAGS  	+= -O3
+	CPPFLAGS	+= -DNDEBUG
+	BUILDDIR	 = build/release
+endif
+
 all: $(BUILDDIR)/blaze/blaze
 
 $(BUILDDIR)/blaze/blaze: $(BUILDDIR)/blaze/blaze.o $(BUILDDIR)/blaze/blaze.a
-	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
+	$(LD) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 $(BUILDDIR)/test/perft: $(BUILDDIR)/test/perft.o $(BUILDDIR)/blaze/blaze.a
-	$(CC) $(LDFLAGS) $(ARCH) $^ $(LDLIBS) -o $@
+	$(LD) $(LDFLAGS) $(ARCH) $^ $(LDLIBS) -o $@
 
 $(BUILDDIR)/blaze/blaze.a: $(filter-out %/blaze.o,$(patsubst blaze/%.c,$(BUILDDIR)/blaze/%.o,$(wildcard blaze/*.c)))
 
@@ -36,7 +47,17 @@ $(BUILDDIR)/%.o: %.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(ARCH) -c -o $@ $<
 
 check: $(BUILDDIR)/test/perft
-	$(BUILDDIR)/test/perft
+	-@$(DIFF) \
+	<($(AWK) -v RS= -v FS=\n 'NR == 1' test/results | head -n 6) \
+	<($(BUILDDIR)/test/perft 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' 5)	\
+
+	-@$(DIFF) \
+	<($(AWK) -v RS= -v FS=\n 'NR == 2' test/results | head -n 6) \
+	<($(BUILDDIR)/test/perft 'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -' 5) \
+
+	-@$(DIFF) \
+	<($(AWK) -v RS= -v FS=\n 'NR == 3' test/results | head -n 6) \
+	<($(BUILDDIR)/test/perft '8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -' 5) \
 
 bench:
 
