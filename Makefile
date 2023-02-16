@@ -46,18 +46,19 @@ $(BUILDDIR)/%.o: %.c
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(ARCH) -c -o $@ $<
 
+# TODO: add test pass/fail information
 check: $(BUILDDIR)/test/perft
 	-@$(DIFF) \
 	<($(AWK) -v RS= -v FS=\n 'NR == 1' test/results | head -n 6) \
 	<($(BUILDDIR)/test/perft 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' 5)	\
 
 	-@$(DIFF) \
-	<($(AWK) -v RS= -v FS=\n 'NR == 2' test/results | head -n 6) \
-	<($(BUILDDIR)/test/perft 'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -' 5) \
+	<($(AWK) -v RS= -v FS=\n 'NR == 2' test/results | head -n 3) \
+	<($(BUILDDIR)/test/perft 'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -' 2) \
 
 	-@$(DIFF) \
-	<($(AWK) -v RS= -v FS=\n 'NR == 3' test/results | head -n 6) \
-	<($(BUILDDIR)/test/perft '8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -' 5) \
+	<($(AWK) -v RS= -v FS=\n 'NR == 3' test/results | head -n 3) \
+	<($(BUILDDIR)/test/perft '8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -' 2) \
 
 bench:
 

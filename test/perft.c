@@ -15,9 +15,6 @@ static uint64_t perft(Board *board, int depth)
         if (depth == 0)
                 return 1;
 
-        if (depth == 1)
-                return list->count;
-
         for (i = 0; i < list->count; ++i) {
                 if (!makeMove(board, list->moves[i]))
                         continue;
