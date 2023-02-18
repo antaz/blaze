@@ -24,3 +24,6 @@ make check
 
 ## Benchmark
 WIP WIP
+
+## License
+Blaze is licensed under the MIT license, a copy of this license can be found in `LICENSE`.
