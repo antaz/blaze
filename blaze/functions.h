@@ -1,10 +1,3 @@
-/*
- * functions.h
- *
- *  Created on: Aug 27, 2017
- *      Author: Antar
- */
-
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 

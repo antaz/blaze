@@ -1,10 +1,3 @@
-/*
- * board.c
- *
- *  Created on: Aug 27, 2017
- *      Author: Antar
- */
-
 #include "definitions.h"
 #include "functions.h"
 #include <stdio.h>
