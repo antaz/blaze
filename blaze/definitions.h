@@ -1,15 +1,6 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
-// debuging and tracing errors
-
-#ifndef NDEBUG
-#include <assert.h>
-#define ASS(x) assert(x)
-#else
-#define ASS(x)
-#endif
-
 // A couple of constants for our chess engine
 
 #define NAME "Trappist"

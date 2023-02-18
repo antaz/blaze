@@ -1,7 +1,6 @@
-// Move generation functions
-
 #include "definitions.h"
 #include "functions.h"
+#include <assert.h>
 #include <stdio.h>
 
 // direction of pieces
@@ -31,8 +30,8 @@ void addMove(Board *board, MoveList *list, unsigned char from, unsigned char to,
              unsigned char enPassant, unsigned char pawnStart,
              unsigned char castle)
 {
-        ASS(onBoard(from));
-        ASS(onBoard(to));
+        assert(onBoard(from));
+        assert(onBoard(to));
 
         Move move;
         move.from = from;
@@ -52,8 +51,8 @@ void addPawnMove(Board *board, MoveList *list, unsigned char from,
                  unsigned char enPassant, unsigned char pawnStart,
                  unsigned char castle)
 {
-        ASS(onBoard(from));
-        ASS(onBoard(to));
+        assert(onBoard(from));
+        assert(onBoard(to));
 
         // checking for promotion
         if (board->pieces[from] == wP && RANK120(from) == RANK_7) {

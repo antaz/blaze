@@ -1,5 +1,6 @@
 #include "definitions.h"
 #include "functions.h"
+#include <assert.h>
 #include <stdio.h>
 
 const int knightDir[8] = {-8, -19, -21, -12, 8, 19, 21, 12};
@@ -10,8 +11,8 @@ const int kingDir[8] = {-1, -10, 1, 10, -9, -11, 11, 9};
 int isAttacked(Board *board, int square, int turn)
 {
         int i, piece, t_square, dir;
-        ASS(onBoard(square));
-        ASS(turn == WHITE || turn == BLACK);
+        assert(onBoard(square));
+        assert(turn == WHITE || turn == BLACK);
 
         // Checking pawn attacks
         if (turn == WHITE) {

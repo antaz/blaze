@@ -1,5 +1,6 @@
 #include "definitions.h"
 #include "functions.h"
+#include <assert.h>
 #include <stdio.h>
 
 #define HASH_PIECE(piece, square)                                              \
@@ -29,8 +30,8 @@ static void clearPiece(Board *board, int square)
         int index = 0;
         int pieceNum = -1;
 
-        ASS(onBoard(square));
-        ASS(pieceValid(piece));
+        assert(onBoard(square));
+        assert(pieceValid(piece));
         // hashing the piece out
         HASH_PIECE(piece, square);
 
@@ -56,8 +57,8 @@ static void clearPiece(Board *board, int square)
 static void addPiece(Board *board, int square, int piece)
 {
 
-        ASS(onBoard(square));
-        ASS(pieceValid(piece));
+        assert(onBoard(square));
+        assert(pieceValid(piece));
 
         // Hashing the piece in
         HASH_PIECE(piece, square);
@@ -76,8 +77,8 @@ static void movePiece(Board *board, int from, int to)
         int index = 0;
         int piece = board->pieces[from];
 
-        ASS(onBoard(from));
-        ASS(onBoard(to));
+        assert(onBoard(from));
+        assert(onBoard(to));
         // Hashing the piece out of from
         HASH_PIECE(piece, from);
 
@@ -104,8 +105,8 @@ int makeMove(Board *board, Move move)
         int from = move.from;
         int to = move.to;
 
-        ASS(onBoard(from));
-        ASS(onBoard(to));
+        assert(onBoard(from));
+        assert(onBoard(to));
 
         int captured = move.captured;
         int promoted = move.promoted;
@@ -231,8 +232,8 @@ void takeMove(Board *board)
         int from = move.from;
         int to = move.to;
 
-        ASS(onBoard(from));
-        ASS(onBoard(to));
+        assert(onBoard(from));
+        assert(onBoard(to));
 
         int captured = move.captured;
         int promoted = move.promoted;

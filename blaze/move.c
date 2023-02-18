@@ -1,5 +1,6 @@
 #include "definitions.h"
 #include "functions.h"
+#include <assert.h>
 #include <stdio.h>
 
 int parseMove(Board *board, char *move, Move *m)
@@ -56,8 +57,8 @@ void printMove(Move move)
 {
         char *pieces = ".pnbrq";
         int promoted = move.promoted;
-        ASS(move.from != OFFBOARD);
-        ASS(move.to != OFFBOARD);
+        assert(move.from != OFFBOARD);
+        assert(move.to != OFFBOARD);
         if (move.from == 0 && move.to == 0) {
                 printf("0000");
                 return;
