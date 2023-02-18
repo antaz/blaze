@@ -46,6 +46,9 @@ $(BUILDDIR)/%.o: %.c
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(ARCH) -c -o $@ $<
 
+# Use bash for process substitution <()
+check: SHELL :=/bin/bash
+
 # TODO: add test pass/fail information
 check: $(BUILDDIR)/test/perft
 	@echo perft rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
