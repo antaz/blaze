@@ -3,8 +3,8 @@
 
 // A couple of constants for our chess engine
 
-#define NAME "Trappist"
-#define AUTHOR "Antar Azri"
+#define NAME "Blaze"
+#define AUTHOR "Dr. Sara Tancredi"
 #define SQNUM 120 // Number of squares on the board
 #define U64 unsigned long long
 #define MAX 256
