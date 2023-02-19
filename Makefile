@@ -1,3 +1,5 @@
+VERSION		= 0.1
+
 # Toolchain
 CC		= clang
 LD		= clang
@@ -67,10 +69,23 @@ check: $(BUILDDIR)/test/perft
 	<($(BUILDDIR)/test/perft '8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -' 2) \
 
 dist:
+	@mkdir blaze-$(VERSION)
+	@cp -r blaze -r man -r test Makefile README.md LICENSE blaze-$(VERSION)
+	@$(TAR) cvzf blaze-$(VERSION).tar.gz blaze-$(VERSION)
+	@rm -rf blaze-$(VERSION)
 
-install:
+# TODO: use PREFIX instead of hardcoded path
+install: $(BUILDDIR)/blaze/blaze
+	@cp $(BUILDDIR)/blaze/blaze /usr/local/bin/
+	@cp man/blaze.1 /usr/local/man/man1
+	@gzip /usr/local/man/man1/blaze.1
+
+dist-clean:
+	@rm -f $(BUILDDIR)/blaze/blaze
+	@rm -f $(BUILDDIR)/test/perft
+	@rm -f blaze-$(VERSION).tar.gz
 
 clean:
-	rm -rf $(BUILDDIR)
+	@rm -f $(BUILDDIR)/blaze/*.o
 
-.PHONY: all check dist install clean
+.PHONY: all check dist install dist-clean clean
