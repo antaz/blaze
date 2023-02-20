@@ -3,6 +3,8 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include "board.h"
+
 #define HASH_PIECE(piece, square)                                              \
         (board->zobristHash ^= (pieceHash[piece][square]))
 #define HASH_CASTLE (board->zobristHash ^= (castleHash[board->castling]))
@@ -23,7 +25,7 @@ const int castlePerm[120] = {
 const int piece_values[13] = {0,   100, 320, 330, 500, 900,  20000,
                               100, 320, 330, 500, 900, 20000};
 
-static void clearPiece(Board *board, int square)
+static void clearPiece(struct board_t *board, int square)
 {
         int piece = board->pieces[square];
         int colour = pieceColor(piece);
@@ -54,7 +56,7 @@ static void clearPiece(Board *board, int square)
             board->pieceList[piece][board->pieceCount[piece]];
 }
 
-static void addPiece(Board *board, int square, int piece)
+static void addPiece(struct board_t *board, int square, int piece)
 {
 
         assert(onBoard(square));
@@ -72,7 +74,7 @@ static void addPiece(Board *board, int square, int piece)
         board->pieceList[piece][board->pieceCount[piece]++] = square;
 }
 
-static void movePiece(Board *board, int from, int to)
+static void movePiece(struct board_t *board, int from, int to)
 {
         int index = 0;
         int piece = board->pieces[from];
@@ -98,7 +100,7 @@ static void movePiece(Board *board, int from, int to)
         }
 }
 
-int makeMove(Board *board, Move move)
+int makeMove(struct board_t *board, Move move)
 {
 
         // setting the move variables
@@ -216,7 +218,7 @@ int makeMove(Board *board, Move move)
         return 1;
 }
 
-void takeMove(Board *board)
+void takeMove(struct board_t *board)
 {
 
         // decrementing the game ply and current search ply

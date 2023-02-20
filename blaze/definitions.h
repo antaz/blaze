@@ -150,25 +150,6 @@ typedef struct {
         U64 size;
 } TTable;
 
-// The main board structure for our chess engine
-typedef struct {
-        int pieces[SQNUM];
-        int pieceCount[13];    // The count of pieces on the board
-        int pieceList[13][10]; // The squares of where pieces are
-        int kingSquare[2];
-        int turn, enPassant, fiftyMove;
-        int ply, hisPly, castling;
-        int material[2];
-        Undo history[MAX];
-
-        int his[13][SQNUM];
-        Move kill[2][MAXDEPTH];
-
-        U64 zobristHash;
-        TTable table[1];
-
-} Board;
-
 // search driver
 typedef struct {
         long long starttime, stoptime;

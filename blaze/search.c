@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "board.h"
+
 #define MATE 99999
 
 static void checkTime(Search *search)
@@ -14,7 +16,7 @@ static void checkTime(Search *search)
         readInput(search);
 }
 
-static int isRep(Board *board)
+static int isRep(struct board_t *board)
 {
         for (int i = board->hisPly - board->fiftyMove; i < board->hisPly; ++i) {
                 if (board->zobristHash == board->history[i].zobristHash)
@@ -23,7 +25,7 @@ static int isRep(Board *board)
         return 0;
 }
 
-static int qSearch(int alpha, int beta, Board *board, Search *search)
+static int qSearch(int alpha, int beta, struct board_t *board, Search *search)
 {
 
         int movenum = 0;
@@ -67,7 +69,7 @@ static int qSearch(int alpha, int beta, Board *board, Search *search)
         return alpha;
 }
 
-static int alphaBeta(int alpha, int beta, int depth, Board *board,
+static int alphaBeta(int alpha, int beta, int depth, struct board_t *board,
                      Search *search, PV *pv)
 {
 
@@ -142,7 +144,7 @@ static int alphaBeta(int alpha, int beta, int depth, Board *board,
         return alpha;
 }
 
-void search(Board *board, Search *search, PV *pv)
+void search(struct board_t *board, Search *search, PV *pv)
 {
 
         int alpha, beta, score;

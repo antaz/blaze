@@ -1,15 +1,15 @@
 #include "definitions.h"
 #include "functions.h"
+#include "board.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
-// value of various pieces (needed to set the material)
 int pieceValue[13] = {0,   100, 320, 330, 500, 900,  20000,
                       100, 320, 330, 500, 900, 20000};
 
-// parsing an FEN string
-void parseFEN(char *fen, Board *board)
+/* parseFEN: parses `fen` (Forsyth–Edwards Notation) string into `board` structure */
+void parseFEN(char *fen, struct board_t *board)
 {
         int rank = RANK_8;
         int file = FILE_A;
@@ -22,12 +22,11 @@ void parseFEN(char *fen, Board *board)
         assert(fen != NULL);
         assert(board != NULL);
 
-        clearBoard(board); // clearing and resetting the board
+        clearBoard(board);
 
         while ((rank >= RANK_1) && *fen) {
                 count = 1;
                 switch (*fen) {
-                // in case of a piece
                 case 'p':
                         piece = bP;
                         break;
@@ -65,7 +64,6 @@ void parseFEN(char *fen, Board *board)
                         piece = wQ;
                         break;
 
-                // in case of a number
                 case '1':
                 case '2':
                 case '3':
@@ -89,7 +87,6 @@ void parseFEN(char *fen, Board *board)
                         printf("Invalid FEN string!\n");
                 }
 
-                // setting pieces on squares
                 for (i = 0; i < count; i++) {
                         sq64 = rank * 8 + file;
                         sq120 = SQ64TO120(sq64);
@@ -102,11 +99,9 @@ void parseFEN(char *fen, Board *board)
 
         assert(*fen == 'w' || *fen == 'b');
 
-        // setting the side to move
         board->turn = (*fen == 'w') ? WHITE : BLACK;
         fen += 2;
 
-        // setting castling permissions
         for (i = 0; i < 4; i++) {
                 if (*fen == ' ')
                         break;
@@ -130,7 +125,6 @@ void parseFEN(char *fen, Board *board)
 
         assert(board->castling >= 0 && board->castling <= 15);
 
-        // setting the en-passant square
         if (*fen != '-') {
                 file = fen[0] - 'a';
                 rank = fen[1] - '1';
@@ -144,8 +138,8 @@ void parseFEN(char *fen, Board *board)
         board->zobristHash = generateHash(board);
 }
 
-// clearing the board function
-void clearBoard(Board *board)
+/* clearBoard: clears `board` */
+void clearBoard(struct board_t *board)
 {
         int i;
         for (i = 0; i < SQNUM; i++)
@@ -167,8 +161,8 @@ void clearBoard(Board *board)
         board->material[WHITE] = board->material[BLACK] = 0;
 }
 
-// updating the piece counts and piece list
-void updatePieceList(Board *board)
+/* updatePieceList: update `pieceList` on board */
+void updatePieceList(struct board_t *board)
 {
         int piece, color, i;
 
@@ -187,8 +181,8 @@ void updatePieceList(Board *board)
         }
 }
 
-// printing the board in std algebraic notation
-void printBoard(Board *board)
+/* printBoard: print `board` in ascii representation */
+void printBoard(struct board_t *board)
 {
         int file, rank, sq, piece;
         char pieceChar[] = ".PNBRQKpnbrqk";
@@ -212,8 +206,7 @@ void printBoard(Board *board)
         printf("Zobrist Hash: %0llx\n", board->zobristHash);
 }
 
-// printing the move list
-
+/* printMoveList: print `list` of moves */
 void printMoveList(MoveList *list)
 {
         int i;
@@ -226,8 +219,7 @@ void printMoveList(MoveList *list)
         }
 }
 
-// printing PV table
-
+/* printPV: print the principle variation `pv` */
 void printPV(PV *pv)
 {
         int i;

@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "board.h"
+
 U64 pieceHash[13][120];
 U64 turnHash;
 U64 castleHash[16];
@@ -34,7 +36,7 @@ void initZobrist()
         }
 }
 
-U64 generateHash(Board *board)
+U64 generateHash(struct board_t *board)
 {
         int square;
         int piece;
@@ -88,7 +90,7 @@ void initTTable(TTable *table)
         // printf("init of TTable complete with %d entries\n", table->size);
 }
 
-int probeTT(Board *board, Move *move)
+int probeTT(struct board_t *board, Move *move)
 {
         int index = board->zobristHash % board->table->size;
 
@@ -101,7 +103,7 @@ int probeTT(Board *board, Move *move)
         return 0;
 }
 
-void storeTT(Board *board, Move move)
+void storeTT(struct board_t *board, Move move)
 {
         int index = board->zobristHash % board->table->size;
         board->table->table[index].move = move;

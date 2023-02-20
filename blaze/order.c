@@ -2,6 +2,8 @@
 #include "functions.h"
 #include <stdio.h>
 
+#include "board.h"
+
 int scores[13] = {0,   100, 200, 300, 400, 500, 600,
                   100, 200, 300, 400, 500, 600};
 
@@ -22,7 +24,7 @@ int compareMoves(const void *m1, const void *m2)
         return 0;
 }
 
-int moveScore(Board *board, Move move)
+int moveScore(struct board_t *board, Move move)
 {
         int score = mvvlva(move.captured, board->pieces[move.from]);
 

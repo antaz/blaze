@@ -3,7 +3,9 @@
 #include <assert.h>
 #include <stdio.h>
 
-int parseMove(Board *board, char *move, Move *m)
+#include "board.h"
+
+int parseMove(struct board_t *board, char *move, Move *m)
 {
         int from, to;
         int moveNum = 0, promoted = EMPTY;

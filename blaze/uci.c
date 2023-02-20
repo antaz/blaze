@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "board.h"
+
 #define INPUTBUFFER 2400
 
 #ifdef WIN32
@@ -25,7 +27,7 @@ long long current_timestamp()
 #endif
 }
 
-void go(Board *board, Search *s, char *line)
+void go(struct board_t *board, Search *s, char *line)
 {
         PV pv;
         pv.count = 0;
@@ -74,7 +76,7 @@ void go(Board *board, Search *s, char *line)
         search(board, s, &pv);
 }
 
-void position(char *lineIn, Board *board)
+void position(char *lineIn, struct board_t *board)
 {
         char *ptrChar = lineIn + 9;
         Move move;
@@ -109,7 +111,7 @@ void position(char *lineIn, Board *board)
         }
         // printBoardSAN(board);
 }
-void uci_loop(Board *board, Search *search)
+void uci_loop(struct board_t *board, Search *search)
 {
 
         setbuf(stdin, NULL);

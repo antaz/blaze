@@ -6,7 +6,7 @@ int main()
 {
         char *start_fen =
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-        Board board[1];
+        struct board_t board[1];
         Search s[1];
         initZobrist();
         board->table->table = NULL;

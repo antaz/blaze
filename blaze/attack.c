@@ -3,12 +3,14 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include "board.h"
+
 const int knightDir[8] = {-8, -19, -21, -12, 8, 19, 21, 12};
 const int rookDir[4] = {-1, -10, 1, 10};
 const int bishopDir[4] = {-9, -11, 11, 9};
 const int kingDir[8] = {-1, -10, 1, 10, -9, -11, 11, 9};
 
-int isAttacked(Board *board, int square, int turn)
+int isAttacked(struct board_t *board, int square, int turn)
 {
         int i, piece, t_square, dir;
         assert(onBoard(square));

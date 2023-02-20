@@ -1,6 +1,8 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
+#include "board.h"
+
 // Macro functions
 #define FR2SQ64(f, r) (((r) << 3) | (f))
 #define FR2SQ120(f, r) (((r) + 2) * 10 + (f) + 1)
@@ -27,58 +29,51 @@
         printf(__VA_ARGS__);                                                   \
         fflush(stdout);
 
-// board.c
-extern void clearBoard(Board *board);
-extern void printBoard(Board *board);
-extern void parseFEN(char *fen, Board *board);
-extern void updatePieceList(Board *board);
-extern void printPV(PV *pv);
-
 // move.c
 extern void printMove(Move move);
-extern int parseMove(Board *board, char *move, Move *m);
+extern int parseMove(struct board_t *board, char *move, Move *m);
 
 // movegen.c
-extern void generateMoves(Board *board, MoveList *list);
-extern void generateCaptures(Board *board, MoveList *list);
+extern void generateMoves(struct board_t *board, MoveList *list);
+extern void generateCaptures(struct board_t *board, MoveList *list);
 
 // makemove.c
-extern int makeMove(Board *board, Move move);
-extern void takeMove(Board *board);
+extern int makeMove(struct board_t *board, Move move);
+extern void takeMove(struct board_t *board);
 
 // evaluation.c
-extern int evaluate(Board *board);
+extern int evaluate(struct board_t *board);
 
 // search.c
 
-extern void search(Board *board, Search *search, PV *pv);
+extern void search(struct board_t *board, Search *search, PV *pv);
 extern int count_nps(long nodes, long long time);
 
 // order.c
 
 int mvvlva(int victim, int attacker);
 int compareMoves(const void *m1, const void *m2);
-int moveScore(Board *board, Move move);
+int moveScore(struct board_t *board, Move move);
 
 // attacks.c
 
-extern int isAttacked(Board *board, int square, int turn);
+extern int isAttacked(struct board_t *board, int square, int turn);
 
 // hash.c
 
 extern void initZobrist();
-extern void setBoardHash(Board *board);
+extern void setBoardHash(struct board_t *board);
 extern void initTTable(TTable *table);
 extern void clearTTable(TTable *table);
-extern int probeTT(Board *board, Move *move);
-extern void storeTT(Board *board, Move move);
-extern U64 generateHash(Board *board);
+extern int probeTT(struct board_t *board, Move *move);
+extern void storeTT(struct board_t *board, Move move);
+extern U64 generateHash(struct board_t *board);
 
 // uci.c
 
-extern void uci_loop(Board *board, Search *search);
+extern void uci_loop(struct board_t *board, Search *search);
 extern long long current_timestamp();
 extern void readInput(Search *search);
-extern void perft_divide(Board *board, int depth);
+extern void perft_divide(struct board_t *board, int depth);
 
 #endif

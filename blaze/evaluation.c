@@ -2,6 +2,8 @@
 #include "functions.h"
 #include <stdio.h>
 
+#include "board.h"
+
 const int piece_square_table[2][6][64] = {
     {{
          // Pawns - early/mid
@@ -154,7 +156,7 @@ int mirror64[64] = {56, 57, 58, 59, 60, 61, 62, 63, 48, 49, 50, 51, 52,
                     31, 16, 17, 18, 19, 20, 21, 22, 23, 8,  9,  10, 11,
                     12, 13, 14, 15, 0,  1,  2,  3,  4,  5,  6,  7};
 
-int mg_eval(Board *board)
+int mg_eval(struct board_t *board)
 {
         int i, piece, square;
         int v = 0;
@@ -233,7 +235,7 @@ int mg_eval(Board *board)
         }
 }
 
-int eg_eval(Board *board)
+int eg_eval(struct board_t *board)
 {
         int i, piece, square;
         int v = 0;
@@ -312,7 +314,7 @@ int eg_eval(Board *board)
         }
 }
 
-int phase(Board *board)
+int phase(struct board_t *board)
 {
         int pawn_phase = 0;
         int knight_phase = 1;
@@ -331,7 +333,7 @@ int phase(Board *board)
         return (phase * 256 + (total_phase / 2)) / total_phase;
 }
 
-int evaluate(Board *board)
+int evaluate(struct board_t *board)
 {
         int mg = mg_eval(board);
         int eg = eg_eval(board);

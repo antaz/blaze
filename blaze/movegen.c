@@ -3,6 +3,8 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include "board.h"
+
 // direction of pieces
 int pieceDirs[13][8] = {{0, 0, 0, 0, 0, 0, 0},
                         {0, 0, 0, 0, 0, 0, 0},
@@ -25,7 +27,7 @@ int sliderPieces[8] = {wB, wR, wQ, 0, bB, bR, bQ, 0};
 int nonSliderPieces[6] = {wN, wK, 0, bN, bK, 0};
 
 // add move to list of moves (if pawn then addPawnMove())
-void addMove(Board *board, MoveList *list, unsigned char from, unsigned char to,
+void addMove(struct board_t *board, MoveList *list, unsigned char from, unsigned char to,
              unsigned char captured, unsigned char promoted,
              unsigned char enPassant, unsigned char pawnStart,
              unsigned char castle)
@@ -46,7 +48,7 @@ void addMove(Board *board, MoveList *list, unsigned char from, unsigned char to,
         list->count++;
 }
 // adding a pawn move
-void addPawnMove(Board *board, MoveList *list, unsigned char from,
+void addPawnMove(struct board_t *board, MoveList *list, unsigned char from,
                  unsigned char to, unsigned char captured,
                  unsigned char enPassant, unsigned char pawnStart,
                  unsigned char castle)
@@ -80,7 +82,7 @@ void addPawnMove(Board *board, MoveList *list, unsigned char from,
 }
 // TODO later, give different scoring to quiet and capture moves
 
-void generateMoves(Board *board, MoveList *list)
+void generateMoves(struct board_t *board, MoveList *list)
 {
 
         // setting some variables
@@ -296,7 +298,7 @@ void generateMoves(Board *board, MoveList *list)
         }
 }
 
-void generateCaptures(Board *board, MoveList *list)
+void generateCaptures(struct board_t *board, MoveList *list)
 {
 
         // setting some variables

@@ -4,7 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static uint64_t perft(Board *board, int depth)
+#include "board.h"
+
+static uint64_t perft(struct board_t *board, int depth)
 {
         uint8_t i;
         uint64_t nodes = 0;
@@ -28,7 +30,7 @@ static uint64_t perft(Board *board, int depth)
 int main(int argc, char *argv[])
 {
         int i;
-        Board board[1];
+        struct board_t board[1];
         printf("%s\n", argv[1]);
         parseFEN(argv[1], board);
         for (i = 1; i <= atoi(argv[2]); ++i)
