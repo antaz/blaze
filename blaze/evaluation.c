@@ -1,8 +1,7 @@
-#include "definitions.h"
-#include "functions.h"
 #include <stdio.h>
 
 #include "board.h"
+#include "evaluation.h"
 
 const int piece_square_table[2][6][64] = {
     {{

@@ -1,6 +1,9 @@
-#include "definitions.h"
-#include "functions.h"
 #include <stdio.h>
+
+#include "board.h"
+#include "search.h"
+#include "hash.h"
+#include "uci.h"
 
 int main()
 {
@@ -9,10 +12,7 @@ int main()
         struct board_t board[1];
         Search s[1];
         initZobrist();
-        board->table->table = NULL;
         parseFEN(start_fen, board);
-        initTTable(board->table);
-        clearTTable(board->table);
 
         uci_loop(board, s);
         return 0;

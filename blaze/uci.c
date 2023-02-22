@@ -1,31 +1,16 @@
-#include "definitions.h"
-#include "functions.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "board.h"
+#include "move.h"
+#include "search.h"
+#include "uci.h"
+#include "makemove.h"
 
+#define NAME "Blaze"
+#define AUTHOR "Dr. Sara Tancredi"
 #define INPUTBUFFER 2400
-
-#ifdef WIN32
-#include <Windows.h>
-#include <io.h>
-#else
-#include <sys/time.h>
-#include <unistd.h>
-#endif
-
-long long current_timestamp()
-{
-#ifdef WIN32
-        return GetTickCount();
-#else
-        struct timeval te;
-        gettimeofday(&te, NULL);
-        return te.tv_sec * 1000 + te.tv_usec / 1000;
-#endif
-}
 
 void go(struct board_t *board, Search *s, char *line)
 {
@@ -79,7 +64,7 @@ void go(struct board_t *board, Search *s, char *line)
 void position(char *lineIn, struct board_t *board)
 {
         char *ptrChar = lineIn + 9;
-        Move move;
+        struct move_t move;
 
         lineIn = ptrChar;
 
@@ -143,67 +128,5 @@ void uci_loop(struct board_t *board, Search *search)
                         printf("id author %s\n", AUTHOR);
                         printf("uciok\n");
                 }
-        }
-}
-
-int inputWaiting()
-{
-#ifndef WIN32
-        struct timeval tv;
-        fd_set readfds;
-
-        FD_ZERO(&readfds);
-        FD_SET(fileno(stdin), &readfds);
-        tv.tv_sec = 0;
-        tv.tv_usec = 0;
-        select(16, &readfds, 0, 0, &tv);
-
-        return (FD_ISSET(fileno(stdin), &readfds));
-#else
-        static int init = 0, pipe;
-        static HANDLE inh;
-        DWORD dw;
-
-        if (!init) {
-                init = 1;
-                inh = GetStdHandle(STD_INPUT_HANDLE);
-                pipe = !GetConsoleMode(inh, &dw);
-                if (!pipe) {
-                        SetConsoleMode(inh, dw & ~(ENABLE_MOUSE_INPUT |
-                                                   ENABLE_WINDOW_INPUT));
-                        FlushConsoleInputBuffer(inh);
-                }
-        }
-        if (pipe) {
-                if (!PeekNamedPipe(inh, NULL, 0, NULL, &dw, NULL))
-                        return 1;
-                return dw;
-        } else {
-                GetNumberOfConsoleInputEvents(inh, &dw);
-                return dw <= 1 ? 0 : dw;
-        }
-#endif
-}
-
-void readInput(Search *search)
-{
-        int bytes;
-        char input[256] = "", *endc;
-
-        if (inputWaiting()) {
-                search->stop = 1;
-                do {
-                        bytes = read(fileno(stdin), input, 256);
-                } while (bytes < 0);
-                endc = strchr(input, '\n');
-                if (endc)
-                        *endc = 0;
-
-                if (strlen(input) > 0) {
-                        if (!strncmp(input, "quit", 4)) {
-                                // search->quit = 1;
-                        }
-                }
-                return;
         }
 }

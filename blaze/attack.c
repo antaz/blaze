@@ -1,5 +1,3 @@
-#include "definitions.h"
-#include "functions.h"
 #include <assert.h>
 #include <stdio.h>
 

@@ -1,9 +1,10 @@
-#include "definitions.h"
-#include "functions.h"
 #include <assert.h>
 #include <stdio.h>
 
+#include "movegen.h"
 #include "board.h"
+#include "move.h"
+#include "makemove.h"
 
 #define HASH_PIECE(piece, square)                                              \
         (board->zobristHash ^= (pieceHash[piece][square]))
@@ -100,7 +101,91 @@ static void movePiece(struct board_t *board, int from, int to)
         }
 }
 
-int makeMove(struct board_t *board, Move move)
+void takeMove(struct board_t *board)
+{
+
+        // decrementing the game ply and current search ply
+        board->hisPly--;
+        board->ply--;
+
+        if (board->enPassant != NO_SQ)
+                HASH_EP;
+        HASH_CASTLE;
+
+        // setting the history move variables
+        struct move_t move = board->history[board->hisPly].move;
+        int from = move.from;
+        int to = move.to;
+
+        assert(onBoard(from));
+        assert(onBoard(to));
+
+        int captured = move.captured;
+        int promoted = move.promoted;
+
+        // updating the board with history information
+        board->castling = board->history[board->hisPly].castling;
+        board->fiftyMove = board->history[board->hisPly].fiftyMove;
+        board->enPassant = board->history[board->hisPly].enPassant;
+
+        if (board->enPassant != NO_SQ)
+                HASH_EP;
+        HASH_CASTLE;
+
+        // switch the turn
+        board->turn ^= 1;
+        HASH_TURN;
+
+        // if enpassant add the pawn back
+        if (move.enPassant) {
+                if (board->turn == WHITE) {
+                        addPiece(board, to - 10, bP);
+                } else {
+                        addPiece(board, to + 10, wP);
+                }
+        }
+        // set castling moves
+        else if (move.castle) {
+                switch (to) {
+                case C1:
+                        movePiece(board, D1, A1);
+                        break;
+                case C8:
+                        movePiece(board, D8, A8);
+                        break;
+                case G1:
+                        movePiece(board, F1, H1);
+                        break;
+                case G8:
+                        movePiece(board, F8, H8);
+                        break;
+                default:;
+                        break;
+                }
+        }
+
+        // move the piece
+        movePiece(board, to, from);
+
+        // set the kingSquare
+        if (isKing(board->pieces[from])) {
+                board->kingSquare[board->turn] = from;
+        }
+
+        // adding back the captured piece
+        if (captured != EMPTY) {
+                addPiece(board, to, captured);
+        }
+
+        // clearing the promoted piece and adding the pawn promoted to the board
+        if (promoted != EMPTY) {
+                clearPiece(board, from);
+                addPiece(board, from,
+                         (pieceColor(promoted) == WHITE ? wP : bP));
+        }
+}
+
+int makeMove(struct board_t *board, struct move_t move)
 {
 
         // setting the move variables
@@ -216,88 +301,4 @@ int makeMove(struct board_t *board, Move move)
         }
 
         return 1;
-}
-
-void takeMove(struct board_t *board)
-{
-
-        // decrementing the game ply and current search ply
-        board->hisPly--;
-        board->ply--;
-
-        if (board->enPassant != NO_SQ)
-                HASH_EP;
-        HASH_CASTLE;
-
-        // setting the history move variables
-        Move move = board->history[board->hisPly].move;
-        int from = move.from;
-        int to = move.to;
-
-        assert(onBoard(from));
-        assert(onBoard(to));
-
-        int captured = move.captured;
-        int promoted = move.promoted;
-
-        // updating the board with history information
-        board->castling = board->history[board->hisPly].castling;
-        board->fiftyMove = board->history[board->hisPly].fiftyMove;
-        board->enPassant = board->history[board->hisPly].enPassant;
-
-        if (board->enPassant != NO_SQ)
-                HASH_EP;
-        HASH_CASTLE;
-
-        // switch the turn
-        board->turn ^= 1;
-        HASH_TURN;
-
-        // if enpassant add the pawn back
-        if (move.enPassant) {
-                if (board->turn == WHITE) {
-                        addPiece(board, to - 10, bP);
-                } else {
-                        addPiece(board, to + 10, wP);
-                }
-        }
-        // set castling moves
-        else if (move.castle) {
-                switch (to) {
-                case C1:
-                        movePiece(board, D1, A1);
-                        break;
-                case C8:
-                        movePiece(board, D8, A8);
-                        break;
-                case G1:
-                        movePiece(board, F1, H1);
-                        break;
-                case G8:
-                        movePiece(board, F8, H8);
-                        break;
-                default:;
-                        break;
-                }
-        }
-
-        // move the piece
-        movePiece(board, to, from);
-
-        // set the kingSquare
-        if (isKing(board->pieces[from])) {
-                board->kingSquare[board->turn] = from;
-        }
-
-        // adding back the captured piece
-        if (captured != EMPTY) {
-                addPiece(board, to, captured);
-        }
-
-        // clearing the promoted piece and adding the pawn promoted to the board
-        if (promoted != EMPTY) {
-                clearPiece(board, from);
-                addPiece(board, from,
-                         (pieceColor(promoted) == WHITE ? wP : bP));
-        }
 }

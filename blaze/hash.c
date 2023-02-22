@@ -1,9 +1,8 @@
-#include "definitions.h"
-#include "functions.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "board.h"
+#include "hash.h"
 
 U64 pieceHash[13][120];
 U64 turnHash;
@@ -60,52 +59,4 @@ U64 generateHash(struct board_t *board)
         zobrist ^= castleHash[board->castling];
 
         return zobrist;
-}
-
-// initialization of TT
-
-const int TTSize = 0x100000 * 2;
-
-void clearTTable(TTable *table)
-{
-        TTEntry *entry;
-        for (entry = table->table; entry < table->table + table->size;
-             entry++) {
-                entry->zobristHash = 0ULL;
-                entry->depth = 0;
-                entry->score = 0;
-                entry->flags = 0;
-        }
-        table->newWrite = 0;
-}
-void initTTable(TTable *table)
-{
-        table->size = TTSize / sizeof(TTEntry);
-        table->size -= 2;
-        if (table->table != NULL) {
-                free(table->table);
-        }
-        table->table = (TTEntry *)malloc(table->size * sizeof(TTEntry));
-        clearTTable(table);
-        // printf("init of TTable complete with %d entries\n", table->size);
-}
-
-int probeTT(struct board_t *board, Move *move)
-{
-        int index = board->zobristHash % board->table->size;
-
-        if (board->table->table[index].zobristHash == board->zobristHash) {
-                move->from = board->table->table[index].move.from;
-                move->to = board->table->table[index].move.to;
-                return 1;
-        }
-
-        return 0;
-}
-
-void storeTT(struct board_t *board, Move move)
-{
-        int index = board->zobristHash % board->table->size;
-        board->table->table[index].move = move;
-        board->table->table[index].zobristHash = board->zobristHash;
 }

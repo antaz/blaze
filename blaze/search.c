@@ -1,12 +1,104 @@
-#include "definitions.h"
-#include "functions.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "board.h"
+#include "move.h"
+#include "movegen.h"
+#include "evaluation.h"
+#include "makemove.h"
 
 #define MATE 99999
+
+
+// search driver
+typedef struct {
+        long long starttime, stoptime;
+        int depth, timeset, movestogo, infinite, stop;
+        long nodes;
+} Search;
+
+#ifdef WIN32
+#include <Windows.h>
+#include <io.h>
+#else
+#include <sys/time.h>
+#include <unistd.h>
+#endif
+
+long long current_timestamp()
+{
+#ifdef WIN32
+        return GetTickCount();
+#else
+        struct timeval te;
+        gettimeofday(&te, NULL);
+        return te.tv_sec * 1000 + te.tv_usec / 1000;
+#endif
+}
+
+
+int inputWaiting()
+{
+#ifndef WIN32
+        struct timeval tv;
+        fd_set readfds;
+
+        FD_ZERO(&readfds);
+        FD_SET(fileno(stdin), &readfds);
+        tv.tv_sec = 0;
+        tv.tv_usec = 0;
+        select(16, &readfds, 0, 0, &tv);
+
+        return (FD_ISSET(fileno(stdin), &readfds));
+#else
+        static int init = 0, pipe;
+        static HANDLE inh;
+        DWORD dw;
+
+        if (!init) {
+                init = 1;
+                inh = GetStdHandle(STD_INPUT_HANDLE);
+                pipe = !GetConsoleMode(inh, &dw);
+                if (!pipe) {
+                        SetConsoleMode(inh, dw & ~(ENABLE_MOUSE_INPUT |
+                                                   ENABLE_WINDOW_INPUT));
+                        FlushConsoleInputBuffer(inh);
+                }
+        }
+        if (pipe) {
+                if (!PeekNamedPipe(inh, NULL, 0, NULL, &dw, NULL))
+                        return 1;
+                return dw;
+        } else {
+                GetNumberOfConsoleInputEvents(inh, &dw);
+                return dw <= 1 ? 0 : dw;
+        }
+#endif
+}
+
+void readInput(Search *search)
+{
+        int bytes;
+        char input[256] = "", *endc;
+
+        if (inputWaiting()) {
+                search->stop = 1;
+                do {
+                        bytes = read(fileno(stdin), input, 256);
+                } while (bytes < 0);
+                endc = strchr(input, '\n');
+                if (endc)
+                        *endc = 0;
+
+                if (strlen(input) > 0) {
+                        if (!strncmp(input, "quit", 4)) {
+                                // search->quit = 1;
+                        }
+                }
+                return;
+        }
+}
 
 static void checkTime(Search *search)
 {
@@ -100,7 +192,7 @@ static int alphaBeta(int alpha, int beta, int depth, struct board_t *board,
         check =
             isAttacked(board, board->kingSquare[board->turn], board->turn ^ 1);
 
-        qsort(list->moves, list->count, sizeof(Move), compareMoves);
+        qsort(list->moves, list->count, sizeof(struct move_t), compareMoves);
 
         for (movenum = 0; movenum < list->count; movenum++) {
 
@@ -126,7 +218,7 @@ static int alphaBeta(int alpha, int beta, int depth, struct board_t *board,
                                 alpha = score;
                                 pv->moves[0] = list->moves[movenum];
                                 memcpy(pv->moves + 1, childpv.moves,
-                                       childpv.count * sizeof(Move));
+                                       childpv.count * sizeof(struct move_t));
                                 pv->count = childpv.count + 1;
                         }
                 }
@@ -144,6 +236,18 @@ static int alphaBeta(int alpha, int beta, int depth, struct board_t *board,
         return alpha;
 }
 
+
+int count_nps(long nodes, long long time)
+{
+        if (time == 0)
+                return 0;
+
+        if (time > 20000)
+                return nodes / (time / 1000);
+        else
+                return (nodes * 1000) / time;
+}
+
 void search(struct board_t *board, Search *search, PV *pv)
 {
 
@@ -152,7 +256,7 @@ void search(struct board_t *board, Search *search, PV *pv)
         alpha = -2 * MATE;
         beta = +2 * MATE;
         int current_depth;
-        Move bestmove = {0};
+        struct move_t bestmove = {0};
 
         for (current_depth = 1; current_depth <= search->depth;
              current_depth++) {
@@ -174,13 +278,3 @@ void search(struct board_t *board, Search *search, PV *pv)
         printf("\n");
 }
 
-int count_nps(long nodes, long long time)
-{
-        if (time == 0)
-                return 0;
-
-        if (time > 20000)
-                return nodes / (time / 1000);
-        else
-                return (nodes * 1000) / time;
-}
