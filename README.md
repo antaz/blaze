@@ -11,7 +11,7 @@ Setting the `DEBUG` variable allows for a custom debug build with debugging symb
 make -j4
 
 # Run
-./build/release/blaze/blaze
+./build/release/blaze
 
 # Debug build
 make -j4 DEBUG=1
