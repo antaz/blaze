@@ -12,12 +12,18 @@ struct board_t {
         bool turn;         // side to move
         uint8_t ply;       // half-move counter
         uint8_t castle;    // castling rights
+        uint8_t ep;        // en-passent square
 };
 
-/* parse: parses `fen` (Forsyth–Edwards Notation) string into `board` structure */
+/* parse: parses `fen` (Forsyth–Edwards Notation) string into `board` structure
+ */
 void parse(const char *fen, struct board_t *board);
 
 /* generate: gnerates pseudo-legal moves */
 void generate(const struct board_t *board, uint16_t *moves);
+
+uint64_t checks(const uint64_t piece[], bool color);
+
+uint64_t danger(const uint64_t piece[], bool color);
 
 #endif /* BOARD_H */
