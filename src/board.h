@@ -6,23 +6,22 @@
 
 /* non-recoverable information */
 struct undo_t {
-	uint8_t ply;             // half-move count
-	uint8_t ca;              // castling rights
-	uint8_t ep;              // en-passent square
-	uint8_t cap;             // captured piece (if any)
+        uint8_t ply; // half-move count
+        uint8_t ca;  // castling rights
+        uint8_t ep;  // en-passent square
+        uint8_t cap; // captured piece (if any)
 };
 
 /* main structure to hold the state of the board */
 struct board_t {
-        uint64_t bb[PC + 2];     // piece bitboards
-        uint8_t  mail[SQ];       // mailbox representation of the board
-        uint8_t  turn;           // side to move
-        uint8_t  ply;            // half-move count
-        uint8_t  ca;             // castling rights
-        uint8_t  ep;             // en-passent square
-	struct undo_t hist[MM];  // history of board states
+        uint64_t bb[PC + 2];    // piece bitboards
+        uint8_t mail[SQ];       // mailbox representation of the board
+        uint8_t turn;           // side to move
+        uint8_t ply;            // half-move count
+        uint8_t ca;             // castling rights
+        uint8_t ep;             // en-passent square
+        struct undo_t hist[MM]; // history of board states
 };
-
 
 /** @brief FEN (Forsyth-Edwards Notation) parser
  *  @param fen the FEN string

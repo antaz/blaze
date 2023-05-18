@@ -3,14 +3,14 @@
 
 #include <stdint.h>
 
-#define EMPTY 0ULL                // empty bitboard
-#define FULL  0xFFFFFFFFFFFFFFFF  // full bitboard
-#define R2    0x000000000000FF00  // 2nd rank
-#define R4    0x00000000FF000000  // 4th rank
-#define R5    0x000000FF00000000  // 5th rank
-#define R7    0x00FF000000000000  // 7th rank
-#define FA    0x0101010101010101  // A file
-#define FH    0x8080808080808080  // H file
+#define EMPTY 0ULL              // empty bitboard
+#define FULL 0xFFFFFFFFFFFFFFFF // full bitboard
+#define R2 0x000000000000FF00   // 2nd rank
+#define R4 0x00000000FF000000   // 4th rank
+#define R5 0x000000FF00000000   // 5th rank
+#define R7 0x00FF000000000000   // 7th rank
+#define FA 0x0101010101010101   // A file
+#define FH 0x8080808080808080   // H file
 
 #define set(b, i) (b |= 1ULL << i)
 #define unset(b, i) (b &= ~(1ULL << i))
@@ -28,7 +28,7 @@ int popcnt(uint64_t b);
  */
 int bsf(uint64_t b);
 
-/** @brief reverse a bitboard 
+/** @brief reverse a bitboard
  *  @param b a bitset (bitboard)
  *  @return uint64_t
  */

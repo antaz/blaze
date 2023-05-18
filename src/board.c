@@ -4,10 +4,10 @@
 
 void parse(const char *fen, struct board_t *board)
 {
-	uint64_t *bb   = board->bb;
-	uint8_t  *mail = board->mail;
+        uint64_t *bb = board->bb;
+        uint8_t *mail = board->mail;
 
-        int i = 7*8; // TODO: don't hard code this
+        int i = 7 * 8; // TODO: don't hard code this
         while (*fen) {
                 switch (*fen) {
                 case 'p':
@@ -83,13 +83,13 @@ void parse(const char *fen, struct board_t *board)
                         break;
 
                 case '/':
-			i -= 2*8;
+                        i -= 2 * 8;
                 case ' ':
                         ++fen;
                         continue;
 
                 default:
-			break;
+                        break;
                 }
                 ++fen;
         }

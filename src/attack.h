@@ -1,8 +1,8 @@
 #ifndef ATTACK_H
 #define ATTACK_H
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #define rank(i) (i >> 3)
 #define file(i) (i & 7)

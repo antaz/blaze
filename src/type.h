@@ -39,10 +39,10 @@ enum {
 
 /* castling permissions */
 enum {
-	WK = 1,  // White king side
-	WQ = 2,  // Black king side
-	BK = 4,  // White queen side
-	BQ = 8   // Black queen side
+        WK = 1, // White king side
+        WQ = 2, // Black king side
+        BK = 4, // White queen side
+        BQ = 8  // Black queen side
 };
 
 /* piece - piece encoding

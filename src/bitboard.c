@@ -9,8 +9,8 @@ uint64_t rev(uint64_t b)
         b = (b & 0x0f0f0f0f0f0f0f0f) << 4 | ((b >> 4) & 0x0f0f0f0f0f0f0f0f);
         b = (b & 0x00ff00ff00ff00ff) << 8 | ((b >> 8) & 0x00ff00ff00ff00ff);
 
-        return (b << 48) | ((b & 0xffff0000) << 16) |
-               ((b >> 16) & 0xffff0000) | (b >> 48);
+        return (b << 48) | ((b & 0xffff0000) << 16) | ((b >> 16) & 0xffff0000) |
+               (b >> 48);
 }
 
 uint64_t oo2r(int i, uint64_t block, uint64_t mask)
@@ -35,10 +35,10 @@ int bsf(uint64_t b) { return popcnt((b & -b) - 1); }
 
 void printb(uint64_t b)
 {
-	for(int r = 7; r >= 0; --r) {
-		for(int f = 0; f < 8; ++f) {
-			b & (1ULL << (r*8 + f)) ? printf("X ") : printf(". ");
-		}
-		printf("\n");
-	}
+        for (int r = 7; r >= 0; --r) {
+                for (int f = 0; f < 8; ++f) {
+                        b & (1ULL << (r * 8 + f)) ? printf("X ") : printf(". ");
+                }
+                printf("\n");
+        }
 }
