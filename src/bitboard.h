@@ -1,48 +1,45 @@
 #ifndef BITBOARD_H
 #define BITBOARD_H
 
-#include <stdbool.h>
 #include <stdint.h>
+
+#define EMPTY 0ULL                // empty bitboard
+#define FULL  0xFFFFFFFFFFFFFFFF  // full bitboard
+#define R2    0x000000000000FF00  // 2nd rank
+#define R4    0x00000000FF000000  // 4th rank
+#define R5    0x000000FF00000000  // 5th rank
+#define R7    0x00FF000000000000  // 7th rank
+#define FA    0x0101010101010101  // A file
+#define FH    0x8080808080808080  // H file
 
 #define set(b, i) (b |= 1ULL << i)
 #define unset(b, i) (b &= ~(1ULL << i))
 #define toggle(b, i) (b ^= 1ULL << i)
-#define rank(i) (i >> 3)
-#define file(i) (i & 7)
-#define diag(i) 7 + rank(i) - file(i)
-#define adiag(i) rank(i) + file(i)
-#define index(f, r) (8 * r + f)
 
-/* popcount: Population Count the number of 1 bits
- * Brian Kernighan's way
+/** @brief count the number of bits in a 64bit integer
+ *  @param b a bitset (bitboard)
+ *  @return int
  */
-int popcount(uint64_t bb);
+int popcnt(uint64_t b);
 
-/* bsf: Bit Scan Forward to find the index of the least significant 1 bit
- * Using population count
+/** @brief bit scan forward returns the index of the least significant 1 bit
+ *  @param b a bitset (bitboard)
+ *  @return int
  */
-int bsf(uint64_t bb);
+int bsf(uint64_t b);
 
-/* king attack vector for a given square index */
-uint64_t kattack(int i);
+/** @brief reverse a bitboard 
+ *  @param b a bitset (bitboard)
+ *  @return uint64_t
+ */
+uint64_t rev(uint64_t b);
 
-/* knight attack vector for a given square index */
-uint64_t nattack(int i);
+/** @brief Hyperbola Quintessence's o^(o - 2r) trick
+ *  @param b a bitset (bitboard)
+ *  @return uint64_t
+ */
+uint64_t oo2r(int i, uint64_t block, uint64_t mask);
 
-/* pawn attack vector for a given square index and color */
-uint64_t pattack(int i, bool color);
-
-/* bishop attack vector from a given square index and a block set */
-uint64_t battack(int i, uint64_t block);
-
-/* rook attack vector from a given square index and a block set */
-uint64_t rattack(int i, uint64_t block);
-
-uint64_t between(int i, int j);
-
-uint64_t line(int i, int j);
-
-/* print bitboard */
-void printb(uint64_t bb);
+void printb(uint64_t b);
 
 #endif /* BITBOARD_H */

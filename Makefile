@@ -19,7 +19,6 @@ BDIR		= build
 CFLAGS		= -Wall -Wextra
 CPPFLAGS	= 
 LDFLAGS		=
-DFLAGS	       	= -MT $@ -MMD -MP -MF $(BDIR)/$*.d 
 
 # architecture
 ARCH		= -march=native
@@ -48,9 +47,18 @@ $(BDIR)/blaze.a: $(filter-out %/blaze.o,$(patsubst src/%.c,$(BDIR)/%.o,$(wildcar
 $(BDIR)/%.a:
 	$(AR) rcs $@ $^
 
-$(BDIR)/%.o: %.c
+$(BDIR)/%.o: %.c $(BDIR)/%.d
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) $(DFLAGS) $(CPPFLAGS) $(ARCH) -c -o $@ $<
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(ARCH) -c -o $@ $<
+
+$(BDIR)/%.d: %.c
+	@mkdir -p $(@D)
+	@set -e; rm -f $@; \
+	$(CC) -M $(CPPFLAGS) $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+.PRECIOUS: $(BDIR)/%.d
 
 # alternatively supress errors with `-include`
 include $(wildcard $(patsubst src/%.c, $(BDIR)/%.d, $(wildcard src/*.c)))

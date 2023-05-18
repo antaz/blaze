@@ -1,29 +1,47 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include <stdbool.h>
+#include "type.h"
 #include <stdint.h>
 
-enum { WHITE, BLACK, PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING };
+/* non-recoverable information */
+struct undo_t {
+	uint8_t ply;             // half-move count
+	uint8_t ca;              // castling rights
+	uint8_t ep;              // en-passent square
+	uint8_t cap;             // captured piece (if any)
+};
 
 /* main structure to hold the state of the board */
 struct board_t {
-        uint64_t piece[8]; // piece bitboards
-        bool turn;         // side to move
-        uint8_t ply;       // half-move counter
-        uint8_t castle;    // castling rights
-        uint8_t ep;        // en-passent square
+        uint64_t bb[PC + 2];     // piece bitboards
+        uint8_t  mail[SQ];       // mailbox representation of the board
+        uint8_t  turn;           // side to move
+        uint8_t  ply;            // half-move count
+        uint8_t  ca;             // castling rights
+        uint8_t  ep;             // en-passent square
+	struct undo_t hist[MM];  // history of board states
 };
 
-/* parse: parses `fen` (Forsyth–Edwards Notation) string into `board` structure
+
+/** @brief FEN (Forsyth-Edwards Notation) parser
+ *  @param fen the FEN string
+ *  @param board board state
+ *  @return void
  */
 void parse(const char *fen, struct board_t *board);
 
-/* generate: gnerates pseudo-legal moves */
-void generate(const struct board_t *board, uint16_t *moves);
+/** @brief make the move on the board
+ *  @param board board state
+ *  @param move the move to be played
+ *  @return void
+ */
+void make(struct board_t *board, const uint16_t *move);
 
-uint64_t checks(const uint64_t piece[], bool color);
-
-uint64_t danger(const uint64_t piece[], bool color);
+/** @brief unmake the last move played on the board
+ *  @param board board state
+ *  @return void
+ */
+void unmake(struct board_t *board);
 
 #endif /* BOARD_H */
