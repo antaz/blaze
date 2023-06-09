@@ -4,71 +4,78 @@
 
 void parse(const char *fen, struct board_t *board)
 {
-        uint64_t *bb = board->bb;
-        uint8_t *mail = board->mail;
+	// TODO: check the validity of the strings
 
-        int i = 7 * 8; // TODO: don't hard code this
-        while (*fen) {
+        uint64_t *bb = board->bb;
+
+        int i = 0;
+        while (*fen != ' ') {
                 switch (*fen) {
                 case 'p':
-                        set(bb[BLACK], i);
-                        mail[i] = piece(BLACK, PAWN);
-                        set(bb[PAWN], i++);
+			bb[1] |= ((uint64_t)PAWN & 1) << (i^0x38);
+			bb[2] |= ((uint64_t)(PAWN >> 1) & 1) << (i^0x38);
+			bb[3] |= ((uint64_t)PAWN >> 2) << (i++^0x38);
                         break;
                 case 'n':
-                        set(bb[BLACK], i);
-                        mail[i] = piece(BLACK, KNIGHT);
-                        set(bb[KNIGHT], i++);
+			bb[1] |= ((uint64_t)KNIGHT & 1) << (i^0x38);
+			bb[2] |= ((uint64_t)(KNIGHT >> 1) & 1) << (i^0x38);
+			bb[3] |= ((uint64_t)KNIGHT >> 2) << (i++^0x38);
                         break;
                 case 'b':
-                        set(bb[BLACK], i);
-                        mail[i] = piece(BLACK, BISHOP);
-                        set(bb[BISHOP], i++);
+			bb[1] |= ((uint64_t)BISHOP & 1) << (i^0x38);
+			bb[2] |= ((uint64_t)(BISHOP >> 1) & 1) << (i^0x38);
+			bb[3] |= ((uint64_t)BISHOP >> 2) << (i++^0x38);
                         break;
                 case 'r':
-                        set(bb[BLACK], i);
-                        mail[i] = piece(BLACK, ROOK);
-                        set(bb[ROOK], i++);
+			bb[1] |= ((uint64_t)ROOK & 1) << (i^0x38);
+			bb[2] |= ((uint64_t)(ROOK >> 1) & 1) << (i^0x38);
+			bb[3] |= ((uint64_t)ROOK >> 2) << (i++^0x38);
                         break;
                 case 'q':
-                        set(bb[BLACK], i);
-                        mail[i] = piece(BLACK, QUEEN);
-                        set(bb[QUEEN], i++);
+			bb[1] |= ((uint64_t)QUEEN & 1) << (i^0x38);
+			bb[2] |= ((uint64_t)(QUEEN >> 1) & 1) << (i^0x38);
+			bb[3] |= ((uint64_t)QUEEN >> 2) << (i++^0x38);
                         break;
                 case 'k':
-                        set(bb[BLACK], i);
-                        mail[i] = piece(BLACK, KING);
-                        set(bb[KING], i++);
+			bb[1] |= ((uint64_t)KING & 1) << (i^0x38);
+			bb[2] |= ((uint64_t)(KING >> 1) & 1) << (i^0x38);
+			bb[3] |= ((uint64_t)KING >> 2) << (i++^0x38);
                         break;
                 case 'P':
-                        set(bb[WHITE], i);
-                        mail[i] = piece(WHITE, PAWN);
-                        set(bb[PAWN], i++);
+			bb[1] |= ((uint64_t)PAWN & 1) << (i^0x38);
+			bb[2] |= ((uint64_t)(PAWN >> 1) & 1) << (i^0x38);
+			bb[3] |= ((uint64_t)PAWN >> 2) << (i^0x38);
+			bb[0] |= 1ULL << (i++^0x38);
                         break;
                 case 'N':
-                        set(bb[WHITE], i);
-                        mail[i] = piece(WHITE, KNIGHT);
-                        set(bb[KNIGHT], i++);
+			bb[1] |= ((uint64_t)KNIGHT & 1) << (i^0x38);
+			bb[2] |= ((uint64_t)(KNIGHT >> 1) & 1) << (i^0x38);
+			bb[3] |= ((uint64_t)KNIGHT >> 2) << (i^0x38);
+			bb[0] |= 1ULL << (i++^0x38);
                         break;
                 case 'B':
-                        set(bb[WHITE], i);
-                        mail[i] = piece(WHITE, BISHOP);
-                        set(bb[BISHOP], i++);
+			bb[1] |= ((uint64_t)BISHOP & 1) << (i^0x38);
+			bb[2] |= ((uint64_t)(BISHOP >> 1) & 1) << (i^0x38);
+			bb[3] |= ((uint64_t)BISHOP >> 2) << (i^0x38);
+			bb[0] |= 1ULL << (i++^0x38);
                         break;
                 case 'R':
-                        set(bb[WHITE], i);
-                        mail[i] = piece(WHITE, ROOK);
-                        set(bb[ROOK], i++);
+			bb[1] |= ((uint64_t)ROOK & 1) << (i^0x38);
+			bb[2] |= ((uint64_t)(ROOK >> 1) & 1) << (i^0x38);
+			bb[3] |= ((uint64_t)ROOK >> 2) << (i^0x38);
+			bb[0] |= 1ULL << (i++^0x38);
                         break;
                 case 'Q':
-                        set(bb[WHITE], i);
-                        mail[i] = piece(WHITE, QUEEN);
-                        set(bb[QUEEN], i++);
+			bb[1] |= ((uint64_t)QUEEN & 1) << (i^0x38);
+			bb[2] |= ((uint64_t)(QUEEN >> 1) & 1) << (i^0x38);
+			bb[3] |= ((uint64_t)QUEEN >> 2) << (i^0x38);
+			bb[0] |= 1ULL << (i++^0x38);
                         break;
                 case 'K':
-                        set(bb[WHITE], i);
-                        mail[i] = piece(WHITE, KING);
-                        set(bb[KING], i++);
+			bb[1] |= ((uint64_t)KING & 1) << (i^0x38);
+			bb[2] |= ((uint64_t)(KING >> 1) & 1) << (i^0x38);
+			bb[3] |= ((uint64_t)KING >> 2) << (i^0x38);
+			bb[0] |= 1ULL << (i++^0x38);
                         break;
 
                 case '1':
@@ -83,8 +90,6 @@ void parse(const char *fen, struct board_t *board)
                         break;
 
                 case '/':
-                        i -= 2 * 8;
-                case ' ':
                         ++fen;
                         continue;
 
@@ -93,6 +98,45 @@ void parse(const char *fen, struct board_t *board)
                 }
                 ++fen;
         }
+
+	++fen;
+
+	board->turn = *fen == 'w' ? WHITE : BLACK;
+
+	fen += 2;
+
+	if(*fen != '-') {
+		for(; *fen != ' '; fen++) {
+			if(*fen == 'K') board->ca |= WK;
+			else if(*fen == 'Q') board->ca |= WQ;
+			else if(*fen == 'k') board->ca |= BK;
+			else if(*fen == 'q') board->ca |= BQ;
+		}
+		fen++;
+	} else {
+		fen += 2;
+	}
+
+	if(*fen != '-') {
+		board->ep = 40 + (*fen - 'a');
+	}
+
+	if(board->turn == BLACK) {
+		flip(&board);
+	}
+}
+
+void flip(struct board_t *board)
+{
+	uint64_t *bb = board->bb;
+
+	bb[0] ^= bb[1] | bb[2] | bb[3];
+	bb[0] ^= rev(bb[0]);
+	bb[1] ^= rev(bb[1]);
+	bb[2] ^= rev(bb[2]);
+	bb[3] ^= rev(bb[2]);
+	board->turn  ^= BLACK;
+	board->ca     = (board->ca >> 4) | (board->ca << 4);
 }
 
 void make(struct board_t *board, const uint16_t *move) {}

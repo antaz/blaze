@@ -14,8 +14,7 @@ struct undo_t {
 
 /* main structure to hold the state of the board */
 struct board_t {
-        uint64_t bb[PC + 2];    // piece bitboards
-        uint8_t mail[SQ];       // mailbox representation of the board
+	uint64_t bb[4];         // quad-bitboards
         uint8_t turn;           // side to move
         uint8_t ply;            // half-move count
         uint8_t ca;             // castling rights
@@ -29,6 +28,12 @@ struct board_t {
  *  @return void
  */
 void parse(const char *fen, struct board_t *board);
+
+/** @brief flip the board with respect to the side to move
+ *  @param board board state
+ *  @return void
+ */
+void flip(struct board_t *board);
 
 /** @brief make the move on the board
  *  @param board board state
