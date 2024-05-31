@@ -14,10 +14,10 @@
 #define NOSQ 65
 
 /* colors and turns */
-enum { WHITE, BLACK };
+enum { WHITE = 0, BLACK = 8 };
 
 /* pieces */
-enum { PAWN = 2, KNIGHT, BISHOP, ROOK, QUEEN, KING, NOPC };
+enum { NOPC, PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING };
 
 /* move types */
 enum {
@@ -39,23 +39,17 @@ enum {
 
 /* castling permissions */
 enum {
-        WK = 1, // White king side
-        WQ = 2, // Black king side
-        BK = 4, // White queen side
-        BQ = 8  // Black queen side
+        WK = 0x02, // White king side
+        WQ = 0x01, // White queen side
+        BK = 0x20, // Black king side
+        BQ = 0x10  // Black queen side
 };
 
-/* piece - piece encoding
-   c: piece color
-   pt: piece type
- */
-#define piece(c, pt) (c >> 3) + pt
-
-/* move - move encoding
-   f: from square
-   t: to square
-   mt: move type
- */
-#define move(f, t, mt) (mt & 0xf) << 12 | (f & 0x3f) << 6 | (t & 0x3f)
+// move serializers and deserializers
+#define MOVE(from, to, type)                                                   \
+        (type & 0xf) << 12 | (from & 0x3f) << 6 | (to & 0x3f)
+#define MOVE_FROM(move) ((move >> 6) & 0x3f)
+#define MOVE_TO(move) (move & 0x3f)
+#define MOVE_TYPE(move) ((move >> 12) & 0x0f)
 
 #endif /* TYPE_H */

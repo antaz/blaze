@@ -16,30 +16,38 @@
 #define unset(b, i) (b &= ~(1ULL << i))
 #define toggle(b, i) (b ^= 1ULL << i)
 
-/** @brief count the number of bits in a 64bit integer
- *  @param b a bitset (bitboard)
- *  @return int
+/**
+ * Population Count.
+ * Counts the number of set bits in a bitboard.
  */
 int popcnt(uint64_t b);
 
-/** @brief bit scan forward returns the index of the least significant 1 bit
- *  @param b a bitset (bitboard)
- *  @return int
+/**
+ * Bit Scan Forward.
+ * Find the least significant set bit.
  */
 int bsf(uint64_t b);
 
-/** @brief reverse a bitboard
- *  @param b a bitset (bitboard)
- *  @return uint64_t
+/**
+ * Flip a bitboard about the center.
+ * Rank 1 is Rank 8 and vice versa.
  */
 uint64_t rev(uint64_t b);
 
-/** @brief Hyperbola Quintessence's o^(o - 2r) trick
- *  @param b a bitset (bitboard)
- *  @return uint64_t
+/**
+ * Rotates a bitboard a 180 degrees.
+ * Square A1 is mapped to H8, and A8 to H1.
+ */
+uint64_t rot180(uint64_t b);
+
+/**
+ * Hyperbola Quintessence o^(o - 2r) trick.
  */
 uint64_t oo2r(int i, uint64_t block, uint64_t mask);
 
+/**
+ * Print a bitboard.
+ */
 void printb(uint64_t b);
 
 #endif /* BITBOARD_H */

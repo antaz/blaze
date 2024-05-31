@@ -1,8 +1,7 @@
 #include "bitboard.h"
-
 #include <stdio.h>
 
-uint64_t rev(uint64_t b)
+uint64_t rot180(uint64_t b)
 {
         b = (b & 0x5555555555555555) << 1 | ((b >> 1) & 0x5555555555555555);
         b = (b & 0x3333333333333333) << 2 | ((b >> 2) & 0x3333333333333333);
@@ -13,10 +12,18 @@ uint64_t rev(uint64_t b)
                (b >> 48);
 }
 
+uint64_t rev(uint64_t b)
+{
+        b = ((b >> 8) & 0x00FF00FF00FF00FF) | ((b & 0x00FF00FF00FF00FF) << 8);
+        b = ((b >> 16) & 0x0000FFFF0000FFFF) | ((b & 0x0000FFFF0000FFFF) << 16);
+        b = (b >> 32) | (b << 32);
+        return b;
+}
+
 uint64_t oo2r(int i, uint64_t block, uint64_t mask)
 {
         return (((mask & block) - (1ULL << i) * 2) ^
-                rev(rev(mask & block) - rev(1ULL << i) * 2)) &
+                rot180(rot180(mask & block) - rot180(1ULL << i) * 2)) &
                mask;
 }
 
