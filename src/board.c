@@ -216,8 +216,6 @@ void make(struct board_t *board, const uint16_t move)
     board->hist[board->ply].cap = EMPTY;
     board->ep = NOSQ;
 
-    // printb(board->bb[1] | board->bb[2] | board->bb[3]);
-
     switch (MOVE_TYPE(move)) {
     case CAPTURE:
         // track the captured piece
@@ -230,9 +228,6 @@ void make(struct board_t *board, const uint16_t move)
         // effectively removing the captured piece
         // note we don't clear the bb[0] board (i.e side to move)
         // because the captured piece is our opponent's piece'
-        // bb[1] &= ~tobb;
-        // bb[2] &= ~tobb;
-        // bb[3] &= ~tobb;
         clear(board, to);
 
         // reset castling if one of the rooks were captured
@@ -304,9 +299,7 @@ void make(struct board_t *board, const uint16_t move)
         assert(cap != KING);
         board->hist[board->ply].cap = cap;
 
-        bb[1] &= ~tobb;
-        bb[2] &= ~tobb;
-        bb[3] &= ~tobb;
+        clear(board, to);
 
         // reset castling if one of the rooks were captured
         if (to == 63)
@@ -317,9 +310,6 @@ void make(struct board_t *board, const uint16_t move)
         bb[0] ^= frombb | tobb;
         bb[1] ^= frombb;
 
-        // bb[1] |= ((uint64_t)(KNIGHT & 1)) << to;
-        // bb[2] |= ((uint64_t)(((KNIGHT) >> 1) & 1)) << to;
-        // bb[3] |= ((uint64_t)((KNIGHT) >> 2)) << to;
         add(board, KNIGHT, to);
         break;
     case BPC:
@@ -329,9 +319,7 @@ void make(struct board_t *board, const uint16_t move)
         assert(cap != KING);
         board->hist[board->ply].cap = cap;
 
-        bb[1] &= ~tobb;
-        bb[2] &= ~tobb;
-        bb[3] &= ~tobb;
+        clear(board, to);
 
         // reset castling if one of the rooks were captured
         if (to == 63)
@@ -342,9 +330,6 @@ void make(struct board_t *board, const uint16_t move)
         bb[0] ^= frombb | tobb;
         bb[1] ^= frombb;
 
-        // bb[1] |= (uint64_t)(BISHOP & 1) << to;
-        // bb[2] |= (uint64_t)(((BISHOP) >> 1) & 1) << to;
-        // bb[3] |= (uint64_t)((BISHOP) >> 2) << to;
         add(board, BISHOP, to);
         break;
     case RPC:
@@ -353,9 +338,10 @@ void make(struct board_t *board, const uint16_t move)
               ((bb[1] >> (to)) & 1);
         assert(cap != KING);
         board->hist[board->ply].cap = cap;
-        bb[1] &= ~tobb;
-        bb[2] &= ~tobb;
-        bb[3] &= ~tobb;
+        // bb[1] &= ~tobb;
+        // bb[2] &= ~tobb;
+        // bb[3] &= ~tobb;
+        clear(board, to);
 
         // reset castling if one of the rooks were captured
         if (to == 63)
@@ -366,9 +352,6 @@ void make(struct board_t *board, const uint16_t move)
         bb[0] ^= frombb | tobb;
         bb[1] ^= frombb;
 
-        // bb[1] |= (uint64_t)(ROOK & 1) << to;
-        // bb[2] |= (uint64_t)(((ROOK) >> 1) & 1) << to;
-        // bb[3] |= (uint64_t)((ROOK) >> 2) << to;
         add(board, ROOK, to);
         break;
     case QPC:
@@ -377,9 +360,7 @@ void make(struct board_t *board, const uint16_t move)
               ((bb[1] >> (to)) & 1);
         assert(cap != KING);
         board->hist[board->ply].cap = cap;
-        bb[1] &= ~tobb;
-        bb[2] &= ~tobb;
-        bb[3] &= ~tobb;
+        clear(board, to);
 
         // reset castling if one of the rooks were captured
         if (to == 63)
@@ -390,9 +371,6 @@ void make(struct board_t *board, const uint16_t move)
         bb[0] ^= frombb | tobb;
         bb[1] ^= frombb;
 
-        // bb[1] |= (uint64_t)(QUEEN & 1) << to;
-        // bb[2] |= (uint64_t)(((QUEEN) >> 1) & 1) << to;
-        // bb[3] |= (uint64_t)((QUEEN) >> 2) << to;
         add(board, QUEEN, to);
         break;
     case EP:
@@ -487,16 +465,11 @@ void unmake(struct board_t *board, const uint16_t move)
 
         if (MOVE_TYPE(move) == CAPTURE) {
             // TODO: do this only if it's a capture
-
             // clear the destination square
-            bb[1] &= ~tobb;
-            bb[2] &= ~tobb;
-            bb[3] &= ~tobb;
+            clear(board, to);
 
             // find the captured piece and put it back in place
-            bb[1] |= ((uint64_t)board->hist[board->ply].cap & 1) << to;
-            bb[2] |= ((uint64_t)(board->hist[board->ply].cap >> 1) & 1) << to;
-            bb[3] |= ((uint64_t)board->hist[board->ply].cap >> 2) << to;
+            add(board, board->hist[board->ply].cap, to);
         }
         break;
     case DPP:
@@ -510,16 +483,10 @@ void unmake(struct board_t *board, const uint16_t move)
         bb[0] ^= frombb | tobb;
         bb[1] ^= frombb | tobb;
 
-        // clear the destination square
-        bb[1] &= ~tobb;
-        bb[2] &= ~tobb;
-        bb[3] &= ~tobb;
+        clear(board, to);
 
         // find the captured piece and add it back
-        bb[1] |= ((uint64_t)board->hist[board->ply].cap & 1) << to;
-        bb[2] |= ((uint64_t)(board->hist[board->ply].cap >> 1) & 1) << to;
-        bb[3] |= ((uint64_t)board->hist[board->ply].cap >> 2) << to;
-        // printf("captured is: %d\n", board->hist[board->ply].cap);
+        add(board, board->hist[board->ply].cap, to);
         break;
     case NP:
     case BP:
@@ -528,10 +495,7 @@ void unmake(struct board_t *board, const uint16_t move)
         bb[0] ^= frombb | tobb;
         bb[1] ^= frombb | tobb;
 
-        // clear the destination square
-        bb[1] &= ~tobb;
-        bb[2] &= ~tobb;
-        bb[3] &= ~tobb;
+        clear(board, to);
         break;
     case EP:
         bb[0] ^= frombb | tobb;
