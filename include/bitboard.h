@@ -15,6 +15,8 @@
 #define set(b, i) (b |= 1ULL << i)
 #define unset(b, i) (b &= ~(1ULL << i))
 #define toggle(b, i) (b ^= 1ULL << i)
+#define LSB(b) ((b) & (-(signed long long)(b)))
+#define MSB(b) (0x3F ^ __builtin_clzll(b))
 
 /**
  * Population Count.

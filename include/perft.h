@@ -5,5 +5,6 @@
 #include <stdint.h>
 
 uint64_t perft(struct board_t *board, int depth);
+void perft_divide(struct board_t *board, int depth);
 
 #endif /* PERFT_H */

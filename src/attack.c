@@ -2,6 +2,9 @@
 #include "bitboard.h"
 #include "type.h"
 
+#include <assert.h>
+#include <stdio.h>
+
 /*
 static const uint64_t SQUARE[65] = {
         0x1, 0x2, 0x4, 0x8,
@@ -40,18 +43,18 @@ static const uint64_t _RANK[8] = {
 
 // Diagnonal mask
 static const uint64_t _DIAG[15] = {
-    0x0000000000000080, 0x0000000000008040, 0x0000000000804020, 
-    0x0000000080402010, 0x0000008040201008, 0x0000804020100804, 
-    0x0080402010080402, 0x8040201008040201, 0x4020100804020100, 
+    0x0000000000000080, 0x0000000000008040, 0x0000000000804020,
+    0x0000000080402010, 0x0000008040201008, 0x0000804020100804,
+    0x0080402010080402, 0x8040201008040201, 0x4020100804020100,
     0x2010080402010000, 0x1008040201000000, 0x0804020100000000,
     0x0402010000000000, 0x0201000000000000, 0x0100000000000000,
 };
 
 // Anti-Diagonal mask
 static const uint64_t _ADIAG[15] = {
-    0x0000000000000001, 0x0000000000000102, 0x0000000000010204, 
-    0x0000000001020408, 0x0000000102040810, 0x0000010204081020, 
-    0x0001020408102040, 0x0102040810204080, 0x0204081020408000, 
+    0x0000000000000001, 0x0000000000000102, 0x0000000000010204,
+    0x0000000001020408, 0x0000000102040810, 0x0000010204081020,
+    0x0001020408102040, 0x0102040810204080, 0x0204081020408000,
     0x0408102040800000, 0x0810204080000000, 0x1020408000000000,
     0x2040800000000000, 0x4080000000000000, 0x8000000000000000,
 };
@@ -255,48 +258,50 @@ static const uint64_t NATK[64] = {
 
 uint64_t katk(const int i) { return KATK[i]; }
 
-uint64_t natk(const int i) { return NATK[i]; }
+uint64_t natk(const int i)
+{
+    assert(i < 64);
+    assert(i >= 0);
+    return NATK[i];
+}
 
 uint64_t batk(const int i, const uint64_t block)
 {
-        // return BATTACK[i][((block & BAMASK[i]) * BMAGIC[i]) >> BSHIFT[i]];
-        return oo2r(i, block, _DIAG[diag(i)]) |
-               oo2r(i, block, _ADIAG[adiag(i)]);
+    // return BATTACK[i][((block & BAMASK[i]) * BMAGIC[i]) >> BSHIFT[i]];
+    return oo2r(i, block, _DIAG[diag(i)]) | oo2r(i, block, _ADIAG[adiag(i)]);
 }
 
 uint64_t ratk(const int i, const uint64_t block)
 {
-        // return RATTACK[i][((block & RAMASK[i]) * RMAGIC[i]) >> RSHIFT[i]];
-        return oo2r(i, block, _FILE[file(i)]) | oo2r(i, block, _RANK[rank(i)]);
+    // return RATTACK[i][((block & RAMASK[i]) * RMAGIC[i]) >> RSHIFT[i]];
+    return oo2r(i, block, _FILE[file(i)]) | oo2r(i, block, _RANK[rank(i)]);
 }
 
 uint64_t qatk(const int i, const uint64_t block)
 {
-        return batk(i, block) | ratk(i, block);
+    return batk(i, block) | ratk(i, block);
 }
 
 uint64_t between(const int i, const int j)
 {
-        // return BETWEEN[i][j];
-        uint64_t sq = (1ULL << i) | (1ULL << j);
+    // return BETWEEN[i][j];
+    uint64_t sq = (1ULL << i) | (1ULL << j);
 
-        if (file(i) == file(j) || rank(i) == rank(j))
-                return ratk(i, sq) & ratk(j, sq);
-        else if (diag(i) == diag(j) || adiag(i) == adiag(j))
-                return batk(i, sq) & batk(j, sq);
-        else
-                return 0ULL;
+    if (file(i) == file(j) || rank(i) == rank(j))
+        return ratk(i, sq) & ratk(j, sq);
+    else if (diag(i) == diag(j) || adiag(i) == adiag(j))
+        return batk(i, sq) & batk(j, sq);
+    else
+        return 0ULL;
 }
 
 uint64_t line(const int i, const int j)
 {
-        // return LINE[i][j];
-        if (file(i) == file(j) || rank(i) == rank(j))
-                return (ratk(i, 0ULL) & ratk(j, 0ULL)) | (1ULL << i) |
-                       (1ULL << j);
-        else if (diag(i) == diag(j) || adiag(i) == adiag(j))
-                return (batk(i, 0ULL) & batk(j, 0ULL)) | (1ULL << i) |
-                       (1ULL << j);
-        else
-                return 0ULL;
+    // return LINE[i][j];
+    if (file(i) == file(j) || rank(i) == rank(j))
+        return (ratk(i, 0ULL) & ratk(j, 0ULL)) | (1ULL << i) | (1ULL << j);
+    else if (diag(i) == diag(j) || adiag(i) == adiag(j))
+        return (batk(i, 0ULL) & batk(j, 0ULL)) | (1ULL << i) | (1ULL << j);
+    else
+        return 0ULL;
 }

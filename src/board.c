@@ -1,154 +1,173 @@
 #include "board.h"
 #include "bitboard.h"
 #include "type.h"
+#include <assert.h>
+#include <stdint.h>
+#include <stdio.h>
+
+void add(struct board_t *board, int type, int idx)
+{
+    // TODO: Test the speed of this (may potentionally be slower)
+    // board->bb[1] |= ((uint64_t)type & 1) << idx;
+    // board->bb[2] |= ((uint64_t)(type >> 1) & 1) << idx;
+    // board->bb[3] |= ((uint64_t)type >> 2) << idx;
+
+    // This may be faster?
+    uint64_t b = 1ULL << idx;
+    switch (type) {
+    case PAWN:
+        board->bb[1] |= b;
+        break;
+    case KNIGHT:
+        board->bb[2] |= b;
+        break;
+    case BISHOP:
+        board->bb[1] |= b;
+        board->bb[2] |= b;
+        break;
+    case ROOK:
+        board->bb[3] |= b;
+        break;
+    case QUEEN:
+        board->bb[1] |= b;
+        board->bb[3] |= b;
+        break;
+    case KING:
+        board->bb[2] |= b;
+        board->bb[3] |= b;
+        break;
+    }
+}
 
 void parse(const char *fen, struct board_t *board)
 {
-        uint64_t *bb = board->bb;
+    uint64_t *bb = board->bb;
 
-        int i = 0;
-        while (*fen != ' ') {
-                switch (*fen) {
-                case 'p':
-                        bb[1] |= ((uint64_t)PAWN & 1) << (i ^ 0x38);
-                        bb[2] |= ((uint64_t)(PAWN >> 1) & 1) << (i ^ 0x38);
-                        bb[3] |= ((uint64_t)PAWN >> 2) << (i++ ^ 0x38);
-                        break;
-                case 'n':
-                        bb[1] |= ((uint64_t)KNIGHT & 1) << (i ^ 0x38);
-                        bb[2] |= ((uint64_t)(KNIGHT >> 1) & 1) << (i ^ 0x38);
-                        bb[3] |= ((uint64_t)KNIGHT >> 2) << (i++ ^ 0x38);
-                        break;
-                case 'b':
-                        bb[1] |= ((uint64_t)BISHOP & 1) << (i ^ 0x38);
-                        bb[2] |= ((uint64_t)(BISHOP >> 1) & 1) << (i ^ 0x38);
-                        bb[3] |= ((uint64_t)BISHOP >> 2) << (i++ ^ 0x38);
-                        break;
-                case 'r':
-                        bb[1] |= ((uint64_t)ROOK & 1) << (i ^ 0x38);
-                        bb[2] |= ((uint64_t)(ROOK >> 1) & 1) << (i ^ 0x38);
-                        bb[3] |= ((uint64_t)ROOK >> 2) << (i++ ^ 0x38);
-                        break;
-                case 'q':
-                        bb[1] |= ((uint64_t)QUEEN & 1) << (i ^ 0x38);
-                        bb[2] |= ((uint64_t)(QUEEN >> 1) & 1) << (i ^ 0x38);
-                        bb[3] |= ((uint64_t)QUEEN >> 2) << (i++ ^ 0x38);
-                        break;
-                case 'k':
-                        bb[1] |= ((uint64_t)KING & 1) << (i ^ 0x38);
-                        bb[2] |= ((uint64_t)(KING >> 1) & 1) << (i ^ 0x38);
-                        bb[3] |= ((uint64_t)KING >> 2) << (i++ ^ 0x38);
-                        break;
-                case 'P':
-                        bb[1] |= ((uint64_t)PAWN & 1) << (i ^ 0x38);
-                        bb[2] |= ((uint64_t)(PAWN >> 1) & 1) << (i ^ 0x38);
-                        bb[3] |= ((uint64_t)PAWN >> 2) << (i ^ 0x38);
-                        bb[0] |= 1ULL << (i++ ^ 0x38);
-                        break;
-                case 'N':
-                        bb[1] |= ((uint64_t)KNIGHT & 1) << (i ^ 0x38);
-                        bb[2] |= ((uint64_t)(KNIGHT >> 1) & 1) << (i ^ 0x38);
-                        bb[3] |= ((uint64_t)KNIGHT >> 2) << (i ^ 0x38);
-                        bb[0] |= 1ULL << (i++ ^ 0x38);
-                        break;
-                case 'B':
-                        bb[1] |= ((uint64_t)BISHOP & 1) << (i ^ 0x38);
-                        bb[2] |= ((uint64_t)(BISHOP >> 1) & 1) << (i ^ 0x38);
-                        bb[3] |= ((uint64_t)BISHOP >> 2) << (i ^ 0x38);
-                        bb[0] |= 1ULL << (i++ ^ 0x38);
-                        break;
-                case 'R':
-                        bb[1] |= ((uint64_t)ROOK & 1) << (i ^ 0x38);
-                        bb[2] |= ((uint64_t)(ROOK >> 1) & 1) << (i ^ 0x38);
-                        bb[3] |= ((uint64_t)ROOK >> 2) << (i ^ 0x38);
-                        bb[0] |= 1ULL << (i++ ^ 0x38);
-                        break;
-                case 'Q':
-                        bb[1] |= ((uint64_t)QUEEN & 1) << (i ^ 0x38);
-                        bb[2] |= ((uint64_t)(QUEEN >> 1) & 1) << (i ^ 0x38);
-                        bb[3] |= ((uint64_t)QUEEN >> 2) << (i ^ 0x38);
-                        bb[0] |= 1ULL << (i++ ^ 0x38);
-                        break;
-                case 'K':
-                        bb[1] |= ((uint64_t)KING & 1) << (i ^ 0x38);
-                        bb[2] |= ((uint64_t)(KING >> 1) & 1) << (i ^ 0x38);
-                        bb[3] |= ((uint64_t)KING >> 2) << (i ^ 0x38);
-                        bb[0] |= 1ULL << (i++ ^ 0x38);
-                        break;
+    int i = 0;
+    while (*fen != ' ') {
+        switch (*fen) {
+        case 'p':
+            add(board, PAWN, i ^ 0x38);
+            i++;
+            break;
+        case 'n':
+            add(board, KNIGHT, i ^ 0x38);
+            i++;
+            break;
+        case 'b':
+            add(board, BISHOP, i ^ 0x38);
+            i++;
+            break;
+        case 'r':
+            add(board, ROOK, i ^ 0x38);
+            i++;
+            break;
+        case 'q':
+            add(board, QUEEN, i ^ 0x38);
+            i++;
+            break;
+        case 'k':
+            add(board, KING, i ^ 0x38);
+            i++;
+            break;
+        case 'P':
+            add(board, PAWN, i ^ 0x38);
+            bb[0] |= 1ULL << (i++ ^ 0x38);
+            break;
+        case 'N':
+            add(board, KNIGHT, i ^ 0x38);
+            bb[0] |= 1ULL << (i++ ^ 0x38);
+            break;
+        case 'B':
+            add(board, BISHOP, i ^ 0x38);
+            bb[0] |= 1ULL << (i++ ^ 0x38);
+            break;
+        case 'R':
+            add(board, ROOK, i ^ 0x38);
+            bb[0] |= 1ULL << (i++ ^ 0x38);
+            break;
+        case 'Q':
+            add(board, QUEEN, i ^ 0x38);
+            bb[0] |= 1ULL << (i++ ^ 0x38);
+            break;
+        case 'K':
+            add(board, KING, i ^ 0x38);
+            bb[0] |= 1ULL << (i++ ^ 0x38);
+            break;
 
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                        i += *fen - '0';
-                        break;
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+            i += *fen - '0';
+            break;
 
-                case '/':
-                        ++fen;
-                        continue;
+        case '/':
+            ++fen;
+            continue;
 
-                default:
-                        break;
-                }
-                ++fen;
+        default:
+            break;
         }
-
         ++fen;
+    }
 
-        board->turn = *fen == 'w' ? WHITE : BLACK;
+    ++fen;
 
+    board->turn = *fen == 'w' ? WHITE : BLACK;
+
+    fen += 2;
+
+    if (*fen != '-') {
+        for (; *fen != ' '; fen++) {
+            switch (*fen) {
+            case 'K':
+                board->ca |= WK;
+                break;
+            case 'Q':
+                board->ca |= WQ;
+                break;
+            case 'k':
+                board->ca |= BK;
+                break;
+            case 'q':
+                board->ca |= BQ;
+                break;
+            }
+        }
+        fen++;
+    } else {
         fen += 2;
+    }
 
-        if (*fen != '-') {
-                for (; *fen != ' '; fen++) {
-                        switch (*fen) {
-                        case 'K':
-                                board->ca |= WK;
-                                break;
-                        case 'Q':
-                                board->ca |= WQ;
-                                break;
-                        case 'k':
-                                board->ca |= BK;
-                                break;
-                        case 'q':
-                                board->ca |= BQ;
-                                break;
-                        }
-                }
-                fen++;
-        } else {
-                fen += 2;
-        }
+    if (*fen != '-') {
+        board->ep = *fen - 'a';
+    }
 
-        if (*fen != '-') {
-                board->ep = 40 + (*fen - 'a');
-        }
-
-        if (board->turn == BLACK) {
-                flip(board);
-        }
+    if (board->turn == BLACK) {
+        flip(board);
+    }
 }
 
 uint64_t pawns(struct board_t *board)
 {
-        return board->bb[1] & ~board->bb[2] & ~board->bb[3];
+    return board->bb[1] & ~board->bb[2] & ~board->bb[3];
 }
 
 uint64_t knights(struct board_t *board)
 {
-        return ~board->bb[1] & board->bb[2] & ~board->bb[3];
+    return ~board->bb[1] & board->bb[2] & ~board->bb[3];
 }
 
 uint64_t bishops(struct board_t *board) { return board->bb[1] & board->bb[2]; }
 
 uint64_t rooks(struct board_t *board)
 {
-        return ~board->bb[1] & ~board->bb[2] & board->bb[3];
+    return ~board->bb[1] & ~board->bb[2] & board->bb[3];
 }
 
 uint64_t queens(struct board_t *board) { return board->bb[1] & board->bb[3]; }
@@ -157,171 +176,386 @@ uint64_t kings(struct board_t *board) { return board->bb[2] & board->bb[3]; }
 
 uint64_t all(struct board_t *board)
 {
-        return board->bb[1] & board->bb[2] & board->bb[3];
+    return board->bb[1] & board->bb[2] & board->bb[3];
 }
 
 void flip(struct board_t *board)
 {
-        uint64_t *bb = board->bb;
+    uint64_t *bb = board->bb;
 
-        bb[0] ^= bb[1] | bb[2] | bb[3];
-        bb[0] = rev(bb[0]);
-        bb[1] = rev(bb[1]);
-        bb[2] = rev(bb[2]);
-        bb[3] = rev(bb[3]);
-        board->turn ^= BLACK;
-        board->ca = (board->ca >> 4) | (board->ca << 4);
+    bb[0] ^= bb[1] | bb[2] | bb[3];
+    bb[0] = rev(bb[0]);
+    bb[1] = rev(bb[1]);
+    bb[2] = rev(bb[2]);
+    bb[3] = rev(bb[3]);
+    board->turn ^= BLACK;
+    board->ca = (board->ca >> 4) | (board->ca << 4);
+}
+
+void clear(struct board_t *board, const uint8_t idx)
+{
+    uint64_t b = 1ULL << idx;
+    board->bb[1] &= ~b;
+    board->bb[2] &= ~b;
+    board->bb[3] &= ~b;
 }
 
 void make(struct board_t *board, const uint16_t move)
 {
-        uint64_t *bb, frombb, tobb;
-        uint8_t from, to, piece;
+    uint64_t *bb, frombb, tobb;
+    uint8_t from, to, piece, cap;
 
-        bb = board->bb;
-        from = MOVE_FROM(move);
-        to = MOVE_TO(move);
-        frombb = 1ULL << ((move >> 6) & 0x3f);
-        tobb = 1ULL << (move & 0x3f);
+    bb = board->bb;
+    from = MOVE_FROM(move);
+    to = MOVE_TO(move);
+    frombb = 1ULL << from;
+    tobb = 1ULL << to;
 
-        switch (MOVE_TYPE(move)) {
-        case CAPTURE:
-                bb[1] &= ~tobb;
-                bb[2] &= ~tobb;
-                bb[3] &= ~tobb;
+    board->hist[board->ply].ep = board->ep;
+    board->hist[board->ply].ca = board->ca;
+    board->hist[board->ply].cap = EMPTY;
+    board->ep = NOSQ;
 
-                if (to == 63)
-                        board->ca &= 0xDF;
-                else if (to == 56)
-                        board->ca &= 0xEF;
-        case QUIET:
-                bb[0] ^= frombb | tobb;
+    // printb(board->bb[1] | board->bb[2] | board->bb[3]);
 
-                piece = ((bb[3] >> (from)) & 1) << 2 |
-                        ((bb[2] >> (from)) & 1) << 1 | ((bb[1] >> (from)) & 1);
+    switch (MOVE_TYPE(move)) {
+    case CAPTURE:
+        // track the captured piece
+        cap = ((bb[3] >> (to)) & 1) << 2 | ((bb[2] >> (to)) & 1) << 1 |
+              ((bb[1] >> (to)) & 1);
+        assert(cap != KING);
+        board->hist[board->ply].cap = cap;
 
-                switch (piece) {
-                case PAWN:
-                        bb[1] ^= frombb | tobb;
-                        break;
-                case KNIGHT:
-                        bb[1] ^= 0;
-                        bb[2] ^= frombb | tobb;
-                        bb[3] ^= 0;
-                        break;
-                case BISHOP:
-                        bb[1] ^= frombb | tobb;
-                        bb[2] ^= frombb | tobb;
-                        bb[3] ^= 0;
-                        break;
-                case ROOK:
-                        bb[1] ^= 0;
-                        bb[2] ^= 0;
-                        bb[3] ^= frombb | tobb;
+        // clear the destination square if it's a capture
+        // effectively removing the captured piece
+        // note we don't clear the bb[0] board (i.e side to move)
+        // because the captured piece is our opponent's piece'
+        // bb[1] &= ~tobb;
+        // bb[2] &= ~tobb;
+        // bb[3] &= ~tobb;
+        clear(board, to);
 
-                        if (from == 7)
-                                board->ca &= 0xFD;
-                        else if (from == 0)
-                                board->ca &= 0xFE;
-                        break;
-                case QUEEN:
-                        bb[1] ^= frombb | tobb;
-                        bb[2] ^= 0;
-                        bb[3] ^= frombb | tobb;
-                        break;
-                case KING:
-                        bb[2] ^= frombb | tobb;
-                        bb[3] ^= frombb | tobb;
+        // reset castling if one of the rooks were captured
+        if (to == 63)
+            board->ca &= 0xDF;
+        else if (to == 56)
+            board->ca &= 0xEF;
+    case QUIET:
+        bb[0] ^= frombb | tobb;
 
-                        board->ca &= 0xFD;
-                        board->ca &= 0xFE;
-                        break;
-                }
-                break;
-        case DPP:
-                bb[0] ^= frombb | tobb;
-                bb[1] ^= frombb | tobb;
+        piece = ((bb[3] >> (from)) & 1) << 2 | ((bb[2] >> (from)) & 1) << 1 |
+                ((bb[1] >> (from)) & 1);
 
-                board->ep = from - 8;
-                break;
-        case NPC:
-                bb[1] &= ~tobb;
-                bb[2] &= ~tobb;
-                bb[3] &= ~tobb;
-        case NP:
-                bb[0] ^= frombb | tobb;
-                bb[1] ^= frombb | tobb;
+        switch (piece) {
+        case PAWN:
+            bb[1] ^= frombb | tobb;
+            break;
+        case KNIGHT:
+            bb[1] ^= 0;
+            bb[2] ^= frombb | tobb;
+            bb[3] ^= 0;
+            break;
+        case BISHOP:
+            bb[1] ^= frombb | tobb;
+            bb[2] ^= frombb | tobb;
+            bb[3] ^= 0;
+            break;
+        case ROOK:
+            bb[1] ^= 0;
+            bb[2] ^= 0;
+            bb[3] ^= frombb | tobb;
 
-                bb[1] |= (KNIGHT & 1) << to;
-                bb[2] |= (((KNIGHT) >> 1) & 1) << to;
-                bb[3] |= ((KNIGHT) >> 2) << to;
-                break;
-        case BPC:
-                bb[1] &= ~tobb;
-                bb[2] &= ~tobb;
-                bb[3] &= ~tobb;
-        case BP:
-                bb[0] ^= frombb | tobb;
-                bb[1] ^= frombb | tobb;
-
-                bb[1] |= (BISHOP & 1) << to;
-                bb[2] |= (((BISHOP) >> 1) & 1) << to;
-                bb[3] |= ((BISHOP) >> 2) << to;
-                break;
-        case RPC:
-                bb[1] &= ~tobb;
-                bb[2] &= ~tobb;
-                bb[3] &= ~tobb;
-        case RP:
-                bb[0] ^= frombb | tobb;
-                bb[1] ^= frombb | tobb;
-
-                bb[1] |= (ROOK & 1) << to;
-                bb[2] |= (((ROOK) >> 1) & 1) << to;
-                bb[3] |= ((ROOK) >> 2) << to;
-                break;
-        case QPC:
-                bb[1] &= ~tobb;
-                bb[2] &= ~tobb;
-                bb[3] &= ~tobb;
-        case QP:
-                bb[0] ^= frombb | tobb;
-                bb[1] ^= frombb | tobb;
-
-                bb[1] |= (QUEEN & 1) << to;
-                bb[2] |= (((QUEEN) >> 1) & 1) << to;
-                bb[3] |= ((QUEEN) >> 2) << to;
-                break;
-        case EP:
-                bb[0] ^= frombb | tobb;
-                bb[1] ^= frombb | tobb;
-                bb[1] ^= tobb >> 8;
-                break;
-        case OO:
-                bb[0] ^= frombb | tobb;
-                bb[2] ^= frombb | tobb;
-                bb[3] ^= frombb | tobb;
-
-                bb[0] ^= 0x00000000000000A0ULL;
-                bb[3] ^= 0x00000000000000A0ULL;
-
+            if (from == 7)
                 board->ca &= 0xFD;
-                break;
-        case OOO:
-                bb[0] ^= frombb | tobb;
-                bb[2] ^= frombb | tobb;
-                bb[3] ^= frombb | tobb;
-
-                bb[0] ^= 0x0000000000000009ULL;
-                bb[3] ^= 0x0000000000000009ULL;
-
+            else if (from == 0)
                 board->ca &= 0xFE;
-                break;
-        default:
-                // TODO: Invalid move type
-                return;
+            break;
+        case QUEEN:
+            bb[1] ^= frombb | tobb;
+            bb[2] ^= 0;
+            bb[3] ^= frombb | tobb;
+            break;
+        case KING:
+            bb[2] ^= frombb | tobb;
+            bb[3] ^= frombb | tobb;
+
+            board->ca &= 0xFD;
+            board->ca &= 0xFE;
+            break;
+        }
+        break;
+    case DPP:
+        bb[0] ^= frombb | tobb;
+        bb[1] ^= frombb | tobb;
+
+        // check if en passant is possible
+        uint64_t their_pawns =
+            (bb[1] & ~bb[2] & ~bb[3]) & (bb[0] ^ (bb[1] | bb[2] | bb[3]));
+        uint64_t p = ((1ULL << ((to & 7) + 16)) << 7 & ~FH) |
+                     ((1ULL << ((to & 7) + 16)) << 9 & ~FA);
+        if (to == from + 16 && p & their_pawns) {
+            board->ep = to & 0x07;
+        }
+        break;
+    case NPC:
+        // track the captured piece
+        cap = ((bb[3] >> (to)) & 1) << 2 | ((bb[2] >> (to)) & 1) << 1 |
+              ((bb[1] >> (to)) & 1);
+        assert(cap != KING);
+        board->hist[board->ply].cap = cap;
+
+        bb[1] &= ~tobb;
+        bb[2] &= ~tobb;
+        bb[3] &= ~tobb;
+
+        // reset castling if one of the rooks were captured
+        if (to == 63)
+            board->ca &= 0xDF;
+        else if (to == 56)
+            board->ca &= 0xEF;
+    case NP:
+        bb[0] ^= frombb | tobb;
+        bb[1] ^= frombb;
+
+        // bb[1] |= ((uint64_t)(KNIGHT & 1)) << to;
+        // bb[2] |= ((uint64_t)(((KNIGHT) >> 1) & 1)) << to;
+        // bb[3] |= ((uint64_t)((KNIGHT) >> 2)) << to;
+        add(board, KNIGHT, to);
+        break;
+    case BPC:
+        // track the captured piece
+        cap = ((bb[3] >> (to)) & 1) << 2 | ((bb[2] >> (to)) & 1) << 1 |
+              ((bb[1] >> (to)) & 1);
+        assert(cap != KING);
+        board->hist[board->ply].cap = cap;
+
+        bb[1] &= ~tobb;
+        bb[2] &= ~tobb;
+        bb[3] &= ~tobb;
+
+        // reset castling if one of the rooks were captured
+        if (to == 63)
+            board->ca &= 0xDF;
+        else if (to == 56)
+            board->ca &= 0xEF;
+    case BP:
+        bb[0] ^= frombb | tobb;
+        bb[1] ^= frombb;
+
+        // bb[1] |= (uint64_t)(BISHOP & 1) << to;
+        // bb[2] |= (uint64_t)(((BISHOP) >> 1) & 1) << to;
+        // bb[3] |= (uint64_t)((BISHOP) >> 2) << to;
+        add(board, BISHOP, to);
+        break;
+    case RPC:
+        // track the captured piece
+        cap = ((bb[3] >> (to)) & 1) << 2 | ((bb[2] >> (to)) & 1) << 1 |
+              ((bb[1] >> (to)) & 1);
+        assert(cap != KING);
+        board->hist[board->ply].cap = cap;
+        bb[1] &= ~tobb;
+        bb[2] &= ~tobb;
+        bb[3] &= ~tobb;
+
+        // reset castling if one of the rooks were captured
+        if (to == 63)
+            board->ca &= 0xDF;
+        else if (to == 56)
+            board->ca &= 0xEF;
+    case RP:
+        bb[0] ^= frombb | tobb;
+        bb[1] ^= frombb;
+
+        // bb[1] |= (uint64_t)(ROOK & 1) << to;
+        // bb[2] |= (uint64_t)(((ROOK) >> 1) & 1) << to;
+        // bb[3] |= (uint64_t)((ROOK) >> 2) << to;
+        add(board, ROOK, to);
+        break;
+    case QPC:
+        // track the captured piece
+        cap = ((bb[3] >> (to)) & 1) << 2 | ((bb[2] >> (to)) & 1) << 1 |
+              ((bb[1] >> (to)) & 1);
+        assert(cap != KING);
+        board->hist[board->ply].cap = cap;
+        bb[1] &= ~tobb;
+        bb[2] &= ~tobb;
+        bb[3] &= ~tobb;
+
+        // reset castling if one of the rooks were captured
+        if (to == 63)
+            board->ca &= 0xDF;
+        else if (to == 56)
+            board->ca &= 0xEF;
+    case QP:
+        bb[0] ^= frombb | tobb;
+        bb[1] ^= frombb;
+
+        // bb[1] |= (uint64_t)(QUEEN & 1) << to;
+        // bb[2] |= (uint64_t)(((QUEEN) >> 1) & 1) << to;
+        // bb[3] |= (uint64_t)((QUEEN) >> 2) << to;
+        add(board, QUEEN, to);
+        break;
+    case EP:
+        bb[0] ^= frombb | tobb;
+        bb[1] ^= frombb | tobb;
+        bb[1] ^= tobb >> 8;
+        break;
+    case OO:
+        bb[0] ^= frombb | tobb;
+        bb[2] ^= frombb | tobb;
+        bb[3] ^= frombb | tobb;
+
+        bb[0] ^= 0x00000000000000A0ULL;
+        bb[3] ^= 0x00000000000000A0ULL;
+
+        board->ca &= 0xFD;
+        board->ca &= 0xFE;
+        break;
+    case OOO:
+        bb[0] ^= frombb | tobb;
+        bb[2] ^= frombb | tobb;
+        bb[3] ^= frombb | tobb;
+
+        bb[0] ^= 0x0000000000000009ULL;
+        bb[3] ^= 0x0000000000000009ULL;
+
+        board->ca &= 0xFD;
+        board->ca &= 0xFE;
+        break;
+    default:
+        // TODO: Invalid move type
+        return;
+    }
+
+    board->ply++;
+    flip(board);
+}
+
+void unmake(struct board_t *board, const uint16_t move)
+{
+    uint64_t *bb, frombb, tobb;
+    uint8_t from, to, piece;
+
+    board->ply--;
+    flip(board);
+    bb = board->bb;
+    // from = MOVE_FROM(move);
+    to = MOVE_TO(move);
+    frombb = 1ULL << ((move >> 6) & 0x3f);
+    tobb = 1ULL << (move & 0x3f);
+
+    board->ep = board->hist[board->ply].ep;
+    board->ca = board->hist[board->ply].ca;
+
+    switch (MOVE_TYPE(move)) {
+    case CAPTURE:
+    case QUIET:
+        bb[0] ^= frombb | tobb;
+
+        piece = ((bb[3] >> (to)) & 1) << 2 | ((bb[2] >> (to)) & 1) << 1 |
+                ((bb[1] >> (to)) & 1);
+
+        switch (piece) {
+        case PAWN:
+            bb[1] ^= frombb | tobb;
+            break;
+        case KNIGHT:
+            bb[1] ^= 0;
+            bb[2] ^= frombb | tobb;
+            bb[3] ^= 0;
+            break;
+        case BISHOP:
+            bb[1] ^= frombb | tobb;
+            bb[2] ^= frombb | tobb;
+            bb[3] ^= 0;
+            break;
+        case ROOK:
+            bb[1] ^= 0;
+            bb[2] ^= 0;
+            bb[3] ^= frombb | tobb;
+            break;
+        case QUEEN:
+            bb[1] ^= frombb | tobb;
+            bb[2] ^= 0;
+            bb[3] ^= frombb | tobb;
+            break;
+        case KING:
+            bb[2] ^= frombb | tobb;
+            bb[3] ^= frombb | tobb;
+            break;
         }
 
-        board->ep = NOSQ;
-        flip(board);
+        if (MOVE_TYPE(move) == CAPTURE) {
+            // TODO: do this only if it's a capture
+
+            // clear the destination square
+            bb[1] &= ~tobb;
+            bb[2] &= ~tobb;
+            bb[3] &= ~tobb;
+
+            // find the captured piece and put it back in place
+            bb[1] |= ((uint64_t)board->hist[board->ply].cap & 1) << to;
+            bb[2] |= ((uint64_t)(board->hist[board->ply].cap >> 1) & 1) << to;
+            bb[3] |= ((uint64_t)board->hist[board->ply].cap >> 2) << to;
+        }
+        break;
+    case DPP:
+        bb[0] ^= frombb | tobb;
+        bb[1] ^= frombb | tobb;
+        break;
+    case NPC:
+    case BPC:
+    case RPC:
+    case QPC:
+        bb[0] ^= frombb | tobb;
+        bb[1] ^= frombb | tobb;
+
+        // clear the destination square
+        bb[1] &= ~tobb;
+        bb[2] &= ~tobb;
+        bb[3] &= ~tobb;
+
+        // find the captured piece and add it back
+        bb[1] |= ((uint64_t)board->hist[board->ply].cap & 1) << to;
+        bb[2] |= ((uint64_t)(board->hist[board->ply].cap >> 1) & 1) << to;
+        bb[3] |= ((uint64_t)board->hist[board->ply].cap >> 2) << to;
+        // printf("captured is: %d\n", board->hist[board->ply].cap);
+        break;
+    case NP:
+    case BP:
+    case RP:
+    case QP:
+        bb[0] ^= frombb | tobb;
+        bb[1] ^= frombb | tobb;
+
+        // clear the destination square
+        bb[1] &= ~tobb;
+        bb[2] &= ~tobb;
+        bb[3] &= ~tobb;
+        break;
+    case EP:
+        bb[0] ^= frombb | tobb;
+        bb[1] ^= frombb | tobb;
+        bb[1] ^= tobb >> 8;
+        break;
+    case OO:
+        bb[0] ^= frombb | tobb;
+        bb[2] ^= frombb | tobb;
+        bb[3] ^= frombb | tobb;
+
+        bb[0] ^= 0x00000000000000A0ULL;
+        bb[3] ^= 0x00000000000000A0ULL;
+        break;
+    case OOO:
+        bb[0] ^= frombb | tobb;
+        bb[2] ^= frombb | tobb;
+        bb[3] ^= frombb | tobb;
+
+        bb[0] ^= 0x0000000000000009ULL;
+        bb[3] ^= 0x0000000000000009ULL;
+        break;
+    default:
+        // TODO: Invalid move type
+        return;
+    }
 }
