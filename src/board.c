@@ -1,9 +1,10 @@
 #include "board.h"
 #include "bitboard.h"
-#include "type.h"
+#include "move.h"
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 void add(struct board_t *board, int type, int idx)
 {
@@ -41,6 +42,11 @@ void add(struct board_t *board, int type, int idx)
 
 void parse(const char *fen, struct board_t *board)
 {
+    memset(board->bb, 0, sizeof board->bb);
+    board->ca = 0;
+    board->ep = NOSQ;
+    board->turn = WHITE;
+    int turn = WHITE;
     uint64_t *bb = board->bb;
 
     int i = 0;
@@ -118,7 +124,7 @@ void parse(const char *fen, struct board_t *board)
 
     ++fen;
 
-    board->turn = *fen == 'w' ? WHITE : BLACK;
+    turn = *fen == 'w' ? WHITE : BLACK;
 
     fen += 2;
 
@@ -148,7 +154,7 @@ void parse(const char *fen, struct board_t *board)
         board->ep = *fen - 'a';
     }
 
-    if (board->turn == BLACK) {
+    if (turn == BLACK) {
         flip(board);
     }
 }
