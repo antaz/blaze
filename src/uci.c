@@ -52,7 +52,7 @@ void loop(struct board_t *board)
                     to = moves[2] - 'a';
                     to += 8 * ((moves[3] - '0') - 1);
 
-                    if(board->turn == BLACK) {
+                    if (board->turn == BLACK) {
                         m = MOVE((from ^ 0x38), (to ^ 0x38), 0);
                     } else {
                         m = MOVE(from, to, 0);

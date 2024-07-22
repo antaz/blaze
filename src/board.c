@@ -242,11 +242,10 @@ void make(struct board_t *board, const uint16_t move)
             board->ca &= 0xEF;
     }
 
+    bb[0] ^= frombb | tobb;
     switch (MOVE_TYPE(move)) {
     case CAPTURE:
     case QUIET:
-        bb[0] ^= frombb | tobb;
-
         piece = ((bb[3] >> (from)) & 1) << 2 | ((bb[2] >> (from)) & 1) << 1 |
                 ((bb[1] >> (from)) & 1);
 
@@ -289,7 +288,6 @@ void make(struct board_t *board, const uint16_t move)
         }
         break;
     case DPP:
-        bb[0] ^= frombb | tobb;
         bb[1] ^= frombb | tobb;
 
         // check if en passant is possible
@@ -303,39 +301,33 @@ void make(struct board_t *board, const uint16_t move)
         break;
     case NPC:
     case NP:
-        bb[0] ^= frombb | tobb;
         bb[1] ^= frombb;
 
         add(board, KNIGHT, to);
         break;
     case BPC:
     case BP:
-        bb[0] ^= frombb | tobb;
         bb[1] ^= frombb;
 
         add(board, BISHOP, to);
         break;
     case RPC:
     case RP:
-        bb[0] ^= frombb | tobb;
         bb[1] ^= frombb;
 
         add(board, ROOK, to);
         break;
     case QPC:
     case QP:
-        bb[0] ^= frombb | tobb;
         bb[1] ^= frombb;
 
         add(board, QUEEN, to);
         break;
     case EP:
-        bb[0] ^= frombb | tobb;
         bb[1] ^= frombb | tobb;
         bb[1] ^= tobb >> 8;
         break;
     case OO:
-        bb[0] ^= frombb | tobb;
         bb[2] ^= frombb | tobb;
         bb[3] ^= frombb | tobb;
 
@@ -346,7 +338,6 @@ void make(struct board_t *board, const uint16_t move)
         board->ca &= 0xFE;
         break;
     case OOO:
-        bb[0] ^= frombb | tobb;
         bb[2] ^= frombb | tobb;
         bb[3] ^= frombb | tobb;
 
@@ -380,6 +371,7 @@ void unmake(struct board_t *board, const uint16_t move)
 
     board->ep = board->hist[board->ply].ep;
     board->ca = board->hist[board->ply].ca;
+
 
     switch (MOVE_TYPE(move)) {
     case CAPTURE:
@@ -418,32 +410,12 @@ void unmake(struct board_t *board, const uint16_t move)
             bb[3] ^= frombb | tobb;
             break;
         }
-
-        if (MOVE_TYPE(move) == CAPTURE) {
-            // TODO: do this only if it's a capture
-            // clear the destination square
-            clear(board, to);
-
-            // find the captured piece and put it back in place
-            add(board, board->hist[board->ply].cap, to);
-        }
         break;
     case DPP:
-        bb[0] ^= frombb | tobb;
-        bb[1] ^= frombb | tobb;
-        break;
     case NPC:
     case BPC:
     case RPC:
     case QPC:
-        bb[0] ^= frombb | tobb;
-        bb[1] ^= frombb | tobb;
-
-        clear(board, to);
-
-        // find the captured piece and add it back
-        add(board, board->hist[board->ply].cap, to);
-        break;
     case NP:
     case BP:
     case RP:
@@ -477,5 +449,13 @@ void unmake(struct board_t *board, const uint16_t move)
     default:
         // TODO: Invalid move type
         return;
+    }
+
+    if (move & 0x4000) {
+        // clear the destination square
+        clear(board, to);
+
+        // find the captured piece and put it back in place
+        add(board, board->hist[board->ply].cap, to);
     }
 }

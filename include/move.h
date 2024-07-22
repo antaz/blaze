@@ -5,20 +5,20 @@
 
 /* move types */
 enum {
-    QUIET,       // Quiet move
-    DPP,         // Double pawn push
-    OO,          // King side castle
-    OOO,         // Queen side castle
-    CAPTURE,     // Capture
-    EP,          // En-Passent
-    NP = 8,      // Knight promotion
-    BP,          // Bishop promotion
-    RP,          // Rook promotion
-    QP,          // Queen promotion
-    NPC,         // Knight promotion capture
-    BPC,         // Bishop promotion capture
-    RPC,         // Rook promotion capture
-    QPC          // Queen promotion capture
+    QUIET,   // Quiet move
+    DPP,     // Double pawn push
+    OO,      // King side castle
+    OOO,     // Queen side castle
+    CAPTURE, // Capture
+    EP,      // En-Passent
+    NP = 8,  // Knight promotion
+    BP,      // Bishop promotion
+    RP,      // Rook promotion
+    QP,      // Queen promotion
+    NPC,     // Knight promotion capture
+    BPC,     // Bishop promotion capture
+    RPC,     // Rook promotion capture
+    QPC      // Queen promotion capture
 };
 
 // move serializers and deserializers
