@@ -222,8 +222,7 @@ void make(struct board_t *board, const uint16_t move)
     board->hist[board->ply].cap = EMPTY;
     board->ep = NOSQ;
 
-    switch (MOVE_TYPE(move)) {
-    case CAPTURE:
+    if (move & 0x4000) {
         // track the captured piece
         cap = ((bb[3] >> (to)) & 1) << 2 | ((bb[2] >> (to)) & 1) << 1 |
               ((bb[1] >> (to)) & 1);
@@ -241,6 +240,10 @@ void make(struct board_t *board, const uint16_t move)
             board->ca &= 0xDF;
         else if (to == 56)
             board->ca &= 0xEF;
+    }
+
+    switch (MOVE_TYPE(move)) {
+    case CAPTURE:
     case QUIET:
         bb[0] ^= frombb | tobb;
 
@@ -299,19 +302,6 @@ void make(struct board_t *board, const uint16_t move)
         }
         break;
     case NPC:
-        // track the captured piece
-        cap = ((bb[3] >> (to)) & 1) << 2 | ((bb[2] >> (to)) & 1) << 1 |
-              ((bb[1] >> (to)) & 1);
-        assert(cap != KING);
-        board->hist[board->ply].cap = cap;
-
-        clear(board, to);
-
-        // reset castling if one of the rooks were captured
-        if (to == 63)
-            board->ca &= 0xDF;
-        else if (to == 56)
-            board->ca &= 0xEF;
     case NP:
         bb[0] ^= frombb | tobb;
         bb[1] ^= frombb;
@@ -319,19 +309,6 @@ void make(struct board_t *board, const uint16_t move)
         add(board, KNIGHT, to);
         break;
     case BPC:
-        // track the captured piece
-        cap = ((bb[3] >> (to)) & 1) << 2 | ((bb[2] >> (to)) & 1) << 1 |
-              ((bb[1] >> (to)) & 1);
-        assert(cap != KING);
-        board->hist[board->ply].cap = cap;
-
-        clear(board, to);
-
-        // reset castling if one of the rooks were captured
-        if (to == 63)
-            board->ca &= 0xDF;
-        else if (to == 56)
-            board->ca &= 0xEF;
     case BP:
         bb[0] ^= frombb | tobb;
         bb[1] ^= frombb;
@@ -339,21 +316,6 @@ void make(struct board_t *board, const uint16_t move)
         add(board, BISHOP, to);
         break;
     case RPC:
-        // track the captured piece
-        cap = ((bb[3] >> (to)) & 1) << 2 | ((bb[2] >> (to)) & 1) << 1 |
-              ((bb[1] >> (to)) & 1);
-        assert(cap != KING);
-        board->hist[board->ply].cap = cap;
-        // bb[1] &= ~tobb;
-        // bb[2] &= ~tobb;
-        // bb[3] &= ~tobb;
-        clear(board, to);
-
-        // reset castling if one of the rooks were captured
-        if (to == 63)
-            board->ca &= 0xDF;
-        else if (to == 56)
-            board->ca &= 0xEF;
     case RP:
         bb[0] ^= frombb | tobb;
         bb[1] ^= frombb;
@@ -361,18 +323,6 @@ void make(struct board_t *board, const uint16_t move)
         add(board, ROOK, to);
         break;
     case QPC:
-        // track the captured piece
-        cap = ((bb[3] >> (to)) & 1) << 2 | ((bb[2] >> (to)) & 1) << 1 |
-              ((bb[1] >> (to)) & 1);
-        assert(cap != KING);
-        board->hist[board->ply].cap = cap;
-        clear(board, to);
-
-        // reset castling if one of the rooks were captured
-        if (to == 63)
-            board->ca &= 0xDF;
-        else if (to == 56)
-            board->ca &= 0xEF;
     case QP:
         bb[0] ^= frombb | tobb;
         bb[1] ^= frombb;
