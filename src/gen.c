@@ -1,7 +1,7 @@
 #include "gen.h"
 #include "attack.h"
 #include "bitboard.h"
-#include "type.h"
+#include "move.h"
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
