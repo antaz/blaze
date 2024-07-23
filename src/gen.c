@@ -276,3 +276,30 @@ uint64_t legal(const struct board_t *board, uint16_t move)
              (katk(ksq) & (board->bb[2] & board->bb[3]))) &
             theirs);
 }
+
+int gen(const struct board_t *board, uint16_t *moves)
+{
+    // generating pseudo-legal moves
+    int count = 0;
+    count = quiet(board, moves);
+    count += noisy(board, moves);
+    return count;
+}
+
+int gen_legal(const struct board_t *board, uint16_t *moves)
+{
+    // generating legal moves
+    uint16_t m[320] = {0};
+    int c = gen(board, m);
+    int count = 0;
+    for (int i = 0; i < c; i++) {
+        if (legal(board, m[i])) {
+            continue;
+        }
+
+        *moves++ = m[i];
+        count++;
+    }
+
+    return count;
+}

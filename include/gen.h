@@ -22,4 +22,7 @@ int noisy(const struct board_t *board, uint16_t *moves);
  */
 uint64_t legal(const struct board_t *board, uint16_t move);
 
+int gen(const struct board_t *board, uint16_t *moves);
+int gen_legal(const struct board_t *board, uint16_t *moves);
+
 #endif /* GEN_H */
