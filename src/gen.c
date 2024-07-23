@@ -3,8 +3,6 @@
 #include "bitboard.h"
 #include "move.h"
 #include <assert.h>
-#include <stdint.h>
-#include <stdio.h>
 
 int quiet(const struct board_t *board, uint16_t *moves)
 {
