@@ -223,6 +223,8 @@ void make(struct board_t *board, const uint16_t move)
     board->ep = NOSQ;
 
     if (move & 0x4000) {
+        // move is a capture
+
         // track the captured piece
         cap = ((bb[3] >> (to)) & 1) << 2 | ((bb[2] >> (to)) & 1) << 1 |
               ((bb[1] >> (to)) & 1);
@@ -240,9 +242,12 @@ void make(struct board_t *board, const uint16_t move)
             board->ca &= 0xDF;
         else if (to == 56)
             board->ca &= 0xEF;
+    } else {
+        // move is not a capture
     }
 
     bb[0] ^= frombb | tobb;
+
     switch (MOVE_TYPE(move)) {
     case CAPTURE:
     case QUIET:
@@ -302,25 +307,21 @@ void make(struct board_t *board, const uint16_t move)
     case NPC:
     case NP:
         bb[1] ^= frombb;
-
         add(board, KNIGHT, to);
         break;
     case BPC:
     case BP:
         bb[1] ^= frombb;
-
         add(board, BISHOP, to);
         break;
     case RPC:
     case RP:
         bb[1] ^= frombb;
-
         add(board, ROOK, to);
         break;
     case QPC:
     case QP:
         bb[1] ^= frombb;
-
         add(board, QUEEN, to);
         break;
     case EP:
@@ -372,12 +373,11 @@ void unmake(struct board_t *board, const uint16_t move)
     board->ep = board->hist[board->ply].ep;
     board->ca = board->hist[board->ply].ca;
 
+    bb[0] ^= frombb | tobb;
 
     switch (MOVE_TYPE(move)) {
     case CAPTURE:
     case QUIET:
-        bb[0] ^= frombb | tobb;
-
         piece = ((bb[3] >> (to)) & 1) << 2 | ((bb[2] >> (to)) & 1) << 1 |
                 ((bb[1] >> (to)) & 1);
 
@@ -420,18 +420,15 @@ void unmake(struct board_t *board, const uint16_t move)
     case BP:
     case RP:
     case QP:
-        bb[0] ^= frombb | tobb;
         bb[1] ^= frombb | tobb;
 
         clear(board, to);
         break;
     case EP:
-        bb[0] ^= frombb | tobb;
         bb[1] ^= frombb | tobb;
         bb[1] ^= tobb >> 8;
         break;
     case OO:
-        bb[0] ^= frombb | tobb;
         bb[2] ^= frombb | tobb;
         bb[3] ^= frombb | tobb;
 
@@ -439,7 +436,6 @@ void unmake(struct board_t *board, const uint16_t move)
         bb[3] ^= 0x00000000000000A0ULL;
         break;
     case OOO:
-        bb[0] ^= frombb | tobb;
         bb[2] ^= frombb | tobb;
         bb[3] ^= frombb | tobb;
 
