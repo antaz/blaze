@@ -42,28 +42,19 @@ void loop(struct board_t *board)
 
             char *moves = strstr(buf, "moves");
             if (moves) {
-                moves += 6;
-                while ((moves[0] >= 'a') && (moves[0] <= 'h')) {
-                    int from, to;
-                    uint16_t m = 0;
+                char *move = strtok(moves + 6, " \n");
+                while (move != NULL) {
+                    uint16_t moves[320];
+                    int count = 0;
+                    count = gen_legal(board, moves);
 
-                    from = moves[0] - 'a';
-                    from += 8 * ((moves[1] - '0') - 1);
-                    to = moves[2] - 'a';
-                    to += 8 * ((moves[3] - '0') - 1);
-
-                    if (board->turn == BLACK) {
-                        m = MOVE((from ^ 0x38), (to ^ 0x38), 0);
-                    } else {
-                        m = MOVE(from, to, 0);
+                    for (int i = 0; i < count; ++i) {
+                        if (!strcmp(str_move(moves[i], board->turn), move)) {
+                            make(board, moves[i]);
+                            break;
+                        }
                     }
-
-                    // Make move
-                    make(board, m);
-
-                    moves += 4;
-                    while (moves[0] == ' ')
-                        moves++;
+                    move = strtok(NULL, " \n");
                 }
             }
         } else if (!strncmp("go", buf, 2)) {
@@ -76,7 +67,7 @@ void loop(struct board_t *board)
                 if (legal(board, moves[i])) {
                     continue;
                 }
-                printf("bestmove %s\n", str_move(moves[0], board->turn));
+                printf("bestmove %s\n", str_move(moves[i], board->turn));
                 break;
             }
         } else if (!strncmp("stop", buf, 4)) {
