@@ -47,13 +47,16 @@ void loop(struct board_t *board)
                     uint16_t moves[320];
                     int count = 0;
                     count = gen_legal(board, moves);
+                    char *str_m;
 
                     for (int i = 0; i < count; ++i) {
-                        if (!strcmp(str_move(moves[i], board->turn), move)) {
+                        str_m = str_move(moves[i], board->turn);
+                        if (!strcmp(str_m, move)) {
                             make(board, moves[i]);
                             break;
                         }
                     }
+
                     move = strtok(NULL, " \n");
                 }
             }
@@ -61,7 +64,7 @@ void loop(struct board_t *board)
             uint16_t moves[320];
             int count = 0;
             count = quiet(board, moves);
-            count += noisy(board, moves);
+            count += noisy(board, moves + count);
 
             for (int i = 0; i < count; ++i) {
                 if (legal(board, moves[i])) {
