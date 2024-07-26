@@ -12,12 +12,9 @@ uint64_t perft(struct board_t *board, int depth)
     if (depth == 0)
         return 1ULL;
 
-    count = quiet(board, moves);
-    count += noisy(board, moves + count);
+    count = gen_legal(board, moves);
 
     for (int i = 0; i < count; ++i) {
-        if (legal(board, moves[i]))
-            continue;
         if (depth > 1) {
             make(board, moves[i]);
             nodes += perft(board, depth - 1);
@@ -37,12 +34,9 @@ void perft_divide(struct board_t *board, int depth)
     uint64_t nodes = 0;
     uint64_t total_nodes = 0;
 
-    count = quiet(board, moves);
-    count += noisy(board, moves + count);
+    count = gen_legal(board, moves);
 
     for (int i = 0; i < count; ++i) {
-        if (legal(board, moves[i]))
-            continue;
         make(board, moves[i]);
         nodes = perft(board, depth - 1);
         unmake(board, moves[i]);
