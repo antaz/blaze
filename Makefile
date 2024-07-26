@@ -46,7 +46,7 @@ $(BDIR)/test/perft: $(BDIR)/test/perft.o $(BDIR)/blaze.a
 
 $(BDIR)/%.o: %.c $(BDIR)/%.d
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(ARCH) $(CPPFLAGS) -c -o $@ $<
 
 $(BDIR)/%.d: %.c
 	@mkdir -p $(@D)
