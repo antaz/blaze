@@ -17,6 +17,11 @@ make -j4
 make -j4 DEBUG=1
 ```
 
+## Technical details
+Blaze is inspired by the didactic engine QBBEngine by Fabio Gobbato
+- Quad bitboards (Using 4 bitboards to represent the entire chess board)
+- Make/Unmake (Rather than Copy/Make)
+
 ## Test
 
 ```
