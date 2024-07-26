@@ -2,6 +2,7 @@
 #include "gen.h"
 #include "move.h"
 #include <stdio.h>
+#include <time.h>
 
 uint64_t perft(struct board_t *board, int depth)
 {
@@ -33,8 +34,11 @@ void perft_divide(struct board_t *board, int depth)
     int count = 0;
     uint64_t nodes = 0;
     uint64_t total_nodes = 0;
+    clock_t start_time, end_time;
+    double elapsed_time;
 
     count = gen_legal(board, moves);
+    start_time = clock();
 
     for (int i = 0; i < count; ++i) {
         make(board, moves[i]);
@@ -44,5 +48,10 @@ void perft_divide(struct board_t *board, int depth)
         total_nodes += nodes;
     }
 
+    end_time = clock();
+    elapsed_time = ((double) (end_time - start_time)) / CLOCKS_PER_SEC;
+    double nps = total_nodes / elapsed_time;
+
     printf("\nNodes searched: %lu\n", total_nodes);
+    printf("NPS: %.2f\n", nps);
 }
