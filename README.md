@@ -20,6 +20,7 @@ make -j4 DEBUG=1
 ## Technical details
 Blaze is inspired by the didactic engine QBBEngine by Fabio Gobbato
 - Quad bitboards (Using 4 bitboards to represent the entire chess board)
+- Using the [o^(o-2r)-trick](https://www.chessprogramming.org/Hyperbola_Quintessence) to generate sliding piece attacks
 - Make/Unmake (Rather than Copy/Make)
 
 ## Test
