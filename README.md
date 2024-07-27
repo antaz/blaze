@@ -1,10 +1,10 @@
 Blaze (formerly Trappist)
 =========================
 
-Blaze is a UCI compatible chess engine written in C
-
 > [!NOTE]
 > This project is still under development and may require a certain envirnoment to be compiled and run
+
+Blaze is a UCI compatible chess engine written in C
 
 ## Build
 Setting the `DEBUG` variable allows for a custom debug build with debugging symbols
