@@ -18,8 +18,9 @@ void loop(struct board_t *board)
 
     for (;;) {
         if (!fgets(buf, SIZE, stdin)) {
-            continue;
+            break;
         }
+
         if (!strncmp("isready", buf, 7)) {
             printf("readyok\n");
         } else if (!strncmp("go perft", buf, 8)) {
@@ -63,13 +64,9 @@ void loop(struct board_t *board)
         } else if (!strncmp("go", buf, 2)) {
             uint16_t moves[320];
             int count = 0;
-            count = quiet(board, moves);
-            count += noisy(board, moves + count);
+            count = gen_legal(board, moves);
 
             for (int i = 0; i < count; ++i) {
-                if (legal(board, moves[i])) {
-                    continue;
-                }
                 printf("bestmove %s\n", str_move(moves[i], board->turn));
                 break;
             }
