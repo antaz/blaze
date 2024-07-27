@@ -78,12 +78,7 @@ static const uint64_t NATK[64] = {
 
 uint64_t katk(const int i) { return KATK[i]; }
 
-uint64_t natk(const int i)
-{
-    assert(i < 64);
-    assert(i >= 0);
-    return NATK[i];
-}
+uint64_t natk(const int i) { return NATK[i]; }
 
 uint64_t batk(const int i, const uint64_t block)
 {
@@ -98,28 +93,4 @@ uint64_t ratk(const int i, const uint64_t block)
 uint64_t qatk(const int i, const uint64_t block)
 {
     return batk(i, block) | ratk(i, block);
-}
-
-uint64_t between(const int i, const int j)
-{
-    // return BETWEEN[i][j];
-    uint64_t sq = (1ULL << i) | (1ULL << j);
-
-    if (file(i) == file(j) || rank(i) == rank(j))
-        return ratk(i, sq) & ratk(j, sq);
-    else if (diag(i) == diag(j) || adiag(i) == adiag(j))
-        return batk(i, sq) & batk(j, sq);
-    else
-        return 0ULL;
-}
-
-uint64_t line(const int i, const int j)
-{
-    // return LINE[i][j];
-    if (file(i) == file(j) || rank(i) == rank(j))
-        return (ratk(i, 0ULL) & ratk(j, 0ULL)) | (1ULL << i) | (1ULL << j);
-    else if (diag(i) == diag(j) || adiag(i) == adiag(j))
-        return (batk(i, 0ULL) & batk(j, 0ULL)) | (1ULL << i) | (1ULL << j);
-    else
-        return 0ULL;
 }
