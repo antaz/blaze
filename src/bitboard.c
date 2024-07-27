@@ -1,5 +1,4 @@
 #include "bitboard.h"
-#include <assert.h>
 #include <stdio.h>
 
 uint64_t rot180(uint64_t b)
