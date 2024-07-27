@@ -234,9 +234,12 @@ int noisy(const struct board_t *board, uint16_t *moves)
 
 uint64_t legal(const struct board_t *board, uint16_t move)
 {
+    int from, to;
     uint8_t ksq;
-    uint64_t from = 1ULL << MOVE_FROM(move);
-    uint64_t to = 1ULL << MOVE_TO(move);
+    from = MOVE_FROM(move);
+    to = MOVE_TO(move);
+    uint64_t frombb = 1ULL << from;
+    uint64_t tobb = 1ULL << to;
 
     uint64_t all = board->bb[1] | board->bb[2] | board->bb[3];
     uint64_t theirs = all ^ board->bb[0];
@@ -248,22 +251,22 @@ uint64_t legal(const struct board_t *board, uint16_t move)
     uint64_t king = (board->bb[2] & board->bb[3]);
 
     // update all and theirs
-    all = (all ^ from) | to;
-    theirs = theirs & ~to;
-    uint8_t piece = ((board->bb[3] >> (MOVE_FROM(move))) & 1) << 2 |
-                    ((board->bb[2] >> (MOVE_FROM(move))) & 1) << 1 |
-                    ((board->bb[1] >> (MOVE_FROM(move))) & 1);
+    all = (all ^ frombb) | tobb;
+    theirs = theirs & ~tobb;
+    uint8_t piece = ((board->bb[3] >> (from)) & 1) << 2 |
+                    ((board->bb[2] >> (from)) & 1) << 1 |
+                    ((board->bb[1] >> (from)) & 1);
 
     if (piece == KING) {
-        king = to;
+        king = tobb;
         ksq = MOVE_TO(move);
     } else {
         king = king & board->bb[0];
         assert(king);
         ksq = bsf(king);
         if (((move >> 12) & 0x0f) == EP) {
-            theirs ^= to >> 8;
-            all ^= to >> 8;
+            theirs ^= tobb >> 8;
+            all ^= tobb >> 8;
         }
     }
     return (((natk(ksq) & knight) | (ratk(ksq, all) & (rook | queen)) |
