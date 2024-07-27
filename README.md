@@ -22,14 +22,7 @@ Blaze is inspired by the didactic engine QBBEngine by Fabio Gobbato
 - Quad bitboards (Using 4 bitboards to represent the entire chess board)
 - Using the [o^(o-2r)-trick](https://www.chessprogramming.org/Hyperbola_Quintessence) to generate sliding piece attacks
 - Make/Unmake (Rather than Copy/Make)
-
-## Test
-
-```
-make check
-```
-
-## Benchmark
+- Around 10Mnps raw perft speed (No hashing, bulk counting in the horizon nodes)
 
 ## License
 Blaze is licensed under the MIT license, a copy of this license can be found in `LICENSE`
