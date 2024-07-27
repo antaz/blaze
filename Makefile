@@ -31,7 +31,7 @@ ifneq ($(DEBUG), )
 	CPPFLAGS	+= -DDEBUG
 	BDIR	 	= build/debug
 else
-	CFLAGS  	+= -O3
+	CFLAGS  	+= -Ofast -static -flto
 	CPPFLAGS	+= -DNDEBUG
 	BDIR	 	= build/release
 endif
