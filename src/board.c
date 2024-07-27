@@ -190,10 +190,10 @@ void flip(struct board_t *board)
     uint64_t *bb = board->bb;
 
     bb[0] ^= bb[1] | bb[2] | bb[3];
-    bb[0] = rev(bb[0]);
-    bb[1] = rev(bb[1]);
-    bb[2] = rev(bb[2]);
-    bb[3] = rev(bb[3]);
+    bb[0] = vflip(bb[0]);
+    bb[1] = vflip(bb[1]);
+    bb[2] = vflip(bb[2]);
+    bb[3] = vflip(bb[3]);
     board->turn ^= BLACK;
     board->ca = (board->ca >> 4) | (board->ca << 4);
 }

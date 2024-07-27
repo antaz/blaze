@@ -34,13 +34,13 @@ int bsf(uint64_t b);
  * Flip a bitboard about the center.
  * Rank 1 is Rank 8 and vice versa.
  */
-uint64_t rev(uint64_t b);
+uint64_t vflip(uint64_t b);
 
 /**
- * Rotates a bitboard a 180 degrees.
- * Square A1 is mapped to H8, and A8 to H1.
+ * Reverse bitboard
+ * Square A1 is mapped to H8, A2 to H7 etc
  */
-uint64_t rot180(uint64_t b);
+uint64_t rev(uint64_t b);
 
 /**
  * Hyperbola Quintessence o^(o - 2r) trick.
