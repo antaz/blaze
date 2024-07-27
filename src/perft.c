@@ -10,19 +10,15 @@ uint64_t perft(struct board_t *board, int depth)
     int count = 0;
     uint64_t nodes = 0;
 
-    if (depth == 0)
-        return 1ULL;
-
     count = gen_legal(board, moves);
 
+    if (depth == 1)
+        return count;
+
     for (int i = 0; i < count; ++i) {
-        if (depth > 1) {
-            make(board, moves[i]);
-            nodes += perft(board, depth - 1);
-            unmake(board, moves[i]);
-        } else {
-            nodes++;
-        }
+        make(board, moves[i]);
+        nodes += perft(board, depth - 1);
+        unmake(board, moves[i]);
     }
 
     return nodes;
