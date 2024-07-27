@@ -29,19 +29,21 @@ uint64_t oo2r(int i, uint64_t block, uint64_t mask)
 
 int popcnt(uint64_t b)
 {
-    int c = 0;
+    // int c = 0;
 
-    while (b) {
-        ++c;
-        b &= b - 1;
-    }
-    return c;
+    // while (b) {
+    //     ++c;
+    //     b &= b - 1;
+    // }
+    // return c;
+    return __builtin_popcount(b);
 }
 
 int bsf(uint64_t b)
 {
-    int c = popcnt((b & -b) - 1);
-    return c;
+    // int c = popcnt((b & -b) - 1);
+    // return c;
+    return __builtin_ctzll(b);
 }
 
 void printb(uint64_t b)
