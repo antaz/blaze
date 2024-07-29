@@ -253,6 +253,8 @@ uint64_t legal(const struct board_t *board, uint16_t move)
     // update all and theirs
     all = (all ^ frombb) | tobb;
     theirs = theirs & ~tobb;
+
+    // TODO: redundant mailbox for faster piece lookup?
     uint8_t piece = ((board->bb[3] >> (from)) & 1) << 2 |
                     ((board->bb[2] >> (from)) & 1) << 1 |
                     ((board->bb[1] >> (from)) & 1);
