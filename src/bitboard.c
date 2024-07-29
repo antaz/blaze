@@ -14,10 +14,11 @@ uint64_t rev(uint64_t b)
 
 uint64_t vflip(uint64_t b)
 {
-    b = ((b >> 8) & 0x00FF00FF00FF00FF) | ((b & 0x00FF00FF00FF00FF) << 8);
-    b = ((b >> 16) & 0x0000FFFF0000FFFF) | ((b & 0x0000FFFF0000FFFF) << 16);
-    b = (b >> 32) | (b << 32);
-    return b;
+    // b = ((b >> 8) & 0x00FF00FF00FF00FF) | ((b & 0x00FF00FF00FF00FF) << 8);
+    // b = ((b >> 16) & 0x0000FFFF0000FFFF) | ((b & 0x0000FFFF0000FFFF) << 16);
+    // b = (b >> 32) | (b << 32);
+    // return b;
+    return __builtin_bswap64(b);
 }
 
 uint64_t oo2r(int i, uint64_t block, uint64_t mask)
