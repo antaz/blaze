@@ -1,9 +1,6 @@
 #include "attack.h"
 #include "bitboard.h"
 
-#include <assert.h>
-#include <stdio.h>
-
 // clang-format off
 // File mask
 static const uint64_t _FILE[8] = {
