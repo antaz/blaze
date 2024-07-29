@@ -1,7 +1,6 @@
 #ifndef ATTACK_H
 #define ATTACK_H
 
-#include <stdbool.h>
 #include <stdint.h>
 
 #define rank(i) (i >> 3)
