@@ -3,6 +3,7 @@
 #include "gen.h"
 #include "move.h"
 #include "perft.h"
+#include "search.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -62,14 +63,7 @@ void loop(struct board_t *board)
                 }
             }
         } else if (!strncmp("go", buf, 2)) {
-            uint16_t moves[320];
-            int count = 0;
-            count = gen_legal(board, moves);
-
-            for (int i = 0; i < count; ++i) {
-                printf("bestmove %s\n", str_move(moves[i], board->turn));
-                break;
-            }
+            search(board);
         } else if (!strncmp("stop", buf, 4)) {
             // stop search
         } else if (!strncmp("quit", buf, 4)) {
