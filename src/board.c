@@ -360,15 +360,15 @@ void make(struct board_t *board, const uint16_t move)
 void unmake(struct board_t *board, const uint16_t move)
 {
     uint64_t *bb, frombb, tobb;
-    uint8_t to, piece;
+    uint8_t from, to, piece;
 
     board->ply--;
     flip(board);
     bb = board->bb;
-    // from = MOVE_FROM(move);
+    from = MOVE_FROM(move);
     to = MOVE_TO(move);
-    frombb = 1ULL << ((move >> 6) & 0x3f);
-    tobb = 1ULL << (move & 0x3f);
+    frombb = 1ULL << from;
+    tobb = 1ULL << to;
 
     board->ep = board->hist[board->ply].ep;
     board->ca = board->hist[board->ply].ca;
