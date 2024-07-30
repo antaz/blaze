@@ -2,6 +2,7 @@
 #include "board.h"
 #include "gen.h"
 #include "move.h"
+#include <search.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -30,7 +31,7 @@ void search(struct board_t *board, struct clck_t *clock)
     uint16_t moves[256];
     gen_legal(board, moves);
 
-    for (;;) {
+    for (int depth = 2; depth <= MAX_DEPTH; depth++) {
 
         // if time is over return bestmove and break;
         if ((int)(time_ms() - start) > movetime) {
