@@ -4,6 +4,7 @@
 #include "move.h"
 #include "perft.h"
 #include "search.h"
+#include <search.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -63,7 +64,46 @@ void loop(struct board_t *board)
                 }
             }
         } else if (!strncmp("go", buf, 2)) {
-            search(board);
+            struct clck_t clock = {.time = {0},
+                                   .inc = {0},
+                                   .depth = 0,
+                                   .nodes = 0,
+                                   .movetime = 0,
+                                   .movestogo = MOVESTOGO};
+            char *token = NULL;
+
+            if ((token = strstr(buf, "infinite"))) {
+                // do an infinite search
+            }
+            if ((token = strstr(buf, "ponder"))) {
+                // ponder a move
+            }
+            if ((token = strstr(buf, "wtime"))) {
+                clock.time[WHITE] = atoi(token + 6);
+            }
+            if ((token = strstr(buf, "btime"))) {
+                clock.time[BLACK] = atoi(token + 6);
+            }
+            if ((token = strstr(buf, "winc"))) {
+                clock.time[WHITE] = atoi(token + 5);
+            }
+            if ((token = strstr(buf, "binc"))) {
+                clock.time[BLACK] = atoi(token + 5);
+            }
+            if ((token = strstr(buf, "movestogo"))) {
+                clock.movestogo = atoi(token + 10);
+            }
+            if ((token = strstr(buf, "depth"))) {
+                clock.depth = atoi(token + 6);
+            }
+            if ((token = strstr(buf, "nodes"))) {
+                clock.nodes = atoi(token + 6);
+            }
+            if ((token = strstr(buf, "movetime"))) {
+                clock.movetime = atoi(token + 9);
+            }
+
+            search(board, &clock);
         } else if (!strncmp("stop", buf, 4)) {
             // stop search
         } else if (!strncmp("quit", buf, 4)) {
