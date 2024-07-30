@@ -16,7 +16,7 @@
 #define NOSQ 8
 
 /* colors and turns */
-enum { WHITE = 0, BLACK = 8 };
+enum { WHITE = 0, BLACK = 1 };
 
 /* pieces */
 enum { NOPC, PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING };
