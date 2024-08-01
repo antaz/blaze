@@ -103,7 +103,7 @@ void loop(struct board_t *board)
                 clock.movetime = atoi(token + 9);
             }
 
-            search(board, &clock);
+            deepen(board, &clock);
         } else if (!strncmp("stop", buf, 4)) {
             // stop search
         } else if (!strncmp("quit", buf, 4)) {
