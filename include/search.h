@@ -15,6 +15,7 @@ struct clck_t {
     int movestogo;
 };
 
-void search(struct board_t *board, struct clck_t *clock);
+void deepen(struct board_t *board, struct clck_t *clock);
+int search(struct board_t *board, int depth, uint16_t *pv);
 
 #endif
