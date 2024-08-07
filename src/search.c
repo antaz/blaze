@@ -37,7 +37,7 @@ static int stop(int depth)
 {
     // check if we should stop searching
     if (movetime) {
-        if ((time_ms() - start) >= movetime)
+        if (((time_ms() - start) * 2) >= movetime)
             return 1;
     } else {
         // check if we reached specified depth
@@ -57,6 +57,9 @@ static int search(struct board_t *board, int depth, uint16_t *pv)
     uint16_t cpv[MAX_DEPTH] = {0};
 
     nodes++;
+
+    if ((nodes & 1023) == 0)
+        stop(depth);
 
     uint16_t moves[256];
     int count = gen_legal(board, moves);
