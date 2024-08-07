@@ -1,55 +1,62 @@
 #include "search.h"
 #include "board.h"
+#include "eval.h"
 #include "gen.h"
 #include "move.h"
-#include "eval.h"
+#include <inttypes.h>
 #include <search.h>
-#include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
-uint16_t PV[MAX_DEPTH];
+static uint64_t start;    // time the search started
+static uint64_t nodes;    // # of nodes searched so far
+static uint64_t movetime; // how long should we search
 
-uint64_t time_ms()
+static uint64_t time_ms()
 {
+    // current time in miliseconds
     struct timespec ts;
+
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return (uint64_t)ts.tv_sec * 1e3 + ts.tv_nsec / 1e6;
 }
 
-void deepen(struct board_t *board, struct clck_t *clock)
+static uint64_t nps()
 {
-    // iterative deepening
-    // int val = 0;
+    // count nodes per second
+    uint64_t elapsed = time_ms() - start;
 
-    // init move and search time
-    uint64_t start = time_ms();
-    int movetime = 0;
-    if (clock->movetime != 0) {
-        movetime = clock->movetime;
-    } else {
-        movetime = clock->time[board->turn] / clock->movestogo +
-                   clock->inc[board->turn];
-    }
+    if (elapsed == 0)
+        return 0;
 
-    for (int depth = 2; depth <= MAX_DEPTH; depth++) {
-
-        search(board, depth, PV);
-        // if time is over return bestmove and break;
-        if ((int)(time_ms() - start) > movetime) {
-            break;
-        }
-    }
-
-    printf("bestmove %s\n", str_move(PV[0], board->turn));
+    return (nodes * 1000) / elapsed;
 }
 
-int search(struct board_t *board, int depth, uint16_t *pv) {
+static int stop(int depth)
+{
+    // check if we should stop searching
+    if (movetime) {
+        if ((time_ms() - start) >= movetime)
+            return 1;
+    } else {
+        // check if we reached specified depth
+        if (tc_data.depth && (depth >= tc_data.depth))
+            return 1;
+        // check if we reached specified nodes count
+        if (tc_data.nodes && (nodes >= tc_data.nodes))
+            return 1;
+    }
+    return 0;
+}
+
+static int search(struct board_t *board, int depth, uint16_t *pv)
+{
     int val = 0;
-    int best = -10000;
+    int best = -999999;
     uint16_t cpv[MAX_DEPTH] = {0};
+
+    nodes++;
 
     uint16_t moves[256];
     int count = gen_legal(board, moves);
@@ -70,4 +77,41 @@ int search(struct board_t *board, int depth, uint16_t *pv) {
         }
     }
     return val;
+}
+
+void go(struct board_t *board)
+{
+    int val = 0;
+    uint16_t pv[MAX_DEPTH] = {0};
+
+    // initialize time management
+    start = time_ms();
+    if (!tc_data.movetime) {
+        movetime = tc_data.time[board->turn] / tc_data.movestogo +
+                   tc_data.inc[board->turn];
+    } else {
+        movetime = tc_data.movetime;
+    }
+
+    // initialize nodes count
+    nodes = 0;
+
+    // iterative deepening
+    for (int depth = 1; depth <= MAX_DEPTH; depth++) {
+
+        val = search(board, depth, pv);
+
+        // info line
+        // TODO: add PV
+        printf("info depth %d seldepth %d score cp %d nodes %" PRIu64
+               " nps %" PRIu64 " time "
+               "%" PRIu64 "\n",
+               depth, depth, val, nodes, nps(), time_ms() - start);
+
+        if (stop(depth)) {
+            break;
+        }
+    }
+
+    printf("bestmove %s\n", str_move(pv[0], board->turn));
 }

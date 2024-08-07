@@ -2,20 +2,21 @@
 #define SEARCH_H
 
 #include "board.h"
+#include <time.h>
 
 #define MOVESTOGO 24
 #define MAX_DEPTH 64
 
-struct clck_t {
-    int time[2];
-    int inc[2];
+// time control information
+extern struct tc_t {
+    uint64_t time[2]; // time for both players
+    uint64_t inc[2];  // increment for both players
     int depth;
-    int nodes;
-    int movetime;
+    uint64_t nodes;
+    uint64_t movetime;
     int movestogo;
-};
+} tc_data;
 
-void deepen(struct board_t *board, struct clck_t *clock);
-int search(struct board_t *board, int depth, uint16_t *pv);
+void go(struct board_t *board);
 
 #endif

@@ -9,17 +9,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SIZE 65536
+#define BUF_SIZE 65536
+struct tc_t tc_data = {.movestogo = MOVESTOGO};
 
 void loop(struct board_t *board)
 {
-    char buf[SIZE];
+    char buf[BUF_SIZE];
 
     setvbuf(stdin, NULL, _IONBF, 0);
     setvbuf(stdout, NULL, _IONBF, 0);
 
     for (;;) {
-        if (!fgets(buf, SIZE, stdin)) {
+        if (!fgets(buf, BUF_SIZE, stdin)) {
             break;
         }
 
@@ -64,12 +65,6 @@ void loop(struct board_t *board)
                 }
             }
         } else if (!strncmp("go", buf, 2)) {
-            struct clck_t clock = {.time = {0},
-                                   .inc = {0},
-                                   .depth = 0,
-                                   .nodes = 0,
-                                   .movetime = 0,
-                                   .movestogo = MOVESTOGO};
             char *token = NULL;
 
             if ((token = strstr(buf, "infinite"))) {
@@ -79,31 +74,31 @@ void loop(struct board_t *board)
                 // ponder a move
             }
             if ((token = strstr(buf, "wtime"))) {
-                clock.time[WHITE] = atoi(token + 6);
+                tc_data.time[WHITE] = atoi(token + 6);
             }
             if ((token = strstr(buf, "btime"))) {
-                clock.time[BLACK] = atoi(token + 6);
+                tc_data.time[BLACK] = atoi(token + 6);
             }
             if ((token = strstr(buf, "winc"))) {
-                clock.time[WHITE] = atoi(token + 5);
+                tc_data.time[WHITE] = atoi(token + 5);
             }
             if ((token = strstr(buf, "binc"))) {
-                clock.time[BLACK] = atoi(token + 5);
+                tc_data.time[BLACK] = atoi(token + 5);
             }
             if ((token = strstr(buf, "movestogo"))) {
-                clock.movestogo = atoi(token + 10);
+                tc_data.movestogo = atoi(token + 10);
             }
             if ((token = strstr(buf, "depth"))) {
-                clock.depth = atoi(token + 6);
+                tc_data.depth = atoi(token + 6);
             }
             if ((token = strstr(buf, "nodes"))) {
-                clock.nodes = atoi(token + 6);
+                tc_data.nodes = atoi(token + 6);
             }
             if ((token = strstr(buf, "movetime"))) {
-                clock.movetime = atoi(token + 9);
+                tc_data.movetime = atoi(token + 9);
             }
 
-            deepen(board, &clock);
+            go(board);
         } else if (!strncmp("stop", buf, 4)) {
             // stop search
         } else if (!strncmp("quit", buf, 4)) {
