@@ -37,7 +37,7 @@ int popcnt(uint64_t b)
     //     b &= b - 1;
     // }
     // return c;
-    return __builtin_popcount(b);
+    return __builtin_popcountll(b);
 }
 
 int bsf(uint64_t b)
