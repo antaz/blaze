@@ -3,8 +3,9 @@
 #include "move.h"
 #include <assert.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <string.h>
+
+uint64_t piece_hash[2][6][64];
 
 void add(struct board_t *board, int type, int idx)
 {
@@ -40,12 +41,12 @@ void add(struct board_t *board, int type, int idx)
     }
 }
 
-void parse(const char *fen, struct board_t *board)
+void parse(struct board_t *board, const char *fen)
 {
     memset(board->bb, 0, sizeof board->bb);
     board->ca = 0;
     board->ep = NOSQ;
-    board->turn = WHITE;
+    board->stm = WHITE;
     int turn = WHITE;
     uint64_t *bb = board->bb;
 
@@ -159,32 +160,6 @@ void parse(const char *fen, struct board_t *board)
     }
 }
 
-uint64_t pawns(struct board_t *board)
-{
-    return board->bb[1] & ~board->bb[2] & ~board->bb[3];
-}
-
-uint64_t knights(struct board_t *board)
-{
-    return ~board->bb[1] & board->bb[2] & ~board->bb[3];
-}
-
-uint64_t bishops(struct board_t *board) { return board->bb[1] & board->bb[2]; }
-
-uint64_t rooks(struct board_t *board)
-{
-    return ~board->bb[1] & ~board->bb[2] & board->bb[3];
-}
-
-uint64_t queens(struct board_t *board) { return board->bb[1] & board->bb[3]; }
-
-uint64_t kings(struct board_t *board) { return board->bb[2] & board->bb[3]; }
-
-uint64_t all(struct board_t *board)
-{
-    return board->bb[1] & board->bb[2] & board->bb[3];
-}
-
 void flip(struct board_t *board)
 {
     uint64_t *bb = board->bb;
@@ -194,7 +169,7 @@ void flip(struct board_t *board)
     bb[1] = vflip(bb[1]);
     bb[2] = vflip(bb[2]);
     bb[3] = vflip(bb[3]);
-    board->turn ^= BLACK;
+    board->stm ^= BLACK;
     board->ca = (board->ca >> 4) | (board->ca << 4);
 }
 
