@@ -14,11 +14,13 @@ uint64_t perft(struct board_t *board, int depth)
 
     if (depth == 1)
         return count;
+    else if (depth == 0)
+        return 1;
 
     for (int i = 0; i < count; ++i) {
         make(board, moves[i]);
         nodes += perft(board, depth - 1);
-        unmake(board, moves[i]);
+        take(board, moves[i]);
     }
 
     return nodes;
@@ -36,8 +38,8 @@ void perft_divide(struct board_t *board, int depth)
     for (int i = 0; i < count; ++i) {
         make(board, moves[i]);
         nodes = perft(board, depth - 1);
-        unmake(board, moves[i]);
-        printf("%s: %lu\n", str_move(moves[i], board->turn), nodes);
+        take(board, moves[i]);
+        printf("%s: %lu\n", str_move(moves[i], board->stm), nodes);
         total_nodes += nodes;
     }
 

@@ -173,7 +173,7 @@ void flip(struct board_t *board)
     board->ca = (board->ca >> 4) | (board->ca << 4);
 }
 
-void clear(struct board_t *board, const uint8_t idx)
+void cls(struct board_t *board, const uint8_t idx)
 {
     uint64_t b = 1ULL << idx;
     board->bb[1] &= ~b;
@@ -210,7 +210,7 @@ void make(struct board_t *board, const uint16_t move)
         // effectively removing the captured piece
         // note we don't clear the bb[0] board (i.e side to move)
         // because the captured piece is our opponent's piece'
-        clear(board, to);
+        cls(board, to);
 
         // reset castling if one of the rooks were captured
         if (to == 63)
@@ -332,7 +332,7 @@ void make(struct board_t *board, const uint16_t move)
     flip(board);
 }
 
-void unmake(struct board_t *board, const uint16_t move)
+void take(struct board_t *board, const uint16_t move)
 {
     uint64_t *bb, frombb, tobb;
     uint8_t from, to, piece;
@@ -397,7 +397,7 @@ void unmake(struct board_t *board, const uint16_t move)
     case QP:
         bb[1] ^= frombb | tobb;
 
-        clear(board, to);
+        cls(board, to);
         break;
     case EP:
         bb[1] ^= frombb | tobb;
@@ -424,7 +424,7 @@ void unmake(struct board_t *board, const uint16_t move)
 
     if (move & 0x4000) {
         // clear the destination square
-        clear(board, to);
+        cls(board, to);
 
         // find the captured piece and put it back in place
         add(board, board->hist[board->ply].cap, to);

@@ -71,7 +71,7 @@ static int search(struct board_t *board, int depth, uint16_t *pv)
     for (int i = 0; i < count; i++) {
         make(board, moves[i]);
         val = -search(board, depth - 1, cpv);
-        unmake(board, moves[i]);
+        take(board, moves[i]);
 
         if (val > best) {
             best = val;
@@ -90,8 +90,8 @@ void go(struct board_t *board)
     // initialize time management
     start = time_ms();
     if (!tc_data.movetime) {
-        movetime = tc_data.time[board->turn] / tc_data.movestogo +
-                   tc_data.inc[board->turn];
+        movetime = tc_data.time[board->stm] / tc_data.movestogo +
+                   tc_data.inc[board->stm];
     } else {
         movetime = tc_data.movetime;
     }
@@ -116,5 +116,5 @@ void go(struct board_t *board)
         }
     }
 
-    printf("bestmove %s\n", str_move(pv[0], board->turn));
+    printf("bestmove %s\n", str_move(pv[0], board->stm));
 }

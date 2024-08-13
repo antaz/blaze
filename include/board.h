@@ -53,6 +53,6 @@ struct board_t {
 void parse(struct board_t *board, const char *fen);
 void flip(struct board_t *board);
 void make(struct board_t *board, const uint16_t move);
-void unmake(struct board_t *board, const uint16_t move);
+void take(struct board_t *board, const uint16_t move);
 
 #endif /* BOARD_H */
