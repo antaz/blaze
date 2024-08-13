@@ -29,19 +29,19 @@ void loop(struct board_t *board)
         } else if (!strncmp("go perft", buf, 8)) {
             perft_divide(board, atoi(buf + 9));
         } else if (!strncmp("ucinewgame", buf, 10)) {
-            parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-                  board);
+            parse(board,
+                  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         } else if (!strncmp("uci", buf, 3)) {
             printf("id name Blaze 0.1\n");
             printf("id author Antar Azri\n");
             printf("uciok\n");
         } else if (!strncmp("position", buf, 8)) {
             if (strstr(buf, "startpos")) {
-                parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq "
-                      "- 0 1",
-                      board);
+                parse(board,
+                      "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq "
+                      "- 0 1");
             } else if (strstr(buf, "fen")) {
-                parse(buf + 13, board);
+                parse(board, buf + 13);
             }
 
             char *moves = strstr(buf, "moves");
@@ -54,7 +54,7 @@ void loop(struct board_t *board)
                     char *str_m;
 
                     for (int i = 0; i < count; ++i) {
-                        str_m = str_move(moves[i], board->turn);
+                        str_m = str_move(moves[i], board->stm);
                         if (!strcmp(str_m, move)) {
                             make(board, moves[i]);
                             break;
