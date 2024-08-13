@@ -1,3 +1,5 @@
 build/
+.cache
 *.tar.gz
 TAGS
+compile_commands.json
