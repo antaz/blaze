@@ -1,6 +1,7 @@
 #include "hash.h"
 #include "board.h"
 #include <stdint.h>
+#include <stdio.h>
 
 static uint64_t prng()
 {
@@ -20,4 +21,14 @@ void init_hash()
             }
         }
     }
+
+    for (int i = 0; i < 8; i++) {
+        ep_hash[i] = prng();
+    }
+
+    for (int i = 0; i < 52; i++) {
+        ca_hash[i] = prng();
+    }
+
+    stm_hash = prng();
 }

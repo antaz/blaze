@@ -1,13 +1,18 @@
 #include "board.h"
 #include "bitboard.h"
+#include "hash.h"
 #include "move.h"
 #include <assert.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
-uint64_t piece_hash[2][6][64];
+uint64_t piece_hash[2][PC][SQ];
+uint64_t ep_hash[8];
+uint64_t ca_hash[52];
+uint64_t stm_hash;
 
-void add(struct board_t *board, int type, int idx)
+void add(uint64_t *bb, const int tp, const int idx)
 {
     // TODO: Test the speed of this (may potentionally be slower)
     // board->bb[1] |= ((uint64_t)type & 1) << idx;
@@ -16,29 +21,84 @@ void add(struct board_t *board, int type, int idx)
 
     // This may be faster?
     uint64_t b = 1ULL << idx;
-    switch (type) {
+    switch (tp) {
     case PAWN:
-        board->bb[1] |= b;
+        bb[1] |= b;
         break;
     case KNIGHT:
-        board->bb[2] |= b;
+        bb[2] |= b;
         break;
     case BISHOP:
-        board->bb[1] |= b;
-        board->bb[2] |= b;
+        bb[1] |= b;
+        bb[2] |= b;
         break;
     case ROOK:
-        board->bb[3] |= b;
+        bb[3] |= b;
         break;
     case QUEEN:
-        board->bb[1] |= b;
-        board->bb[3] |= b;
+        bb[1] |= b;
+        bb[3] |= b;
         break;
     case KING:
-        board->bb[2] |= b;
-        board->bb[3] |= b;
+        bb[2] |= b;
+        bb[3] |= b;
         break;
     }
+}
+
+void cls(uint64_t *bb, const int idx)
+{
+    uint64_t b = 1ULL << idx;
+    bb[1] &= ~b;
+    bb[2] &= ~b;
+    bb[3] &= ~b;
+}
+
+void movep(struct board_t *board, int fidx, int tidx)
+{
+    uint64_t *bb = board->bb;
+    uint64_t fb = 1ULL << fidx;
+    uint64_t tb = 1ULL << tidx;
+
+    int pf = ((bb[3] >> (fidx)) & 1) << 2 | ((bb[2] >> (fidx)) & 1) << 1 |
+             ((bb[1] >> (fidx)) & 1);
+
+    int pt = ((bb[3] >> (tidx)) & 1) << 2 | ((bb[2] >> (tidx)) & 1) << 1 |
+             ((bb[1] >> (tidx)) & 1);
+
+    switch (pf) {
+    case PAWN:
+        bb[1] ^= fb | tb;
+        break;
+    case KNIGHT:
+        bb[1] ^= 0;
+        bb[2] ^= fb | tb;
+        bb[3] ^= 0;
+        break;
+    case BISHOP:
+        bb[1] ^= fb | tb;
+        bb[2] ^= fb | tb;
+        bb[3] ^= 0;
+        break;
+    case ROOK:
+        bb[1] ^= 0;
+        bb[2] ^= 0;
+        bb[3] ^= fb | tb;
+        break;
+    case QUEEN:
+        bb[1] ^= fb | tb;
+        bb[2] ^= 0;
+        bb[3] ^= fb | tb;
+        break;
+    case KING:
+        bb[2] ^= fb | tb;
+        bb[3] ^= fb | tb;
+        break;
+    }
+
+    // update hash
+    // board->hash ^= piece_hash[stm][pf][fidx] ^ piece_hash[stm][pf][tidx] ^
+    //                piece_hash[stm ^ BLACK][pt][tidx];
 }
 
 void parse(struct board_t *board, const char *fen)
@@ -47,59 +107,72 @@ void parse(struct board_t *board, const char *fen)
     board->ca = 0;
     board->ep = NOSQ;
     board->stm = WHITE;
-    int turn = WHITE;
+    board->hash = 0ULL;
+    int stm = WHITE;
     uint64_t *bb = board->bb;
 
     int i = 0;
     while (*fen != ' ') {
         switch (*fen) {
         case 'p':
-            add(board, PAWN, i ^ 0x38);
+            add(board->bb, PAWN, i ^ 0x38);
+            board->hash ^= piece_hash[BLACK][PAWN][i ^ 0x38];
             i++;
             break;
         case 'n':
-            add(board, KNIGHT, i ^ 0x38);
+            add(board->bb, KNIGHT, i ^ 0x38);
+            board->hash ^= piece_hash[BLACK][KNIGHT][i ^ 0x38];
             i++;
             break;
         case 'b':
-            add(board, BISHOP, i ^ 0x38);
+            add(board->bb, BISHOP, i ^ 0x38);
+            board->hash ^= piece_hash[BLACK][BISHOP][i ^ 0x38];
             i++;
             break;
         case 'r':
-            add(board, ROOK, i ^ 0x38);
+            add(board->bb, ROOK, i ^ 0x38);
+            board->hash ^= piece_hash[BLACK][ROOK][i ^ 0x38];
             i++;
             break;
         case 'q':
-            add(board, QUEEN, i ^ 0x38);
+            add(board->bb, QUEEN, i ^ 0x38);
+            board->hash ^= piece_hash[BLACK][QUEEN][i ^ 0x38];
             i++;
             break;
         case 'k':
-            add(board, KING, i ^ 0x38);
+            add(board->bb, KING, i ^ 0x38);
+            board->hash ^= piece_hash[BLACK][KING][i ^ 0x38];
             i++;
             break;
         case 'P':
-            add(board, PAWN, i ^ 0x38);
+            add(board->bb, PAWN, i ^ 0x38);
             bb[0] |= 1ULL << (i++ ^ 0x38);
+            board->hash ^= piece_hash[WHITE][PAWN][i ^ 0x38];
             break;
         case 'N':
-            add(board, KNIGHT, i ^ 0x38);
+            add(board->bb, KNIGHT, i ^ 0x38);
             bb[0] |= 1ULL << (i++ ^ 0x38);
+            board->hash ^= piece_hash[WHITE][KNIGHT][i ^ 0x38];
             break;
         case 'B':
-            add(board, BISHOP, i ^ 0x38);
+            add(board->bb, BISHOP, i ^ 0x38);
             bb[0] |= 1ULL << (i++ ^ 0x38);
+            board->hash ^= piece_hash[WHITE][BISHOP][i ^ 0x38];
             break;
         case 'R':
-            add(board, ROOK, i ^ 0x38);
+            add(board->bb, ROOK, i ^ 0x38);
             bb[0] |= 1ULL << (i++ ^ 0x38);
+            board->hash ^= piece_hash[WHITE][ROOK][i ^ 0x38];
             break;
         case 'Q':
-            add(board, QUEEN, i ^ 0x38);
+            add(board->bb, QUEEN, i ^ 0x38);
             bb[0] |= 1ULL << (i++ ^ 0x38);
+            board->hash ^= piece_hash[WHITE][QUEEN][i ^ 0x38];
             break;
         case 'K':
-            add(board, KING, i ^ 0x38);
+            add(board->bb, KING, i ^ 0x38);
             bb[0] |= 1ULL << (i++ ^ 0x38);
+            board->hash ^= piece_hash[WHITE][KING][i ^ 0x38];
             break;
 
         case '1':
@@ -125,7 +198,7 @@ void parse(struct board_t *board, const char *fen)
 
     ++fen;
 
-    turn = *fen == 'w' ? WHITE : BLACK;
+    stm = *fen == 'w' ? WHITE : BLACK;
 
     fen += 2;
 
@@ -147,15 +220,18 @@ void parse(struct board_t *board, const char *fen)
             }
         }
         fen++;
+        board->hash ^= ca_hash[board->ca];
     } else {
         fen += 2;
     }
 
     if (*fen != '-') {
         board->ep = *fen - 'a';
+        board->hash ^= ep_hash[*fen - 'a'];
     }
 
-    if (turn == BLACK) {
+    if (stm == BLACK) {
+        board->hash ^= stm_hash;
         flip(board);
     }
 }
@@ -173,52 +249,57 @@ void flip(struct board_t *board)
     board->ca = (board->ca >> 4) | (board->ca << 4);
 }
 
-void cls(struct board_t *board, const uint8_t idx)
-{
-    uint64_t b = 1ULL << idx;
-    board->bb[1] &= ~b;
-    board->bb[2] &= ~b;
-    board->bb[3] &= ~b;
-}
-
 void make(struct board_t *board, const uint16_t move)
 {
     uint64_t *bb, frombb, tobb;
-    uint8_t from, to, piece, cap;
+    int from, to, piece;
 
     bb = board->bb;
     from = MOVE_FROM(move);
     to = MOVE_TO(move);
+    int ply = board->ply;
+    int stm = board->stm;
     frombb = 1ULL << from;
     tobb = 1ULL << to;
 
-    board->hist[board->ply].ep = board->ep;
-    board->hist[board->ply].ca = board->ca;
-    board->hist[board->ply].cap = EMPTY;
+    board->hist[ply].ep = board->ep;
+    board->hist[ply].ca = board->ca;
+    board->hist[ply].cap = EMPTY;
     board->ep = NOSQ;
 
     if (move & 0x4000) {
         // move is a capture
+        int piece = ((bb[3] >> (from)) & 1) << 2 |
+                    ((bb[2] >> (from)) & 1) << 1 | ((bb[1] >> (from)) & 1);
 
         // track the captured piece
-        cap = ((bb[3] >> (to)) & 1) << 2 | ((bb[2] >> (to)) & 1) << 1 |
-              ((bb[1] >> (to)) & 1);
+        int cap = ((bb[3] >> (to)) & 1) << 2 | ((bb[2] >> (to)) & 1) << 1 |
+                  ((bb[1] >> (to)) & 1);
         assert(cap != KING);
-        board->hist[board->ply].cap = cap;
+        board->hist[ply].cap = cap;
 
         // clear the destination square if it's a capture
         // effectively removing the captured piece
         // note we don't clear the bb[0] board (i.e side to move)
         // because the captured piece is our opponent's piece'
-        cls(board, to);
+        cls(bb, to);
 
         // reset castling if one of the rooks were captured
         if (to == 63)
             board->ca &= 0xDF;
         else if (to == 56)
             board->ca &= 0xEF;
+
+        board->hash ^= piece_hash[stm][piece][from] ^
+                      piece_hash[stm][piece][to] ^
+                      piece_hash[stm ^ BLACK][cap][to];
     } else {
         // move is not a capture
+        int piece = ((bb[3] >> (from)) & 1) << 2 |
+                    ((bb[2] >> (from)) & 1) << 1 | ((bb[1] >> (from)) & 1);
+
+        board->hash ^= piece_hash[stm][piece][from] ^
+                      piece_hash[stm][piece][to];
     }
 
     bb[0] ^= frombb | tobb;
@@ -282,22 +363,22 @@ void make(struct board_t *board, const uint16_t move)
     case NPC:
     case NP:
         bb[1] ^= frombb;
-        add(board, KNIGHT, to);
+        add(board->bb, KNIGHT, to);
         break;
     case BPC:
     case BP:
         bb[1] ^= frombb;
-        add(board, BISHOP, to);
+        add(board->bb, BISHOP, to);
         break;
     case RPC:
     case RP:
         bb[1] ^= frombb;
-        add(board, ROOK, to);
+        add(board->bb, ROOK, to);
         break;
     case QPC:
     case QP:
         bb[1] ^= frombb;
-        add(board, QUEEN, to);
+        add(board->bb, QUEEN, to);
         break;
     case EP:
         bb[1] ^= frombb | tobb;
@@ -328,6 +409,11 @@ void make(struct board_t *board, const uint16_t move)
         return;
     }
 
+    if (stm == BLACK) {
+        board->hash ^= stm_hash;
+    }
+    board->hash ^= ep_hash[board->ep];
+    board->hash ^= ca_hash[board->ca];
     board->ply++;
     flip(board);
 }
@@ -340,13 +426,21 @@ void take(struct board_t *board, const uint16_t move)
     board->ply--;
     flip(board);
     bb = board->bb;
+    int stm = board->stm;
     from = MOVE_FROM(move);
     to = MOVE_TO(move);
     frombb = 1ULL << from;
     tobb = 1ULL << to;
 
+    if (stm == BLACK) {
+        board->hash ^= stm_hash;
+    }
+    board->hash ^= ep_hash[board->ep];
+    board->hash ^= ca_hash[board->ca];
+
     board->ep = board->hist[board->ply].ep;
     board->ca = board->hist[board->ply].ca;
+    int cap = board->hist[board->ply].cap;
 
     bb[0] ^= frombb | tobb;
 
@@ -397,7 +491,7 @@ void take(struct board_t *board, const uint16_t move)
     case QP:
         bb[1] ^= frombb | tobb;
 
-        cls(board, to);
+        cls(bb, to);
         break;
     case EP:
         bb[1] ^= frombb | tobb;
@@ -423,10 +517,27 @@ void take(struct board_t *board, const uint16_t move)
     }
 
     if (move & 0x4000) {
+        // move is a capture
+        int piece = ((bb[3] >> (from)) & 1) << 2 | ((bb[2] >> (from)) & 1) << 1 |
+                ((bb[1] >> (from)) & 1);
+
         // clear the destination square
-        cls(board, to);
+        cls(bb, to);
 
         // find the captured piece and put it back in place
-        add(board, board->hist[board->ply].cap, to);
+        add(board->bb, board->hist[board->ply].cap, to);
+
+        board->hash ^= piece_hash[stm][piece][from] ^
+                      piece_hash[stm][piece][to] ^
+                      piece_hash[stm ^ BLACK][cap][to];
+
+    } else {
+        // move is not a capture
+        int piece = ((bb[3] >> (from)) & 1) << 2 | ((bb[2] >> (from)) & 1) << 1 |
+                ((bb[1] >> (from)) & 1);
+
+        board->hash ^= piece_hash[stm][piece][from] ^
+                      piece_hash[stm][piece][to];
+
     }
 }

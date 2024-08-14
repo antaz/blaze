@@ -1,12 +1,13 @@
 #ifndef HASH_H
 #define HASH_H
 
+#include "board.h"
 #include <stdint.h>
 
-extern uint64_t piece_hash[2][6][64];
-extern uint64_t ep_bash[8];
-extern uint64_t ca_hash[16];
-extern uint64_t turn_hash;
+extern uint64_t piece_hash[2][PC][SQ];
+extern uint64_t ep_hash[8];
+extern uint64_t ca_hash[52];
+extern uint64_t stm_hash;
 
 void init_hash();
 
