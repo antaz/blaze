@@ -40,10 +40,7 @@
 
 #define TESTING
 
-#define TESTCASE(X)                                                            \
-    {                                                                          \
-        &(X)                                                                   \
-    }
+#define TESTCASE(X) {&(X)}
 
 #define TOKEN_PASTE(x, y) x##y
 #define TOKEN(x, y) TOKEN_PASTE(x, y)
