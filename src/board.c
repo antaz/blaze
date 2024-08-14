@@ -239,20 +239,22 @@ void parse(struct board_t *board, const char *fen)
 void flip(struct board_t *board)
 {
     uint64_t *bb = board->bb;
+    uint8_t *stm = &board->stm;
+    uint8_t *ca = &board->ca;
 
     bb[0] ^= bb[1] | bb[2] | bb[3];
     bb[0] = vflip(bb[0]);
     bb[1] = vflip(bb[1]);
     bb[2] = vflip(bb[2]);
     bb[3] = vflip(bb[3]);
-    board->stm ^= BLACK;
-    board->ca = (board->ca >> 4) | (board->ca << 4);
+    *stm ^= BLACK;
+    *ca = (board->ca >> 4) | (board->ca << 4);
 }
 
 void make(struct board_t *board, const uint16_t move)
 {
     uint64_t *bb, frombb, tobb;
-    int from, to, piece;
+    int from, to;
 
     bb = board->bb;
     from = MOVE_FROM(move);
@@ -267,11 +269,11 @@ void make(struct board_t *board, const uint16_t move)
     board->hist[ply].cap = EMPTY;
     board->ep = NOSQ;
 
+    int piece = ((bb[3] >> (from)) & 1) << 2 | ((bb[2] >> (from)) & 1) << 1 |
+                ((bb[1] >> (from)) & 1);
+
     if (move & 0x4000) {
         // move is a capture
-        int piece = ((bb[3] >> (from)) & 1) << 2 |
-                    ((bb[2] >> (from)) & 1) << 1 | ((bb[1] >> (from)) & 1);
-
         // track the captured piece
         int cap = ((bb[3] >> (to)) & 1) << 2 | ((bb[2] >> (to)) & 1) << 1 |
                   ((bb[1] >> (to)) & 1);
@@ -291,15 +293,13 @@ void make(struct board_t *board, const uint16_t move)
             board->ca &= 0xEF;
 
         board->hash ^= piece_hash[stm][piece][from] ^
-                      piece_hash[stm][piece][to] ^
-                      piece_hash[stm ^ BLACK][cap][to];
+                       piece_hash[stm][piece][to] ^
+                       piece_hash[stm ^ BLACK][cap][to];
     } else {
         // move is not a capture
-        int piece = ((bb[3] >> (from)) & 1) << 2 |
-                    ((bb[2] >> (from)) & 1) << 1 | ((bb[1] >> (from)) & 1);
 
-        board->hash ^= piece_hash[stm][piece][from] ^
-                      piece_hash[stm][piece][to];
+        board->hash ^=
+            piece_hash[stm][piece][from] ^ piece_hash[stm][piece][to];
     }
 
     bb[0] ^= frombb | tobb;
@@ -307,9 +307,6 @@ void make(struct board_t *board, const uint16_t move)
     switch (MOVE_TYPE(move)) {
     case CAPTURE:
     case QUIET:
-        piece = ((bb[3] >> (from)) & 1) << 2 | ((bb[2] >> (from)) & 1) << 1 |
-                ((bb[1] >> (from)) & 1);
-
         switch (piece) {
         case PAWN:
             bb[1] ^= frombb | tobb;
@@ -518,8 +515,8 @@ void take(struct board_t *board, const uint16_t move)
 
     if (move & 0x4000) {
         // move is a capture
-        int piece = ((bb[3] >> (from)) & 1) << 2 | ((bb[2] >> (from)) & 1) << 1 |
-                ((bb[1] >> (from)) & 1);
+        int piece = ((bb[3] >> (from)) & 1) << 2 |
+                    ((bb[2] >> (from)) & 1) << 1 | ((bb[1] >> (from)) & 1);
 
         // clear the destination square
         cls(bb, to);
@@ -528,16 +525,15 @@ void take(struct board_t *board, const uint16_t move)
         add(board->bb, board->hist[board->ply].cap, to);
 
         board->hash ^= piece_hash[stm][piece][from] ^
-                      piece_hash[stm][piece][to] ^
-                      piece_hash[stm ^ BLACK][cap][to];
+                       piece_hash[stm][piece][to] ^
+                       piece_hash[stm ^ BLACK][cap][to];
 
     } else {
         // move is not a capture
-        int piece = ((bb[3] >> (from)) & 1) << 2 | ((bb[2] >> (from)) & 1) << 1 |
-                ((bb[1] >> (from)) & 1);
+        int piece = ((bb[3] >> (from)) & 1) << 2 |
+                    ((bb[2] >> (from)) & 1) << 1 | ((bb[1] >> (from)) & 1);
 
-        board->hash ^= piece_hash[stm][piece][from] ^
-                      piece_hash[stm][piece][to];
-
+        board->hash ^=
+            piece_hash[stm][piece][from] ^ piece_hash[stm][piece][to];
     }
 }
