@@ -9,8 +9,8 @@ enum {
     DPP,     // Double pawn push
     OO,      // King side castle
     OOO,     // Queen side castle
-    CAPTURE, // Capture
-    EP,      // En-Passent
+    CAPTURE, // Non special capture
+    EP,      // En-Passent capture
     NP = 8,  // Knight promotion
     BP,      // Bishop promotion
     RP,      // Rook promotion
