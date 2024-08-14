@@ -107,6 +107,8 @@ void parse(struct board_t *board, const char *fen)
     board->ca = 0;
     board->ep = NOSQ;
     board->stm = WHITE;
+    board->ply = 0;
+    board->fifty = 0;
     board->hash = 0ULL;
     int stm = WHITE;
     uint64_t *bb = board->bb;
@@ -266,6 +268,7 @@ void make(struct board_t *board, const uint16_t move)
 
     board->hist[ply].ep = board->ep;
     board->hist[ply].ca = board->ca;
+    board->hist[ply].fifty = board->fifty;
     board->hist[ply].cap = EMPTY;
     board->ep = NOSQ;
 
@@ -292,12 +295,20 @@ void make(struct board_t *board, const uint16_t move)
         else if (to == 56)
             board->ca &= 0xEF;
 
+        // reset 50 move counter
+        board->fifty = 0;
+
+        // hash the from and to square
         board->hash ^= piece_hash[stm][piece][from] ^
                        piece_hash[stm][piece][to] ^
                        piece_hash[stm ^ BLACK][cap][to];
     } else {
         // move is not a capture
 
+        // increment 50 move counter
+        board->fifty++;
+
+        // hash the from and to square
         board->hash ^=
             piece_hash[stm][piece][from] ^ piece_hash[stm][piece][to];
     }
@@ -310,6 +321,8 @@ void make(struct board_t *board, const uint16_t move)
         switch (piece) {
         case PAWN:
             bb[1] ^= frombb | tobb;
+
+            board->fifty = 0;
             break;
         case KNIGHT:
             bb[1] ^= 0;
@@ -356,6 +369,8 @@ void make(struct board_t *board, const uint16_t move)
         if (to == from + 16 && p & their_pawns) {
             board->ep = to & 0x07;
         }
+
+        board->fifty = 0;
         break;
     case NPC:
     case NP:
@@ -436,6 +451,7 @@ void take(struct board_t *board, const uint16_t move)
     board->hash ^= ca_hash[board->ca];
 
     board->ep = board->hist[board->ply].ep;
+    board->fifty = board->hist[board->ply].fifty;
     board->ca = board->hist[board->ply].ca;
     int cap = board->hist[board->ply].cap;
 

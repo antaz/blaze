@@ -50,6 +50,16 @@ static int stop(int depth)
     return 0;
 }
 
+static int rep(struct board_t *board)
+{
+    int r = 0;
+    for (int i = board->ply - board->fifty; i < board->ply; i++)
+        if (board->hist[i].hash == board->hash)
+            r++;
+
+    return r;
+}
+
 static int search(struct board_t *board, int depth, uint16_t *pv)
 {
     int val = 0;
@@ -67,6 +77,9 @@ static int search(struct board_t *board, int depth, uint16_t *pv)
     if (depth == 0) {
         return eval(board);
     }
+
+    if(board->ply & rep(board))
+        return 0;
 
     for (int i = 0; i < count; i++) {
         make(board, moves[i]);
