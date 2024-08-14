@@ -1,9 +1,8 @@
-#include "board.h"
 #include "bitboard.h"
-#include <stdlib.h>
-#include <time.h>
+#include "board.h"
 
-int eval(struct board_t *board) {
+int eval(struct board_t *board)
+{
 
     uint64_t all = board->bb[1] | board->bb[2] | board->bb[3];
     uint64_t ours = board->bb[0];
@@ -17,9 +16,9 @@ int eval(struct board_t *board) {
 
     // material score
     return 100 * (popcnt(pawn & ours) - popcnt(pawn & theirs)) +
-    300 * (popcnt(knight & ours) - popcnt(knight & theirs)) +
-    350 * (popcnt(bishop & ours) - popcnt(bishop & theirs)) +
-    500 * (popcnt(rook & ours) - popcnt(rook & theirs)) +
-    900 * (popcnt(queen & ours) - popcnt(queen & theirs)) +
-    1000 * (popcnt(king & ours) - popcnt(king & theirs));
+           300 * (popcnt(knight & ours) - popcnt(knight & theirs)) +
+           350 * (popcnt(bishop & ours) - popcnt(bishop & theirs)) +
+           500 * (popcnt(rook & ours) - popcnt(rook & theirs)) +
+           900 * (popcnt(queen & ours) - popcnt(queen & theirs)) +
+           1000 * (popcnt(king & ours) - popcnt(king & theirs));
 }
