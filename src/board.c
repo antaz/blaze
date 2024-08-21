@@ -108,6 +108,7 @@ void parse(struct board_t *board, const char *fen)
     board->ep = NOSQ;
     board->stm = WHITE;
     board->ply = 0;
+    board->hply = 0;
     board->fifty = 0;
     board->hash = 0ULL;
     int stm = WHITE;
@@ -148,33 +149,39 @@ void parse(struct board_t *board, const char *fen)
             break;
         case 'P':
             add(board->bb, PAWN, i ^ 0x38);
-            bb[0] |= 1ULL << (i++ ^ 0x38);
+            bb[0] |= 1ULL << (i ^ 0x38);
             board->hash ^= piece_hash[WHITE][PAWN][i ^ 0x38];
+            i++;
             break;
         case 'N':
             add(board->bb, KNIGHT, i ^ 0x38);
-            bb[0] |= 1ULL << (i++ ^ 0x38);
+            bb[0] |= 1ULL << (i ^ 0x38);
             board->hash ^= piece_hash[WHITE][KNIGHT][i ^ 0x38];
+            i++;
             break;
         case 'B':
             add(board->bb, BISHOP, i ^ 0x38);
-            bb[0] |= 1ULL << (i++ ^ 0x38);
+            bb[0] |= 1ULL << (i ^ 0x38);
             board->hash ^= piece_hash[WHITE][BISHOP][i ^ 0x38];
+            i++;
             break;
         case 'R':
             add(board->bb, ROOK, i ^ 0x38);
-            bb[0] |= 1ULL << (i++ ^ 0x38);
+            bb[0] |= 1ULL << (i ^ 0x38);
             board->hash ^= piece_hash[WHITE][ROOK][i ^ 0x38];
+            i++;
             break;
         case 'Q':
             add(board->bb, QUEEN, i ^ 0x38);
-            bb[0] |= 1ULL << (i++ ^ 0x38);
+            bb[0] |= 1ULL << (i ^ 0x38);
             board->hash ^= piece_hash[WHITE][QUEEN][i ^ 0x38];
+            i++;
             break;
         case 'K':
             add(board->bb, KING, i ^ 0x38);
-            bb[0] |= 1ULL << (i++ ^ 0x38);
+            bb[0] |= 1ULL << (i ^ 0x38);
             board->hash ^= piece_hash[WHITE][KING][i ^ 0x38];
+            i++;
             break;
 
         case '1':
@@ -222,14 +229,17 @@ void parse(struct board_t *board, const char *fen)
             }
         }
         fen++;
-        board->hash ^= ca_hash[board->ca];
+        // board->hash ^= ca_hash[board->ca];
     } else {
         fen += 2;
     }
 
     if (*fen != '-') {
         board->ep = *fen - 'a';
-        board->hash ^= ep_hash[*fen - 'a'];
+        // board->hash ^= ep_hash[*fen - 'a'];
+        fen++;
+    } else {
+        fen += 2;
     }
 
     if (stm == BLACK) {
@@ -262,14 +272,16 @@ void make(struct board_t *board, const uint16_t move)
     from = MOVE_FROM(move);
     to = MOVE_TO(move);
     int ply = board->ply;
+    int hply = board->hply;
     int stm = board->stm;
     frombb = 1ULL << from;
     tobb = 1ULL << to;
 
-    board->hist[ply].ep = board->ep;
-    board->hist[ply].ca = board->ca;
-    board->hist[ply].fifty = board->fifty;
-    board->hist[ply].cap = EMPTY;
+    board->hist[hply].ep = board->ep;
+    board->hist[hply].ca = board->ca;
+    board->hist[hply].fifty = board->fifty;
+    board->hist[hply].cap = EMPTY;
+    board->hist[hply].hash = board->hash;
     board->ep = NOSQ;
 
     int piece = ((bb[3] >> (from)) & 1) << 2 | ((bb[2] >> (from)) & 1) << 1 |
@@ -299,9 +311,15 @@ void make(struct board_t *board, const uint16_t move)
         board->fifty = 0;
 
         // hash the from and to square
-        board->hash ^= piece_hash[stm][piece][from] ^
-                       piece_hash[stm][piece][to] ^
-                       piece_hash[stm ^ BLACK][cap][to];
+        if (stm == WHITE) {
+            board->hash ^= piece_hash[stm][piece][from] ^
+                           piece_hash[stm][piece][to] ^
+                           piece_hash[stm ^ BLACK][cap][to];
+        } else {
+            board->hash ^= piece_hash[stm][piece][from ^ 0x38] ^
+                           piece_hash[stm][piece][to ^ 0x38] ^
+                           piece_hash[stm ^ BLACK][cap][to ^ 0x38];
+        }
     } else {
         // move is not a capture
 
@@ -309,8 +327,13 @@ void make(struct board_t *board, const uint16_t move)
         board->fifty++;
 
         // hash the from and to square
-        board->hash ^=
-            piece_hash[stm][piece][from] ^ piece_hash[stm][piece][to];
+        if (stm == WHITE) {
+            board->hash ^=
+                piece_hash[stm][piece][from] ^ piece_hash[stm][piece][to];
+        } else {
+            board->hash ^= piece_hash[stm][piece][from ^ 0x38] ^
+                           piece_hash[stm][piece][to ^ 0x38];
+        }
     }
 
     bb[0] ^= frombb | tobb;
@@ -421,12 +444,11 @@ void make(struct board_t *board, const uint16_t move)
         return;
     }
 
-    if (stm == BLACK) {
-        board->hash ^= stm_hash;
-    }
-    board->hash ^= ep_hash[board->ep];
-    board->hash ^= ca_hash[board->ca];
+    board->hash ^= stm_hash;
+    // board->hash ^= ep_hash[board->ep];
+    // board->hash ^= ca_hash[board->ca];
     board->ply++;
+    board->hply++;
     flip(board);
 }
 
@@ -436,6 +458,7 @@ void take(struct board_t *board, const uint16_t move)
     uint8_t from, to, piece;
 
     board->ply--;
+    board->hply--;
     flip(board);
     bb = board->bb;
     int stm = board->stm;
@@ -444,16 +467,11 @@ void take(struct board_t *board, const uint16_t move)
     frombb = 1ULL << from;
     tobb = 1ULL << to;
 
-    if (stm == BLACK) {
-        board->hash ^= stm_hash;
-    }
-    board->hash ^= ep_hash[board->ep];
-    board->hash ^= ca_hash[board->ca];
-
-    board->ep = board->hist[board->ply].ep;
-    board->fifty = board->hist[board->ply].fifty;
-    board->ca = board->hist[board->ply].ca;
-    int cap = board->hist[board->ply].cap;
+    board->ep = board->hist[board->hply].ep;
+    board->fifty = board->hist[board->hply].fifty;
+    board->ca = board->hist[board->hply].ca;
+    int cap = board->hist[board->hply].cap;
+    board->hash = board->hist[board->hply].hash;
 
     bb[0] ^= frombb | tobb;
 
@@ -540,16 +558,9 @@ void take(struct board_t *board, const uint16_t move)
         // find the captured piece and put it back in place
         add(board->bb, board->hist[board->ply].cap, to);
 
-        board->hash ^= piece_hash[stm][piece][from] ^
-                       piece_hash[stm][piece][to] ^
-                       piece_hash[stm ^ BLACK][cap][to];
-
     } else {
         // move is not a capture
         int piece = ((bb[3] >> (from)) & 1) << 2 |
                     ((bb[2] >> (from)) & 1) << 1 | ((bb[1] >> (from)) & 1);
-
-        board->hash ^=
-            piece_hash[stm][piece][from] ^ piece_hash[stm][piece][to];
     }
 }

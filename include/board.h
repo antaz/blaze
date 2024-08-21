@@ -43,6 +43,7 @@ struct board_t {
     uint64_t bb[4];         // quad-bitboards
     uint8_t stm;            // side to move
     uint8_t ply;            // half-move count
+    uint8_t hply;           // history half-move count
     uint8_t fifty;          // fifty-move counter
     uint8_t ca;             // castling rights
     uint8_t ep;             // en-passent square
