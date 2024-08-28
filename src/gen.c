@@ -16,7 +16,6 @@ int quiet(const struct board_t *board, uint16_t *moves)
     uint64_t rook = (~board->bb[1] & ~board->bb[2] & board->bb[3]) & ours;
     uint64_t queen = (board->bb[1] & board->bb[3]) & ours;
     uint64_t king = (board->bb[2] & board->bb[3]) & ours;
-    assert(king);
     uint64_t p;
     int count = 0;
 
@@ -67,6 +66,7 @@ int quiet(const struct board_t *board, uint16_t *moves)
     }
 
     // castling
+    // TODO: refactor this
     uint8_t ca = board->ca;
     if ((ca & 0x02) && !(all & 0x60)) {
         uint64_t pawn = (board->bb[1] & ~board->bb[2] & ~board->bb[3]) & theirs;
@@ -140,7 +140,6 @@ int noisy(const struct board_t *board, uint16_t *moves)
     uint64_t rook = (~board->bb[1] & ~board->bb[2] & board->bb[3]) & ours;
     uint64_t queen = (board->bb[1] & board->bb[3]) & ours;
     uint64_t king = (board->bb[2] & board->bb[3]) & ours;
-    assert(king);
     uint64_t p;
     int count = 0;
 
