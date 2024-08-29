@@ -223,7 +223,7 @@ void make(struct board_t *board, const uint16_t move)
         // track the captured piece in history
         int cap = ((bb[3] >> (to)) & 1) << 2 | ((bb[2] >> (to)) & 1) << 1 |
                   ((bb[1] >> (to)) & 1);
-        board->hist[ply].cap = cap;
+        board->hist[hply].cap = cap;
 
         // clear the destination square
         bb[1] &= ~tb;
