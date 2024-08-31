@@ -201,7 +201,6 @@ void make(struct board_t *board, const uint16_t move)
     uint64_t *bb = board->bb;
     uint64_t fb = 1ULL << from;
     uint64_t tb = 1ULL << to;
-    int ply = board->ply;
     int hply = board->hply;
     int stm = board->stm;
 
@@ -413,7 +412,6 @@ void take(struct board_t *board, const uint16_t move)
     uint64_t *bb = board->bb;
     uint64_t fb = 1ULL << from;
     uint64_t tb = 1ULL << to;
-    int stm = board->stm;
 
     // decrement counters
     board->ply--;
