@@ -279,6 +279,28 @@ uint64_t legal(const struct board_t *board, uint16_t move)
             theirs);
 }
 
+uint64_t check(const struct board_t *board)
+{
+    uint64_t all = board->bb[1] | board->bb[2] | board->bb[3];
+    uint64_t theirs = all ^ board->bb[0];
+    uint64_t pawn = (board->bb[1] & ~board->bb[2] & ~board->bb[3]);
+    uint64_t knight = (~board->bb[1] & board->bb[2] & ~board->bb[3]);
+    uint64_t bishop = (board->bb[1] & board->bb[2]);
+    uint64_t rook = (~board->bb[1] & ~board->bb[2] & board->bb[3]);
+    uint64_t queen = (board->bb[1] & board->bb[3]);
+    uint64_t king = (board->bb[2] & board->bb[3]);
+
+    uint64_t ksq = bsf(king & board->bb[0]);
+
+    return (((natk(ksq) & knight) | (ratk(ksq, all) & (rook | queen)) |
+             (batk(ksq, all) & (bishop | queen)) |
+             ((((king << 9) & 0xFEFEFEFEFEFEFEFEULL) |
+               ((king << 7) & 0x7F7F7F7F7F7F7F7FULL)) &
+              pawn) |
+             (katk(ksq) & (board->bb[2] & board->bb[3]))) &
+            theirs);
+}
+
 int gen(const struct board_t *board, uint16_t *moves)
 {
     // generating pseudo-legal moves

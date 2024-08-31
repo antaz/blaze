@@ -21,6 +21,7 @@ int noisy(const struct board_t *board, uint16_t *moves);
  * Check if a given move is legal in the given board.
  */
 uint64_t legal(const struct board_t *board, uint16_t move);
+uint64_t check(const struct board_t *board);
 
 int gen(const struct board_t *board, uint16_t *moves);
 int gen_legal(const struct board_t *board, uint16_t *moves);
