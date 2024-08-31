@@ -29,7 +29,7 @@ ifneq ($(DEBUG), )
 	CPPFLAGS	+= -DDEBUG
 	BDIR	 	= build/debug
 else
-	CFLAGS  	+= -Ofast -static -flto -Werror -Wno-unused-function -Wno-unused-parameter -Wno-unused-variable
+	CFLAGS  	+= -Ofast -static -flto -Werror
 	CPPFLAGS	+= -DNDEBUG
 	BDIR	 	= build/release
 endif
