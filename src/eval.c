@@ -102,7 +102,7 @@ int eval(struct board_t *board)
             eval += PST[QUEEN][bsf(p)] + StaticValue[QUEEN];
         }
         uint64_t ksq = bsf((board->bb[2] & board->bb[3]) & board->bb[0]);
-        eval += (PST[KING][ksq] * phase * PST[KING + 1][ksq]*(16 - phase))/16;
+        eval += (PST[KING][ksq] * phase + PST[KING + 1][ksq]*(16 - phase))/16;
         flip(board);
         eval = -eval;
     }
