@@ -89,6 +89,7 @@ static int search(struct board_t *board, int depth, struct pv_t *pv)
     nodes++;
 
     if (board->ply && rep(board)) {
+        pv->count = 0;
         return 0;
     }
 
@@ -112,6 +113,7 @@ static int search(struct board_t *board, int depth, struct pv_t *pv)
     }
 
     if (board->fifty >= 100) {
+        pv->count = 0;
         return 0;
     }
 
@@ -159,7 +161,6 @@ void go(struct board_t *board)
         val = search(board, depth, &pv);
 
         // info line
-        // TODO: add PV
         printf("info depth %d seldepth %d score cp %d nodes %" PRIu64
                " nps %" PRIu64 " time "
                "%" PRIu64 " pv ",
