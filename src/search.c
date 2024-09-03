@@ -71,10 +71,10 @@ static void print_pv(struct pv_t pv, int stm)
     }
 }
 
-static int search(struct board_t *board, int depth, struct pv_t *pv)
+static int search(struct board_t *board, int alpha, int beta, int depth,
+                  struct pv_t *pv)
 {
     int val = 0;
-    int best = -2 * 9999;
     struct pv_t cpv;
     cpv.count = 0;
 
@@ -98,14 +98,16 @@ static int search(struct board_t *board, int depth, struct pv_t *pv)
 
     for (int i = 0; i < count; i++) {
         make(board, moves[i]);
-        val = -search(board, depth - 1, &cpv);
+        val = -search(board, -beta, -alpha, depth - 1, &cpv);
         take(board, moves[i]);
 
         if (stop_search)
             break;
 
-        if (val > best) {
-            best = val;
+        if (val >= beta)
+            return beta;
+        if (val > alpha) {
+            alpha = val;
             pv->moves[0] = moves[i];
             memcpy(pv->moves + 1, cpv.moves, cpv.count * sizeof(uint16_t));
             pv->count = cpv.count + 1;
@@ -126,7 +128,7 @@ static int search(struct board_t *board, int depth, struct pv_t *pv)
         }
     }
 
-    return best;
+    return alpha;
 }
 
 void go(struct board_t *board)
@@ -158,7 +160,7 @@ void go(struct board_t *board)
     // iterative deepening
     for (int depth = 1; depth <= max_depth; depth++) {
 
-        val = search(board, depth, &pv);
+        val = search(board, -2 * 9999, 2 * 9999, depth, &pv);
 
         // info line
         printf("info depth %d seldepth %d score cp %d nodes %" PRIu64
