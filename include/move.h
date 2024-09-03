@@ -21,6 +21,12 @@ enum {
     QPC      // Queen promotion capture
 };
 
+// Extended move structure
+struct move_t {
+    uint16_t data; // raw encoding of move
+    int score;     // score associated with move
+};
+
 // move serializers and deserializers
 #define MOVE(from, to, type)                                                   \
     (type & 0xf) << 12 | (from & 0x3f) << 6 | (to & 0x3f)

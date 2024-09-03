@@ -4,7 +4,7 @@
 #include "move.h"
 #include <assert.h>
 
-int quiet(const struct board_t *board, uint16_t *moves)
+int quiet(const struct board_t *board, struct move_t *moves)
 {
     /* TODO: this section needs to be abstracted */
     uint64_t all = board->bb[1] | board->bb[2] | board->bb[3];
@@ -22,7 +22,8 @@ int quiet(const struct board_t *board, uint16_t *moves)
     // king moves
     for (uint64_t k = king; k; k &= k - 1) {
         for (p = katk(bsf(k)) & ~all; p; p &= p - 1) {
-            *moves++ = MOVE(bsf(k), bsf(p), QUIET);
+            moves->data = MOVE(bsf(k), bsf(p), QUIET);
+            moves++;
             count++;
         }
     }
@@ -30,7 +31,8 @@ int quiet(const struct board_t *board, uint16_t *moves)
     // knight moves
     for (uint64_t n = knight; n; n &= n - 1) {
         for (p = natk(bsf(n)) & ~all; p; p &= p - 1) {
-            *moves++ = MOVE(bsf(n), bsf(p), QUIET);
+            moves->data = MOVE(bsf(n), bsf(p), QUIET);
+            moves++;
             count++;
         }
     }
@@ -38,7 +40,8 @@ int quiet(const struct board_t *board, uint16_t *moves)
     // bishop & queen diagonal moves
     for (uint64_t d = (bishop | queen); d; d &= d - 1) {
         for (p = batk(bsf(d), all) & ~all; p; p &= p - 1) {
-            *moves++ = MOVE(bsf(d), bsf(p), QUIET);
+            moves->data = MOVE(bsf(d), bsf(p), QUIET);
+            moves++;
             count++;
         }
     }
@@ -46,7 +49,8 @@ int quiet(const struct board_t *board, uint16_t *moves)
     // rook & queen orthogonal moves
     for (uint64_t o = (rook | queen); o; o &= o - 1) {
         for (p = ratk(bsf(o), all) & ~all; p; p &= p - 1) {
-            *moves++ = MOVE(bsf(o), bsf(p), QUIET);
+            moves->data = MOVE(bsf(o), bsf(p), QUIET);
+            moves++;
             count++;
         }
     }
@@ -54,14 +58,16 @@ int quiet(const struct board_t *board, uint16_t *moves)
     // pawn push
     for (p = ((pawn & ~R7) << 8) & ~all; p; p &= p - 1) {
         int to = bsf(p);
-        *moves++ = MOVE(to - 8, to, QUIET);
+        moves->data = MOVE(to - 8, to, QUIET);
+        moves++;
         count++;
     }
 
     // double pawn push
     for (p = (pawn << 8 & ~all) << 8 & R4 & ~all; p; p &= p - 1) {
         int to = bsf(p);
-        *moves++ = MOVE(to - 16, to, DPP);
+        moves->data = MOVE(to - 16, to, DPP);
+        moves++;
         count++;
     }
 
@@ -93,7 +99,9 @@ int quiet(const struct board_t *board, uint16_t *moves)
               (0x0000000000F8DC00ULL & knight) |
               (0x000000000000F800ULL & pawn) |
               (0x0000000000004000ULL & king))) {
-            *moves++ = MOVE(4, 6, OO);
+            moves->data = MOVE(4, 6, OO);
+            moves->score = 0;
+            moves++;
             count++;
         }
     }
@@ -122,14 +130,15 @@ int quiet(const struct board_t *board, uint16_t *moves)
               (0x00000000003E7700ULL & knight) |
               (0x0000000000003E00ULL & pawn) |
               (0x0000000000000600ULL & king))) {
-            *moves++ = MOVE(4, 2, OOO);
+            moves->data = MOVE(4, 2, OOO);
+            moves++;
             count++;
         }
     }
     return count;
 }
 
-int noisy(const struct board_t *board, uint16_t *moves)
+int noisy(const struct board_t *board, struct move_t *moves)
 {
     uint64_t ours = board->bb[0];
     uint64_t all = board->bb[1] | board->bb[2] | board->bb[3];
@@ -146,7 +155,8 @@ int noisy(const struct board_t *board, uint16_t *moves)
     // king moves
     for (uint64_t k = king; k; k &= k - 1) {
         for (p = katk(bsf(k)) & theirs; p; p &= p - 1) {
-            *moves++ = MOVE(bsf(k), bsf(p), CAPTURE);
+            moves->data = MOVE(bsf(k), bsf(p), CAPTURE);
+            moves++;
             count++;
         }
     }
@@ -154,7 +164,8 @@ int noisy(const struct board_t *board, uint16_t *moves)
     // knight moves
     for (uint64_t n = knight; n; n &= n - 1) {
         for (p = natk(bsf(n)) & theirs; p; p &= p - 1) {
-            *moves++ = MOVE(bsf(n), bsf(p), CAPTURE);
+            moves->data = MOVE(bsf(n), bsf(p), CAPTURE);
+            moves++;
             count++;
         }
     }
@@ -162,7 +173,8 @@ int noisy(const struct board_t *board, uint16_t *moves)
     // Generate bishop & queen diagonal moves
     for (uint64_t d = (bishop | queen); d; d &= d - 1) {
         for (p = batk(bsf(d), all) & theirs; p; p &= p - 1) {
-            *moves++ = MOVE(bsf(d), bsf(p), CAPTURE);
+            moves->data = MOVE(bsf(d), bsf(p), CAPTURE);
+            moves++;
             count++;
         }
     }
@@ -170,7 +182,8 @@ int noisy(const struct board_t *board, uint16_t *moves)
     // Generate rook & queen orthogonal moves
     for (uint64_t o = (rook | queen); o; o &= o - 1) {
         for (p = ratk(bsf(o), all) & theirs; p; p &= p - 1) {
-            *moves++ = MOVE(bsf(o), bsf(p), CAPTURE);
+            moves->data = MOVE(bsf(o), bsf(p), CAPTURE);
+            moves++;
             count++;
         }
     }
@@ -178,42 +191,56 @@ int noisy(const struct board_t *board, uint16_t *moves)
     // pawn captures
     for (p = ((pawn & ~R7) << 7) & ~FH & theirs; p; p &= p - 1) {
         int to = bsf(p);
-        *moves++ = MOVE(to - 7, to, CAPTURE);
+        moves->data = MOVE(to - 7, to, CAPTURE);
+        moves++;
         count++;
     }
 
     for (p = ((pawn & ~R7) << 9) & ~FA & theirs; p; p &= p - 1) {
         int to = bsf(p);
-        *moves++ = MOVE(to - 9, to, CAPTURE);
+        moves->data = MOVE(to - 9, to, CAPTURE);
+        moves++;
         count++;
     }
 
     // capture promotion
     for (p = ((pawn & R7) << 7) & ~FH & theirs; p; p &= p - 1) {
         int to = bsf(p);
-        *moves++ = MOVE(to - 7, to, NPC);
-        *moves++ = MOVE(to - 7, to, BPC);
-        *moves++ = MOVE(to - 7, to, RPC);
-        *moves++ = MOVE(to - 7, to, QPC);
+        moves->data = MOVE(to - 7, to, NPC);
+        moves++;
+        moves->data = MOVE(to - 7, to, BPC);
+        moves++;
+        moves->data = MOVE(to - 7, to, RPC);
+        moves++;
+        moves->data = MOVE(to - 7, to, QPC);
+        moves++;
         count = count + 4;
     }
 
     for (p = ((pawn & R7) << 9) & ~FA & theirs; p; p &= p - 1) {
         int to = bsf(p);
-        *moves++ = MOVE(to - 9, to, NPC);
-        *moves++ = MOVE(to - 9, to, BPC);
-        *moves++ = MOVE(to - 9, to, RPC);
-        *moves++ = MOVE(to - 9, to, QPC);
+        moves->data = MOVE(to - 9, to, NPC);
+        moves++;
+        moves->data = MOVE(to - 9, to, BPC);
+        moves++;
+        moves->data = MOVE(to - 9, to, RPC);
+        moves++;
+        moves->data = MOVE(to - 9, to, QPC);
+        moves++;
         count = count + 4;
     }
 
     // non-capturing promotion
     for (p = (pawn & R7) << 8 & ~all; p; p &= p - 1) {
         int to = bsf(p);
-        *moves++ = MOVE(to - 8, to, NP);
-        *moves++ = MOVE(to - 8, to, BP);
-        *moves++ = MOVE(to - 8, to, RP);
-        *moves++ = MOVE(to - 8, to, QP);
+        moves->data = MOVE(to - 8, to, NP);
+        moves++;
+        moves->data = MOVE(to - 8, to, BP);
+        moves++;
+        moves->data = MOVE(to - 8, to, RP);
+        moves++;
+        moves->data = MOVE(to - 8, to, QP);
+        moves++;
         count = count + 4;
     }
 
@@ -224,7 +251,8 @@ int noisy(const struct board_t *board, uint16_t *moves)
         for (p = pawn & (((1ULL << (ep + 24)) << 7 & ~FH) |
                          ((1ULL << (ep + 24)) << 9 & ~FA));
              p; p &= p - 1) {
-            *moves++ = MOVE(bsf(p), 40 + ep, EP);
+            moves->data = MOVE(bsf(p), 40 + ep, EP);
+            moves++;
             count++;
         }
     }
@@ -301,7 +329,7 @@ uint64_t check(const struct board_t *board)
             theirs);
 }
 
-int gen(const struct board_t *board, uint16_t *moves)
+int gen(const struct board_t *board, struct move_t *moves)
 {
     // generating pseudo-legal moves
     int count = 0;
@@ -310,14 +338,14 @@ int gen(const struct board_t *board, uint16_t *moves)
     return count;
 }
 
-int gen_legal(const struct board_t *board, uint16_t *moves)
+int gen_legal(const struct board_t *board, struct move_t *moves)
 {
     // generating legal moves
-    uint16_t m[320] = {0};
+    struct move_t m[320] = {{.data = 0, .score = 0}};
     int c = gen(board, m);
     int count = 0;
     for (int i = 0; i < c; i++) {
-        if (legal(board, m[i])) {
+        if (legal(board, m[i].data)) {
             continue;
         }
 

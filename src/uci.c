@@ -48,15 +48,15 @@ void loop(struct board_t *board)
             if (moves) {
                 char *move = strtok(moves + 6, " \n");
                 while (move != NULL) {
-                    uint16_t moves[320];
+                    struct move_t moves[320];
                     int count = 0;
                     count = gen_legal(board, moves);
                     char *str_m;
 
                     for (int i = 0; i < count; ++i) {
-                        str_m = str_move(moves[i], board->stm);
+                        str_m = str_move(moves[i].data, board->stm);
                         if (!strcmp(str_m, move)) {
-                            make(board, moves[i]);
+                            make(board, moves[i].data);
                             break;
                         }
                     }

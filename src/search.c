@@ -93,13 +93,13 @@ static int search(struct board_t *board, int alpha, int beta, int depth,
         return 0;
     }
 
-    uint16_t moves[256];
+    struct move_t moves[256];
     int count = gen_legal(board, moves);
 
     for (int i = 0; i < count; i++) {
-        make(board, moves[i]);
+        make(board, moves[i].data);
         val = -search(board, -beta, -alpha, depth - 1, &cpv);
-        take(board, moves[i]);
+        take(board, moves[i].data);
 
         if (stop_search)
             break;
@@ -108,7 +108,7 @@ static int search(struct board_t *board, int alpha, int beta, int depth,
             return beta;
         if (val > alpha) {
             alpha = val;
-            pv->moves[0] = moves[i];
+            pv->moves[0] = moves[i].data;
             memcpy(pv->moves + 1, cpv.moves, cpv.count * sizeof(uint16_t));
             pv->count = cpv.count + 1;
         }

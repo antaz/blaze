@@ -2,7 +2,6 @@
 #define SEARCH_H
 
 #include "board.h"
-#include <time.h>
 
 #define MOVESTOGO 24
 #define MAX_DEPTH 64
