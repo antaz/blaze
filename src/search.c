@@ -10,9 +10,8 @@
 #include <string.h>
 #include <time.h>
 
-static uint64_t movetime; // how long should we search
-
 static struct search_t driver;
+static uint64_t movetime; // how long should we search
 
 static void halt()
 {
@@ -134,5 +133,5 @@ void deepen(struct board_t *board)
         }
     }
 
-    printf("bestmove %s\n", m2uci(driver.bestmove, driver.stm));
+    printf("bestmove %s\n", m2uci(pv.moves[0], driver.stm));
 }
