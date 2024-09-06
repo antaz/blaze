@@ -3,50 +3,28 @@
 #include "eval.h"
 #include "gen.h"
 #include "move.h"
+#include "uci.h"
 #include <inttypes.h>
 #include <search.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
 
-static uint64_t start;      // time the search started
-static uint64_t nodes;      // # of nodes searched so far
-static uint64_t movetime;   // how long should we search
-static int stop_search = 0; // search stop flag
+static uint64_t movetime; // how long should we search
 
-static uint64_t time_ms()
-{
-    // current time in miliseconds
-    struct timespec ts;
+static struct search_t driver;
 
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    return (uint64_t)ts.tv_sec * 1e3 + ts.tv_nsec / 1e6;
-}
-
-static uint64_t nps()
-{
-    // count nodes per second
-    uint64_t elapsed = time_ms() - start;
-
-    if (elapsed == 0)
-        return 0;
-
-    return (nodes * 1000) / elapsed;
-}
-
-static void stop(int depth)
+static void halt()
 {
     // check if we should stop searching
     if (movetime) {
-        if ((time_ms() - start) >= movetime)
-            stop_search = 1;
-    } else {
-        // check if we reached specified depth
-        if (tc_data.depth && (depth >= tc_data.depth))
-            stop_search = 1;
-        // check if we reached specified nodes count
-        if (tc_data.nodes && (nodes >= tc_data.nodes))
-            stop_search = 1;
+        struct timespec now;
+        clock_gettime(CLOCK_MONOTONIC, &now);
+        uint64_t elapsed = (now.tv_sec - driver.start.tv_sec) * 1e3 +
+                           (now.tv_nsec - driver.start.tv_nsec) / 1e6;
+        if (elapsed >= movetime) {
+            driver.stop = 1;
+        }
     }
 }
 
@@ -61,16 +39,6 @@ static int rep(struct board_t *board)
     return r;
 }
 
-static void print_pv(struct pv_t pv, int stm)
-{
-    int s = stm;
-
-    for (int i = 0; i < pv.count; i++) {
-        printf("%s ", m2uci(pv.moves[i], s));
-        s ^= BLACK;
-    }
-}
-
 static int search(struct board_t *board, int alpha, int beta, int depth,
                   struct pv_t *pv)
 {
@@ -78,15 +46,15 @@ static int search(struct board_t *board, int alpha, int beta, int depth,
     struct pv_t cpv;
     cpv.count = 0;
 
-    if ((nodes & 1023) == 0)
-        stop(depth);
+    if ((driver.nodes & 1023) == 0)
+        halt();
 
     if (depth == 0) {
         pv->count = 0;
         return eval(board);
     }
 
-    nodes++;
+    driver.nodes++;
 
     if (board->ply && rep(board)) {
         pv->count = 0;
@@ -101,7 +69,7 @@ static int search(struct board_t *board, int alpha, int beta, int depth,
         val = -search(board, -beta, -alpha, depth - 1, &cpv);
         take(board, moves[i].data);
 
-        if (stop_search)
+        if (driver.stop)
             break;
 
         if (val >= beta)
@@ -131,16 +99,19 @@ static int search(struct board_t *board, int alpha, int beta, int depth,
     return alpha;
 }
 
-void go(struct board_t *board)
+void deepen(struct board_t *board)
 {
-    int val = 0;
     int max_depth = MAX_DEPTH;
-    stop_search = 0;
-    struct pv_t pv;
-    pv.count = 0;
+    int val = 0;
+    struct pv_t pv = {0};
+    driver.stm = board->stm;
+    driver.stop = 0;
+    driver.nodes = 0;
+    board->ply = 0;
 
     // initialize time management
-    start = time_ms();
+    clock_gettime(CLOCK_MONOTONIC, &driver.start);
+
     if (!tc_data.movetime) {
         movetime = tc_data.time[board->stm] / tc_data.movestogo +
                    tc_data.inc[board->stm];
@@ -148,33 +119,20 @@ void go(struct board_t *board)
         movetime = tc_data.movetime;
     }
 
-    // initialize nodes count
-    nodes = 0;
-
-    // reset ply
-    board->ply = 0;
-
     if (tc_data.depth)
         max_depth = tc_data.depth;
 
     // iterative deepening
-    for (int depth = 1; depth <= max_depth; depth++) {
+    for (driver.depth = 1; driver.depth <= max_depth; driver.depth++) {
 
-        val = search(board, -2 * 9999, 2 * 9999, depth, &pv);
+        val = search(board, -2 * 9999, 2 * 9999, driver.depth, &pv);
 
-        // info line
-        printf("info depth %d seldepth %d score cp %d nodes %" PRIu64
-               " nps %" PRIu64 " time "
-               "%" PRIu64 " pv ",
-               depth, depth, val, nodes, nps(), time_ms() - start);
+        pvinfo(&driver, &pv, val);
 
-        print_pv(pv, board->stm);
-        printf("\n");
-
-        if (stop_search) {
+        if (driver.stop) {
             break;
         }
     }
 
-    printf("bestmove %s\n", m2uci(pv.moves[0], board->stm));
+    printf("bestmove %s\n", m2uci(driver.bestmove, driver.stm));
 }

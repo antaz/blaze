@@ -2,7 +2,6 @@
 #include "gen.h"
 #include "move.h"
 #include <stdio.h>
-#include <time.h>
 
 uint64_t perft(struct board_t *board, int depth)
 {

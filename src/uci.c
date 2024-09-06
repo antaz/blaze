@@ -12,6 +12,37 @@
 #define BUF_SIZE 65536
 struct tc_t tc_data = {.movestogo = MOVESTOGO};
 
+int senduci(char *buffer)
+{
+    fprintf(stdout, "%s\n", buffer);
+    return 0;
+}
+
+int pvinfo(struct search_t *data, struct pv_t *pv, int score)
+{
+    char buf[4096];
+    struct timespec now;
+
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    long long time = (now.tv_sec - data->start.tv_sec) * 1000 +
+                     (now.tv_nsec - data->start.tv_nsec) / 1000000;
+    long long nps = time > 0 ? (data->nodes * 1000) / time : 0;
+
+    int s = data->stm;
+    char pv_str[4096] = "";
+
+    for (int i = 0; i < pv->count; i++) {
+        strcat(pv_str, m2uci(pv->moves[i], s));
+        strcat(pv_str, " ");
+        s ^= BLACK;
+    }
+
+    sprintf(buf, "info depth %d score %d time %lld nodes %lld nps %lld pv %s",
+            data->depth, score, time, data->nodes, nps, pv_str);
+
+    return senduci(buf);
+}
+
 void loop(struct board_t *board)
 {
     char buf[BUF_SIZE];
@@ -98,7 +129,7 @@ void loop(struct board_t *board)
                 tc_data.movetime = atoi(token + 9);
             }
 
-            go(board);
+            deepen(board);
         } else if (!strncmp("stop", buf, 4)) {
             // stop search
         } else if (!strncmp("quit", buf, 4)) {

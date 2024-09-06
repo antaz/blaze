@@ -2,6 +2,7 @@
 #define SEARCH_H
 
 #include "board.h"
+#include <time.h>
 
 #define MOVESTOGO 24
 #define MAX_DEPTH 64
@@ -22,6 +23,16 @@ extern struct tc_t {
     int movestogo;
 } tc_data;
 
-void go(struct board_t *board);
+// search engine parameters
+struct search_t {
+    struct timespec start; // time search started
+    int stm;               // side to move
+    int depth;             // current search depth
+    long long nodes;       // nodes count
+    uint16_t bestmove;     // best move so far
+    int stop;              // stop flag
+};
+
+void deepen(struct board_t *board);
 
 #endif
