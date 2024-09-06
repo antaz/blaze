@@ -39,7 +39,7 @@ void perft_divide(struct board_t *board, int depth)
         make(board, moves[i].data);
         nodes = perft(board, depth - 1);
         take(board, moves[i].data);
-        printf("%s: %lu\n", str_move(moves[i].data, board->stm), nodes);
+        printf("%s: %lu\n", m2uci(moves[i].data, board->stm), nodes);
         total_nodes += nodes;
     }
 

@@ -3,57 +3,24 @@
 #include <stdint.h>
 #include <stdio.h>
 
-char *str_move(uint16_t move, int turn)
+char *m2uci(uint16_t m, int stm)
 {
-    // TODO: refactor and simplify this
-    static char buffer[6];
-    int from = MOVE_FROM(move);
-    int to = MOVE_TO(move);
-    int type = MOVE_TYPE(move);
-    char prom = 0;
+    static char buf[6];
 
-    if (turn == BLACK) {
-        from = from ^ 0x38;
-        to = to ^ 0x38;
-    }
+    int from = MOVE_FROM(m) ^ (stm == BLACK ? 0x38 : 0);
+    int to = MOVE_TO(m) ^ (stm == BLACK ? 0x38 : 0);
+    char prom = "\0\0\0nbrq"[MOVE_TYPE(m) & 7];
 
-    switch (type) {
-    case NPC:
-    case NP:
-        prom = 'n';
-        break;
-    case BPC:
-    case BP:
-        prom = 'b';
-        break;
-    case RPC:
-    case RP:
-        prom = 'r';
-        break;
-    case QPC:
-    case QP:
-        prom = 'q';
-        break;
-    }
+    sprintf(buf, "%c%d%c%d%c", 'a' + (from & 7), (from >> 3) + 1,
+            'a' + (to & 7), (to >> 3) + 1, prom);
 
-    if (prom != 0) {
-        sprintf(buffer, "%c%d%c%d%c", ('a' + (from & 7)), (from >> 3) + 1,
-                ('a' + (to & 7)), (to >> 3) + 1, prom);
-    } else {
-        sprintf(buffer, "%c%d%c%d", ('a' + (from & 7)), (from >> 3) + 1,
-                ('a' + (to & 7)), (to >> 3) + 1);
-    }
-    return buffer;
+    return buf;
 }
 
-uint16_t parse_move(char *san)
+uint16_t uci2m(char *uci)
 {
-    int from, to;
-
-    from = 8 * (san[0] - 'a');
-    from += ((san[1] - '0') - 1);
-    to = 8 * (san[2] - 'a');
-    to += ((san[3] - '0') - 1);
+    int from = 8 * (uci[0] - 'a') + (uci[1] - '1');
+    int to = 8 * (uci[2] - 'a') + (uci[3] - '1');
 
     return MOVE(from, to, 0);
 }

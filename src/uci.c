@@ -54,7 +54,7 @@ void loop(struct board_t *board)
                     char *str_m;
 
                     for (int i = 0; i < count; ++i) {
-                        str_m = str_move(moves[i].data, board->stm);
+                        str_m = m2uci(moves[i].data, board->stm);
                         if (!strcmp(str_m, move)) {
                             make(board, moves[i].data);
                             break;

@@ -66,7 +66,7 @@ static void print_pv(struct pv_t pv, int stm)
     int s = stm;
 
     for (int i = 0; i < pv.count; i++) {
-        printf("%s ", str_move(pv.moves[i], s));
+        printf("%s ", m2uci(pv.moves[i], s));
         s ^= BLACK;
     }
 }
@@ -176,5 +176,5 @@ void go(struct board_t *board)
         }
     }
 
-    printf("bestmove %s\n", str_move(pv.moves[0], board->stm));
+    printf("bestmove %s\n", m2uci(pv.moves[0], board->stm));
 }

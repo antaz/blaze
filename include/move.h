@@ -34,7 +34,7 @@ struct move_t {
 #define MOVE_TO(move) (move & 0x3f)
 #define MOVE_TYPE(move) ((move >> 12) & 0x0f)
 
-char *str_move(uint16_t move, int turn);
-uint16_t parse_move(char *san);
+char *m2uci(uint16_t m, int stm);
+uint16_t uci2m(char *uci);
 
 #endif
