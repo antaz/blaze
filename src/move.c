@@ -6,14 +6,17 @@
 char *m2uci(uint16_t m, int stm)
 {
     static char buf[6];
+    int from = MOVE_FROM(m), to = MOVE_TO(m);
 
-    int from = MOVE_FROM(m) ^ (stm == BLACK ? 0x38 : 0);
-    int to = MOVE_TO(m) ^ (stm == BLACK ? 0x38 : 0);
-    char prom = "\0\0\0nbrq"[MOVE_TYPE(m) & 7];
+    if (stm == BLACK) {
+        from ^= 0x38;
+        to ^= 0x38;
+    }
+
+    char prom = "\0\0\0\0\0\0\0\0nbrknbrk"[MOVE_TYPE(m)];
 
     sprintf(buf, "%c%d%c%d%c", 'a' + (from & 7), (from >> 3) + 1,
             'a' + (to & 7), (to >> 3) + 1, prom);
-
     return buf;
 }
 
