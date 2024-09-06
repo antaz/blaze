@@ -4,7 +4,6 @@
 #include "move.h"
 #include "perft.h"
 #include "search.h"
-#include <search.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,8 +36,19 @@ int pvinfo(struct search_t *data, struct pv_t *pv, int score)
         s ^= BLACK;
     }
 
-    sprintf(buf, "info depth %d score %d time %lld nodes %lld nps %lld pv %s",
-            data->depth, score, time, data->nodes, nps, pv_str);
+    char score_str[10] = "";
+    if (abs(score) < INF - 2000) {
+        sprintf(score_str, "cp %d", score);
+    } else {
+        if (score > 0) {
+            sprintf(score_str, "mate %d", (INF - score) / 2 + 1);
+        } else {
+            sprintf(score_str, "mate %d", -(INF + score) / 2 - 1);
+        }
+    }
+
+    sprintf(buf, "info depth %d score %s time %lld nodes %lld nps %lld pv %s",
+            data->depth, score_str, time, data->nodes, nps, pv_str);
 
     return senduci(buf);
 }

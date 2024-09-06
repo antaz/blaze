@@ -89,7 +89,7 @@ static int search(struct board_t *board, int alpha, int beta, int depth,
     if (count == 0) {
         pv->count = 0;
         if (check(board)) {
-            return -9999 + board->ply;
+            return -INF + board->ply;
         } else {
             return 0;
         }
@@ -124,7 +124,7 @@ void deepen(struct board_t *board)
     // iterative deepening
     for (driver.depth = 1; driver.depth <= max_depth; driver.depth++) {
 
-        val = search(board, -2 * 9999, 2 * 9999, driver.depth, &pv);
+        val = search(board, -2 * INF, 2 * INF, driver.depth, &pv);
 
         pvinfo(&driver, &pv, val);
 
