@@ -13,7 +13,7 @@ char *m2uci(uint16_t m, int stm)
         to ^= 0x38;
     }
 
-    char prom = "\0\0\0\0\0\0\0\0nbrknbrk"[MOVE_TYPE(m)];
+    char prom = "\0\0\0\0\0\0\0\0nbrqnbrq"[MOVE_TYPE(m)];
 
     sprintf(buf, "%c%d%c%d%c", 'a' + (from & 7), (from >> 3) + 1,
             'a' + (to & 7), (to >> 3) + 1, prom);
