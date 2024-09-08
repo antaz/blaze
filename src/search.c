@@ -101,6 +101,7 @@ static int search(struct board_t *board, int alpha, int beta, int depth,
 void deepen(struct board_t *board)
 {
     int max_depth = MAX_DEPTH;
+    uint16_t bestmove = 0;
     int val = 0;
     struct pv_t pv = {0};
     driver.stm = board->stm;
@@ -126,12 +127,12 @@ void deepen(struct board_t *board)
 
         val = search(board, -2 * INF, 2 * INF, driver.depth, &pv);
 
-        pvinfo(&driver, &pv, val);
-
-        if (driver.stop) {
+        if (driver.stop)
             break;
-        }
+
+        bestmove = pv.moves[0];
+        pvinfo(&driver, &pv, val);
     }
 
-    printf("bestmove %s\n", m2uci(pv.moves[0], driver.stm));
+    printf("bestmove %s\n", m2uci(bestmove, driver.stm));
 }
