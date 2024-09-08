@@ -71,9 +71,9 @@ static int search(struct board_t *board, int alpha, int beta, int depth,
         if (driver.stop)
             break;
 
-        if (score >= beta)
-            return beta;
         if (score > alpha) {
+            if (score >= beta)
+                return beta;
             alpha = score;
             pv->moves[0] = moves[i].data;
             memcpy(pv->moves + 1, cpv.moves, cpv.count * sizeof(uint16_t));
