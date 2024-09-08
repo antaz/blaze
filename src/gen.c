@@ -333,8 +333,8 @@ int gen(const struct board_t *board, struct move_t *moves)
 {
     // generating pseudo-legal moves
     int count = 0;
-    count = quiet(board, moves);
-    count += noisy(board, moves + count);
+    count = noisy(board, moves);
+    count += quiet(board, moves + count);
     return count;
 }
 
