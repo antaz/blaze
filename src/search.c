@@ -41,7 +41,7 @@ static int rep(struct board_t *board)
 static int search(struct board_t *board, int alpha, int beta, int depth,
                   struct pv_t *pv)
 {
-    int val = 0;
+    int score = 0;
     struct pv_t cpv;
     cpv.count = 0;
 
@@ -65,16 +65,16 @@ static int search(struct board_t *board, int alpha, int beta, int depth,
 
     for (int i = 0; i < count; i++) {
         make(board, moves[i].data);
-        val = -search(board, -beta, -alpha, depth - 1, &cpv);
+        score = -search(board, -beta, -alpha, depth - 1, &cpv);
         take(board, moves[i].data);
 
         if (driver.stop)
             break;
 
-        if (val >= beta)
+        if (score >= beta)
             return beta;
-        if (val > alpha) {
-            alpha = val;
+        if (score > alpha) {
+            alpha = score;
             pv->moves[0] = moves[i].data;
             memcpy(pv->moves + 1, cpv.moves, cpv.count * sizeof(uint16_t));
             pv->count = cpv.count + 1;
@@ -100,9 +100,10 @@ static int search(struct board_t *board, int alpha, int beta, int depth,
 
 void deepen(struct board_t *board)
 {
+    int score;
+    int alpha = -2 * INF, beta = 2 * INF;
     int max_depth = MAX_DEPTH;
     uint16_t bestmove = 0;
-    int val = 0;
     struct pv_t pv = {0};
     driver.stm = board->stm;
     driver.stop = 0;
@@ -125,13 +126,13 @@ void deepen(struct board_t *board)
     // iterative deepening
     for (driver.depth = 1; driver.depth <= max_depth; driver.depth++) {
 
-        val = search(board, -2 * INF, 2 * INF, driver.depth, &pv);
+        score = search(board, alpha, beta, driver.depth, &pv);
 
         if (driver.stop)
             break;
 
         bestmove = pv.moves[0];
-        pvinfo(&driver, &pv, val);
+        pvinfo(&driver, &pv, score);
     }
 
     printf("bestmove %s\n", m2uci(bestmove, driver.stm));
