@@ -42,6 +42,7 @@ static int search(struct board_t *board, int alpha, int beta, int depth,
                   struct pv_t *pv)
 {
     int score = 0;
+    int active = 0;
     struct pv_t cpv;
     cpv.count = 0;
 
@@ -61,9 +62,13 @@ static int search(struct board_t *board, int alpha, int beta, int depth,
     }
 
     struct move_t moves[256];
-    int count = gen_legal(board, moves);
+    int count = gen(board, moves);
 
     for (int i = 0; i < count; i++) {
+        if (legal(board, moves[i].data))
+            continue;
+
+        active++;
         make(board, moves[i].data);
         score = -search(board, -beta, -alpha, depth - 1, &cpv);
         take(board, moves[i].data);
@@ -86,7 +91,7 @@ static int search(struct board_t *board, int alpha, int beta, int depth,
         return 0;
     }
 
-    if (count == 0) {
+    if (!active) {
         pv->count = 0;
         if (check(board)) {
             return -INF + board->ply;
