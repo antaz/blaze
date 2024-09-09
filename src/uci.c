@@ -121,10 +121,10 @@ void loop(struct board_t *board)
                 tc_data.time[BLACK] = atoi(token + 6);
             }
             if ((token = strstr(buf, "winc"))) {
-                tc_data.time[WHITE] = atoi(token + 5);
+                tc_data.inc[WHITE] = atoi(token + 5);
             }
             if ((token = strstr(buf, "binc"))) {
-                tc_data.time[BLACK] = atoi(token + 5);
+                tc_data.inc[BLACK] = atoi(token + 5);
             }
             if ((token = strstr(buf, "movestogo"))) {
                 tc_data.movestogo = atoi(token + 10);
