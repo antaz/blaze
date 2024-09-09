@@ -3,3 +3,5 @@ build/
 *.tar.gz
 TAGS
 compile_commands.json
+gmon.out
+prof
