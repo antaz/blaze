@@ -26,5 +26,6 @@ uint64_t check(const struct board_t *board);
 
 int gen(const struct board_t *board, struct move_t *moves);
 int gen_legal(const struct board_t *board, struct move_t *moves);
+int capture(const struct board_t *board, struct move_t *moves);
 
 #endif /* GEN_H */

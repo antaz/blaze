@@ -38,6 +38,49 @@ static int rep(struct board_t *board)
     return r;
 }
 
+static int quiesce(struct board_t *board, int alpha, int beta)
+{
+    if ((driver.nodes & 1023) == 0)
+        halt();
+
+    if (driver.stop)
+        return 0;
+
+    int score;
+    driver.nodes++;
+
+    score = eval(board);
+
+    if (score >= beta)
+        return beta;
+
+    if (score > alpha)
+        alpha = score;
+
+    struct move_t moves[256];
+    int count = capture(board, moves);
+    for (int i = 0; i < count; i++) {
+        if (legal(board, moves[i].data))
+            continue;
+
+        make(board, moves[i].data);
+        score = -quiesce(board, -beta, -alpha);
+        take(board, moves[i].data);
+
+        if (driver.stop)
+            return 0;
+
+        if (score > alpha) {
+            if (score >= beta)
+                return beta;
+
+            alpha = score;
+        }
+    }
+
+    return alpha;
+}
+
 static int search(struct board_t *board, int alpha, int beta, int depth,
                   struct pv_t *pv)
 {
@@ -51,7 +94,7 @@ static int search(struct board_t *board, int alpha, int beta, int depth,
 
     if (depth == 0) {
         pv->count = 0;
-        return eval(board);
+        return quiesce(board, alpha, beta);
     }
 
     driver.nodes++;
