@@ -152,6 +152,7 @@ void deepen(struct board_t *board)
     int alpha = -2 * INF, beta = 2 * INF;
     int max_depth = MAX_DEPTH;
     uint16_t bestmove = 0;
+    movetime = 0;
     struct pv_t pv = {0};
     driver.stm = board->stm;
     driver.stop = 0;
@@ -164,6 +165,8 @@ void deepen(struct board_t *board)
     if (!tc_data.movetime) {
         movetime = tc_data.time[board->stm] / tc_data.movestogo +
                    tc_data.inc[board->stm];
+        if (movetime > 20)
+            movetime -= 20;
     } else {
         movetime = tc_data.movetime;
     }
