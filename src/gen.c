@@ -424,9 +424,9 @@ uint64_t check(const struct board_t *board)
     uint64_t bishop = (board->bb[1] & board->bb[2]);
     uint64_t rook = (~board->bb[1] & ~board->bb[2] & board->bb[3]);
     uint64_t queen = (board->bb[1] & board->bb[3]);
-    uint64_t king = (board->bb[2] & board->bb[3]);
+    uint64_t king = (board->bb[2] & board->bb[3]) & board->bb[0];
 
-    uint64_t ksq = bsf(king & board->bb[0]);
+    uint64_t ksq = bsf(king);
 
     return (((natk(ksq) & knight) | (ratk(ksq, all) & (rook | queen)) |
              (batk(ksq, all) & (bishop | queen)) |
