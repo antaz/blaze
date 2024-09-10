@@ -273,57 +273,6 @@ int capture(const struct board_t *board, struct move_t *moves)
     uint64_t p;
     int count = 0;
 
-    // king moves
-    for (uint64_t k = king; k; k &= k - 1) {
-        for (p = katk(bsf(k)) & theirs; p; p &= p - 1) {
-            moves->data = MOVE(bsf(k), bsf(p), CAPTURE);
-            moves++;
-            count++;
-        }
-    }
-
-    // knight moves
-    for (uint64_t n = knight; n; n &= n - 1) {
-        for (p = natk(bsf(n)) & theirs; p; p &= p - 1) {
-            moves->data = MOVE(bsf(n), bsf(p), CAPTURE);
-            moves++;
-            count++;
-        }
-    }
-
-    // Generate bishop & queen diagonal moves
-    for (uint64_t d = (bishop | queen); d; d &= d - 1) {
-        for (p = batk(bsf(d), all) & theirs; p; p &= p - 1) {
-            moves->data = MOVE(bsf(d), bsf(p), CAPTURE);
-            moves++;
-            count++;
-        }
-    }
-
-    // Generate rook & queen orthogonal moves
-    for (uint64_t o = (rook | queen); o; o &= o - 1) {
-        for (p = ratk(bsf(o), all) & theirs; p; p &= p - 1) {
-            moves->data = MOVE(bsf(o), bsf(p), CAPTURE);
-            moves++;
-            count++;
-        }
-    }
-
-    // pawn captures
-    for (p = ((pawn & ~R7) << 7) & ~FH & theirs; p; p &= p - 1) {
-        int to = bsf(p);
-        moves->data = MOVE(to - 7, to, CAPTURE);
-        moves++;
-        count++;
-    }
-
-    for (p = ((pawn & ~R7) << 9) & ~FA & theirs; p; p &= p - 1) {
-        int to = bsf(p);
-        moves->data = MOVE(to - 9, to, CAPTURE);
-        moves++;
-        count++;
-    }
-
     // capture promotion
     for (p = ((pawn & R7) << 7) & ~FH & theirs; p; p &= p - 1) {
         int to = bsf(p);
@@ -351,6 +300,21 @@ int capture(const struct board_t *board, struct move_t *moves)
         count = count + 4;
     }
 
+    // pawn captures
+    for (p = ((pawn & ~R7) << 7) & ~FH & theirs; p; p &= p - 1) {
+        int to = bsf(p);
+        moves->data = MOVE(to - 7, to, CAPTURE);
+        moves++;
+        count++;
+    }
+
+    for (p = ((pawn & ~R7) << 9) & ~FA & theirs; p; p &= p - 1) {
+        int to = bsf(p);
+        moves->data = MOVE(to - 9, to, CAPTURE);
+        moves++;
+        count++;
+    }
+
     // en passant
     uint8_t ep = board->ep;
     if (ep != NOSQ) {
@@ -363,6 +327,43 @@ int capture(const struct board_t *board, struct move_t *moves)
             count++;
         }
     }
+
+    // Generate bishop & queen diagonal moves
+    for (uint64_t d = (bishop | queen); d; d &= d - 1) {
+        for (p = batk(bsf(d), all) & theirs; p; p &= p - 1) {
+            moves->data = MOVE(bsf(d), bsf(p), CAPTURE);
+            moves++;
+            count++;
+        }
+    }
+
+    // Generate rook & queen orthogonal moves
+    for (uint64_t o = (rook | queen); o; o &= o - 1) {
+        for (p = ratk(bsf(o), all) & theirs; p; p &= p - 1) {
+            moves->data = MOVE(bsf(o), bsf(p), CAPTURE);
+            moves++;
+            count++;
+        }
+    }
+
+    // king moves
+    for (uint64_t k = king; k; k &= k - 1) {
+        for (p = katk(bsf(k)) & theirs; p; p &= p - 1) {
+            moves->data = MOVE(bsf(k), bsf(p), CAPTURE);
+            moves++;
+            count++;
+        }
+    }
+
+    // knight moves
+    for (uint64_t n = knight; n; n &= n - 1) {
+        for (p = natk(bsf(n)) & theirs; p; p &= p - 1) {
+            moves->data = MOVE(bsf(n), bsf(p), CAPTURE);
+            moves++;
+            count++;
+        }
+    }
+
     return count;
 }
 
