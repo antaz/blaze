@@ -2,16 +2,19 @@
 #include "board.h"
 #include "eval.h"
 #include "gen.h"
+#include "hash.h"
 #include "move.h"
 #include "uci.h"
 #include <inttypes.h>
 #include <search.h>
 #include <stdio.h>
-#include <string.h>
 #include <time.h>
 
 static struct search_t driver;
 static uint64_t movetime; // how long should we search
+
+struct entry_t *table;
+int size_tt;
 
 static void halt()
 {
@@ -81,26 +84,23 @@ static int quiesce(struct board_t *board, int alpha, int beta)
     return alpha;
 }
 
-static int search(struct board_t *board, int alpha, int beta, int depth,
-                  struct pv_t *pv)
+static int search(struct board_t *board, int alpha, int beta, int depth)
 {
     int score = 0;
+    int oldalpha = alpha;
     int active = 0;
-    struct pv_t cpv;
-    cpv.count = 0;
+    struct move_t bestmove;
 
     if ((driver.nodes & 1023) == 0)
         halt();
 
     if (depth == 0) {
-        pv->count = 0;
         return quiesce(board, alpha, beta);
     }
 
     driver.nodes++;
 
     if (board->ply && rep(board)) {
-        pv->count = 0;
         return 0;
     }
 
@@ -113,7 +113,7 @@ static int search(struct board_t *board, int alpha, int beta, int depth,
 
         active++;
         make(board, moves[i].data);
-        score = -search(board, -beta, -alpha, depth - 1, &cpv);
+        score = -search(board, -beta, -alpha, depth - 1);
         take(board, moves[i].data);
 
         if (driver.stop)
@@ -123,19 +123,15 @@ static int search(struct board_t *board, int alpha, int beta, int depth,
             if (score >= beta)
                 return beta;
             alpha = score;
-            pv->moves[0] = moves[i].data;
-            memcpy(pv->moves + 1, cpv.moves, cpv.count * sizeof(uint16_t));
-            pv->count = cpv.count + 1;
+            bestmove = moves[i];
         }
     }
 
     if (board->fifty >= 100) {
-        pv->count = 0;
         return 0;
     }
 
     if (!active) {
-        pv->count = 0;
         if (check(board)) {
             return -INF + board->ply;
         } else {
@@ -143,6 +139,9 @@ static int search(struct board_t *board, int alpha, int beta, int depth,
         }
     }
 
+    if (alpha != oldalpha) {
+        store(board->hash, depth, score, bestmove.data, EXACT);
+    }
     return alpha;
 }
 
@@ -153,7 +152,6 @@ void deepen(struct board_t *board)
     int max_depth = MAX_DEPTH;
     uint16_t bestmove = 0;
     movetime = 0;
-    struct pv_t pv = {0};
     driver.stm = board->stm;
     driver.stop = 0;
     driver.nodes = 0;
@@ -177,11 +175,13 @@ void deepen(struct board_t *board)
     // iterative deepening
     for (driver.depth = 1; driver.depth <= max_depth; driver.depth++) {
 
-        score = search(board, alpha, beta, driver.depth, &pv);
+        struct pv_t pv = {0};
+        score = search(board, alpha, beta, driver.depth);
 
         if (driver.stop)
             break;
 
+        probepv(board, &pv, driver.depth);
         bestmove = pv.moves[0];
         pvinfo(&driver, &pv, score);
     }
