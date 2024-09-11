@@ -5,6 +5,7 @@
 #include "hash.h"
 #include "move.h"
 #include "uci.h"
+#include <pthread.h>
 #include <signal.h>
 #include <stdio.h>
 #include <time.h>
@@ -12,7 +13,7 @@
 // signal interrupt
 extern volatile sig_atomic_t interrupt;
 
-static struct search_t driver;
+struct search_t driver;
 static uint64_t movetime; // how long should we search
 
 struct entry_t *table;
@@ -147,8 +148,9 @@ static int search(struct board_t *board, int alpha, int beta, int depth)
 	return alpha;
 }
 
-void deepen(struct board_t *board)
+void *deepen(void *args)
 {
+	struct board_t *board = (struct board_t *)args;
 	int score;
 	int alpha = -2 * INF, beta = 2 * INF;
 	int max_depth = MAX_DEPTH;
@@ -157,6 +159,7 @@ void deepen(struct board_t *board)
 	driver.stm = board->stm;
 	driver.stop = 0;
 	driver.nodes = 0;
+	driver.depth = 1;
 	board->ply = 0;
 
 	// initialize time management
@@ -190,4 +193,5 @@ void deepen(struct board_t *board)
 	}
 
 	printf("bestmove %s\n", m2uci(bestmove, driver.stm));
+	pthread_exit(0);
 }

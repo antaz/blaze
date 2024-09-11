@@ -4,6 +4,7 @@
 #include "move.h"
 #include "perft.h"
 #include "search.h"
+#include <pthread.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,6 +12,12 @@
 
 // signal interrupt
 extern volatile sig_atomic_t interrupt;
+
+// search thread
+static pthread_t worker;
+
+// search driver
+extern struct search_t driver;
 
 #define BUF_SIZE 65536
 struct tc_t tc_data = {.movestogo = MOVESTOGO};
@@ -146,10 +153,26 @@ void loop(struct board_t *board)
 				tc_data.movetime = atoi(token + 9);
 			}
 
-			deepen(board);
+			if (pthread_create(&worker, NULL, deepen,
+					   (void *)board) != 0) {
+				perror("Error: creating search thread");
+				exit(EXIT_FAILURE);
+			}
+
 		} else if (!strncmp("stop", buf, 4)) {
 			// stop search
+			driver.stop = 1;
+
+			if (pthread_join(worker, NULL) != 0) {
+				exit(EXIT_FAILURE);
+			}
+
 		} else if (!strncmp("quit", buf, 4)) {
+			driver.stop = 1;
+			// TODO: this conflicts with uci stop
+			if (pthread_join(worker, NULL) != 0) {
+				exit(EXIT_FAILURE);
+			}
 			break;
 		}
 	}

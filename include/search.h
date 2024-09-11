@@ -1,7 +1,7 @@
 #ifndef SEARCH_H
 #define SEARCH_H
 
-#include "board.h"
+#include <inttypes.h>
 #include <time.h>
 
 #define INF 99999
@@ -34,6 +34,6 @@ struct search_t {
 	int stop;	       // stop flag
 };
 
-void deepen(struct board_t *board);
+void *deepen(void *args);
 
 #endif
