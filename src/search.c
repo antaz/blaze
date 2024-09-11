@@ -5,8 +5,6 @@
 #include "hash.h"
 #include "move.h"
 #include "uci.h"
-#include <inttypes.h>
-#include <search.h>
 #include <signal.h>
 #include <stdio.h>
 #include <time.h>
