@@ -7,8 +7,12 @@
 #include "uci.h"
 #include <inttypes.h>
 #include <search.h>
+#include <signal.h>
 #include <stdio.h>
 #include <time.h>
+
+// signal interrupt
+extern volatile sig_atomic_t interrupt;
 
 static struct search_t driver;
 static uint64_t movetime; // how long should we search
@@ -173,7 +177,7 @@ void deepen(struct board_t *board)
         max_depth = tc_data.depth;
 
     // iterative deepening
-    for (driver.depth = 1; driver.depth <= max_depth; driver.depth++) {
+    while (driver.depth <= max_depth && !interrupt) {
 
         struct pv_t pv = {0};
         score = search(board, alpha, beta, driver.depth);
@@ -184,6 +188,7 @@ void deepen(struct board_t *board)
         probepv(board, &pv, driver.depth);
         bestmove = pv.moves[0];
         pvinfo(&driver, &pv, score);
+        driver.depth++;
     }
 
     printf("bestmove %s\n", m2uci(bestmove, driver.stm));

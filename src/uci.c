@@ -4,9 +4,13 @@
 #include "move.h"
 #include "perft.h"
 #include "search.h"
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+// signal interrupt
+extern volatile sig_atomic_t interrupt;
 
 #define BUF_SIZE 65536
 struct tc_t tc_data = {.movestogo = MOVESTOGO};
@@ -60,7 +64,7 @@ void loop(struct board_t *board)
     setvbuf(stdin, NULL, _IONBF, 0);
     setvbuf(stdout, NULL, _IONBF, 0);
 
-    for (;;) {
+    while (!interrupt) {
         if (!fgets(buf, BUF_SIZE, stdin)) {
             break;
         }
