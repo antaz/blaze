@@ -21,11 +21,11 @@ extern int size_tt;
 
 // hash table entry
 struct entry_t {
-    uint64_t hash;
-    int depth;
-    int score;
-    int flag;
-    uint16_t move;
+	uint64_t hash;
+	int depth;
+	int score;
+	int flag;
+	uint16_t move;
 };
 
 void init_hash();

@@ -79,15 +79,16 @@ uint64_t natk(const int i) { return NATK[i]; }
 
 uint64_t batk(const int i, const uint64_t block)
 {
-    return oo2r(i, block, _DIAG[diag(i)]) | oo2r(i, block, _ADIAG[adiag(i)]);
+	return oo2r(i, block, _DIAG[diag(i)]) |
+	       oo2r(i, block, _ADIAG[adiag(i)]);
 }
 
 uint64_t ratk(const int i, const uint64_t block)
 {
-    return oo2r(i, block, _FILE[file(i)]) | oo2r(i, block, _RANK[rank(i)]);
+	return oo2r(i, block, _FILE[file(i)]) | oo2r(i, block, _RANK[rank(i)]);
 }
 
 uint64_t qatk(const int i, const uint64_t block)
 {
-    return batk(i, block) | ratk(i, block);
+	return batk(i, block) | ratk(i, block);
 }

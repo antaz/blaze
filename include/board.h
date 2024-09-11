@@ -23,32 +23,32 @@ enum { NOPC, PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING };
 
 /* castling permissions */
 enum {
-    WK = 0x02, // White king side
-    WQ = 0x01, // White queen side
-    BK = 0x20, // Black king side
-    BQ = 0x10  // Black queen side
+	WK = 0x02, // White king side
+	WQ = 0x01, // White queen side
+	BK = 0x20, // Black king side
+	BQ = 0x10  // Black queen side
 };
 
 /* non-recoverable information */
 struct undo_t {
-    uint8_t fifty; // fifty-move counter
-    uint8_t ca;    // castling rights
-    uint8_t ep;    // en-passent square
-    uint8_t cap;   // captured piece (if any)
-    uint64_t hash; // zobrist hash
+	uint8_t fifty; // fifty-move counter
+	uint8_t ca;    // castling rights
+	uint8_t ep;    // en-passent square
+	uint8_t cap;   // captured piece (if any)
+	uint64_t hash; // zobrist hash
 };
 
 /* main structure to hold the state of the board */
 struct board_t {
-    uint64_t bb[4];         // quad-bitboards
-    uint8_t stm;            // side to move
-    uint8_t ply;            // half-move count
-    uint8_t hply;           // history half-move count
-    uint8_t fifty;          // fifty-move counter
-    uint8_t ca;             // castling rights
-    uint8_t ep;             // en-passent square
-    uint64_t hash;          // zobrist hash
-    struct undo_t hist[MM]; // history of board states
+	uint64_t bb[4];		// quad-bitboards
+	uint8_t stm;		// side to move
+	uint8_t ply;		// half-move count
+	uint8_t hply;		// history half-move count
+	uint8_t fifty;		// fifty-move counter
+	uint8_t ca;		// castling rights
+	uint8_t ep;		// en-passent square
+	uint64_t hash;		// zobrist hash
+	struct undo_t hist[MM]; // history of board states
 };
 
 void parse(struct board_t *board, const char *fen);
