@@ -5,3 +5,4 @@ TAGS
 compile_commands.json
 gmon.out
 prof
+test/
