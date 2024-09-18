@@ -1,7 +1,12 @@
 #include "perft.h"
 #include "gen.h"
+#include "hash.h"
 #include "move.h"
+#include <stdint.h>
 #include <stdio.h>
+
+int collisions = 0;
+int insertions = 0;
 
 uint64_t perft(struct board_t *board, int depth)
 {
@@ -16,11 +21,17 @@ uint64_t perft(struct board_t *board, int depth)
 	else if (depth == 0)
 		return 1;
 
+	struct entry_t *entry = probe(board->hash);
+	if (entry != NULL && entry->depth == depth)
+		return entry->nodes;
+
 	for (int i = 0; i < count; ++i) {
 		make(board, moves[i].data);
 		nodes += perft(board, depth - 1);
 		take(board, moves[i].data);
 	}
+
+	store(board->hash, depth, nodes, 0, 0, 0);
 
 	return nodes;
 }
