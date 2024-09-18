@@ -4,6 +4,7 @@
 #include "move.h"
 #include "search.h"
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 static uint64_t prng()
@@ -25,7 +26,7 @@ void init_hash()
 		}
 	}
 
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i <= 8; i++) {
 		ep_hash[i] = prng();
 	}
 
@@ -44,37 +45,40 @@ void init_table(int size)
 	table = (struct entry_t *)malloc(size);
 }
 
-void store(uint64_t hash, int depth, int score, uint16_t move, int flag)
+void store(uint64_t hash, int depth, int nodes, int score, uint16_t move,
+	   int flag)
 {
 	struct entry_t *entry = &table[hash & size_tt];
 
+	if (entry->hash != 0ULL && entry->hash != hash) {
+		return;
+	}
+
 	entry->hash = hash;
 	entry->depth = depth;
+	entry->nodes = nodes;
 	entry->score = score;
 	entry->flag = flag;
 	entry->move = move;
 }
 
-int probe(uint64_t hash, uint16_t *move)
+struct entry_t *probe(uint64_t hash)
 {
 	struct entry_t *entry = &table[hash & size_tt];
 
-	if (entry->hash == hash) {
-		*move = entry->move;
-		return entry->score;
-	}
+	if (entry->hash == hash)
+		return entry;
 
-	return INVALID;
+	return NULL;
 }
 
 int probepv(struct board_t *board, struct pv_t *pv, int depth)
 {
-
-	uint16_t bestmove;
+	struct entry_t *entry;
 	struct move_t moves[256];
 
 	for (int i = 1; i <= depth; i++) {
-		if (probe(board->hash, &bestmove) == INVALID)
+		if ((entry = probe(board->hash)) == NULL)
 			break;
 
 		int count = gen(board, moves);
@@ -83,7 +87,7 @@ int probepv(struct board_t *board, struct pv_t *pv, int depth)
 			if (legal(board, moves[j].data))
 				continue;
 
-			if (moves[j].data == bestmove) {
+			if (moves[j].data == entry->move) {
 				make(board, moves[j].data);
 
 				pv->moves[pv->count] = moves[j].data;

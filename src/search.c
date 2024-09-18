@@ -143,7 +143,8 @@ static int search(struct board_t *board, int alpha, int beta, int depth)
 	}
 
 	if (alpha != oldalpha) {
-		store(board->hash, depth, score, bestmove.data, EXACT);
+		store(board->hash, depth, driver.nodes, score, bestmove.data,
+		      EXACT);
 	}
 	return alpha;
 }
