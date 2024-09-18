@@ -7,7 +7,7 @@
 #include <string.h>
 
 uint64_t piece_hash[2][PC][SQ];
-uint64_t ep_hash[8];
+uint64_t ep_hash[9];
 uint64_t ca_hash[52];
 uint64_t stm_hash;
 
@@ -22,6 +22,53 @@ static void reset(struct board_t *board)
 	board->ca = 0;
 	board->ep = NOSQ;
 	board->hash = 0ULL;
+}
+
+uint64_t zobrist(struct board_t *board)
+{
+	uint64_t hash = 0ULL;
+
+	// hashing pieces
+	for (int i = 0; i < 2; i++) {
+		for (uint64_t p =
+			 (board->bb[1] & ~board->bb[2] & ~board->bb[3]) &
+			 board->bb[0];
+		     p; p &= p - 1) {
+			hash ^= piece_hash[i][PAWN][bsf(p)];
+		}
+		for (uint64_t p =
+			 (~board->bb[1] & board->bb[2] & ~board->bb[3]) &
+			 board->bb[0];
+		     p; p &= p - 1) {
+			hash ^= piece_hash[i][KNIGHT][bsf(p)];
+		}
+		for (uint64_t p = (board->bb[1] & board->bb[2]) & board->bb[0];
+		     p; p &= p - 1) {
+			hash ^= piece_hash[i][BISHOP][bsf(p)];
+		}
+		for (uint64_t p =
+			 (~board->bb[1] & ~board->bb[2] & board->bb[3]) &
+			 board->bb[0];
+		     p; p &= p - 1) {
+			hash ^= piece_hash[i][ROOK][bsf(p)];
+		}
+		for (uint64_t p = (board->bb[1] & board->bb[3]) & board->bb[0];
+		     p; p &= p - 1) {
+			hash ^= piece_hash[i][QUEEN][bsf(p)];
+		}
+		uint64_t ksq =
+		    bsf((board->bb[2] & board->bb[3]) & board->bb[0]);
+		hash ^= piece_hash[i][KING][ksq];
+		flip(board);
+	}
+
+	// hashing ep square
+	hash ^= ep_hash[board->ep];
+
+	// hash castling
+	hash ^= ca_hash[board->ca];
+
+	return hash;
 }
 
 void parse(struct board_t *board, const char *fen)
@@ -41,74 +88,62 @@ void parse(struct board_t *board, const char *fen)
 		switch (*fen) {
 		case 'p':
 			bb[1] |= 1ULL << sq;
-			board->hash ^= piece_hash[BLACK][PAWN][sq];
 			i++;
 			break;
 		case 'n':
 			bb[2] |= 1ULL << sq;
-			board->hash ^= piece_hash[BLACK][KNIGHT][sq];
 			i++;
 			break;
 		case 'b':
 			bb[1] |= 1ULL << sq;
 			bb[2] |= 1ULL << sq;
-			board->hash ^= piece_hash[BLACK][BISHOP][sq];
 			i++;
 			break;
 		case 'r':
 			bb[3] |= 1ULL << sq;
-			board->hash ^= piece_hash[BLACK][ROOK][sq];
 			i++;
 			break;
 		case 'q':
 			bb[1] |= 1ULL << sq;
 			bb[3] |= 1ULL << sq;
-			board->hash ^= piece_hash[BLACK][QUEEN][sq];
 			i++;
 			break;
 		case 'k':
 			bb[2] |= 1ULL << sq;
 			bb[3] |= 1ULL << sq;
-			board->hash ^= piece_hash[BLACK][KING][sq];
 			i++;
 			break;
 		case 'P':
 			bb[1] |= 1ULL << sq;
 			bb[0] |= 1ULL << sq;
-			board->hash ^= piece_hash[WHITE][PAWN][sq];
 			i++;
 			break;
 		case 'N':
 			bb[2] |= 1ULL << sq;
 			bb[0] |= 1ULL << sq;
-			board->hash ^= piece_hash[WHITE][KNIGHT][sq];
 			i++;
 			break;
 		case 'B':
 			bb[1] |= 1ULL << sq;
 			bb[2] |= 1ULL << sq;
 			bb[0] |= 1ULL << sq;
-			board->hash ^= piece_hash[WHITE][BISHOP][sq];
 			i++;
 			break;
 		case 'R':
 			bb[3] |= 1ULL << sq;
 			bb[0] |= 1ULL << sq;
-			board->hash ^= piece_hash[WHITE][ROOK][sq];
 			i++;
 			break;
 		case 'Q':
 			bb[1] |= 1ULL << sq;
 			bb[3] |= 1ULL << sq;
 			bb[0] |= 1ULL << sq;
-			board->hash ^= piece_hash[WHITE][QUEEN][sq];
 			i++;
 			break;
 		case 'K':
 			bb[2] |= 1ULL << sq;
 			bb[3] |= 1ULL << sq;
 			bb[0] |= 1ULL << sq;
-			board->hash ^= piece_hash[WHITE][KING][sq];
 			i++;
 			break;
 
@@ -157,7 +192,6 @@ void parse(struct board_t *board, const char *fen)
 			}
 		}
 		fen++;
-		// board->hash ^= ca_hash[board->ca];
 	} else {
 		fen += 2;
 	}
@@ -165,16 +199,17 @@ void parse(struct board_t *board, const char *fen)
 	// parse en-passant square
 	if (*fen != '-') {
 		board->ep = *fen - 'a';
-		// board->hash ^= ep_hash[*fen - 'a'];
 		fen++;
 	} else {
 		fen += 2;
 	}
 
+	// calculate hash
+	board->hash = zobrist(board);
+
 	// flip the board to the side to move
 	if (stm == BLACK) {
 		flip(board);
-		board->hash ^= stm_hash;
 	}
 }
 
@@ -189,6 +224,7 @@ void flip(struct board_t *board)
 	bb[1] = vflip(bb[1]);
 	bb[2] = vflip(bb[2]);
 	bb[3] = vflip(bb[3]);
+	board->hash = vflip(board->hash);
 	*stm ^= BLACK;
 	*ca = (board->ca >> 4) | (board->ca << 4);
 }
@@ -202,7 +238,6 @@ void make(struct board_t *board, const uint16_t move)
 	uint64_t fb = 1ULL << from;
 	uint64_t tb = 1ULL << to;
 	int hply = board->hply;
-	int stm = board->stm;
 
 	// store history
 	board->hist[hply].ep = board->ep;
@@ -237,29 +272,9 @@ void make(struct board_t *board, const uint16_t move)
 
 		// reset 50 move counter
 		board->fifty = 0;
-
-		// rehash the from and to square
-		if (stm == WHITE) {
-			board->hash ^= piece_hash[stm][p][from] ^
-				       piece_hash[stm][p][to] ^
-				       piece_hash[stm ^ BLACK][cap][to];
-		} else {
-			board->hash ^= piece_hash[stm][p][from ^ 0x38] ^
-				       piece_hash[stm][p][to ^ 0x38] ^
-				       piece_hash[stm ^ BLACK][cap][to ^ 0x38];
-		}
 	} else {
 		// increment 50 move counter
 		board->fifty++;
-
-		// rehash the from and to square
-		if (stm == WHITE) {
-			board->hash ^=
-			    piece_hash[stm][p][from] ^ piece_hash[stm][p][to];
-		} else {
-			board->hash ^= piece_hash[stm][p][from ^ 0x38] ^
-				       piece_hash[stm][p][to ^ 0x38];
-		}
 	}
 
 	switch (MOVE_TYPE(move)) {
@@ -395,12 +410,12 @@ void make(struct board_t *board, const uint16_t move)
 		return;
 	}
 
-	// rehash the side to move
-	board->hash ^= stm_hash;
-
 	// increment counter
 	board->ply++;
 	board->hply++;
+
+	// calculate hash
+	board->hash = zobrist(board);
 
 	// flip the board
 	flip(board);
