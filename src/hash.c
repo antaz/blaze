@@ -50,10 +50,6 @@ void store(uint64_t hash, int depth, int nodes, int score, uint16_t move,
 {
 	struct entry_t *entry = &table[hash & size_tt];
 
-	if (entry->hash != 0ULL && entry->hash != hash) {
-		return;
-	}
-
 	entry->hash = hash;
 	entry->depth = depth;
 	entry->nodes = nodes;
