@@ -1,8 +1,10 @@
 #include "hash.h"
+#include "bitboard.h"
 #include "board.h"
 #include "gen.h"
 #include "move.h"
 #include "search.h"
+#include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,6 +37,58 @@ void init_hash()
 	}
 
 	stm_hash = prng();
+}
+
+uint64_t zobrist(struct board_t *board)
+{
+	uint64_t hash = 0ULL;
+
+	// hashing pieces
+	for (int i = 0; i < 2; i++) {
+		for (uint64_t p =
+			 (board->bb[1] & ~board->bb[2] & ~board->bb[3]) &
+			 board->bb[0];
+		     p; p &= p - 1) {
+			hash ^= piece_hash[board->stm][PAWN][bsf(p)];
+		}
+		for (uint64_t p =
+			 (~board->bb[1] & board->bb[2] & ~board->bb[3]) &
+			 board->bb[0];
+		     p; p &= p - 1) {
+			hash ^= piece_hash[i][KNIGHT][bsf(p)];
+		}
+		for (uint64_t p = (board->bb[1] & board->bb[2]) & board->bb[0];
+		     p; p &= p - 1) {
+			hash ^= piece_hash[i][BISHOP][bsf(p)];
+		}
+		for (uint64_t p =
+			 (~board->bb[1] & ~board->bb[2] & board->bb[3]) &
+			 board->bb[0];
+		     p; p &= p - 1) {
+			hash ^= piece_hash[i][ROOK][bsf(p)];
+		}
+		for (uint64_t p = (board->bb[1] & board->bb[3]) & board->bb[0];
+		     p; p &= p - 1) {
+			hash ^= piece_hash[i][QUEEN][bsf(p)];
+		}
+		uint64_t ksq =
+		    bsf((board->bb[2] & board->bb[3]) & board->bb[0]);
+		hash ^= piece_hash[i][KING][ksq];
+		flip(board);
+	}
+
+	// hashing ep square
+	hash ^= ep_hash[board->ep];
+
+	// hash castling
+	hash ^= ca_hash[board->ca];
+
+	if (board->stm == BLACK) {
+		hash ^= stm_hash;
+		hash = vflip(hash);
+	}
+
+	return hash;
 }
 
 void init_table(int size)

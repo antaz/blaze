@@ -24,53 +24,6 @@ static void reset(struct board_t *board)
 	board->hash = 0ULL;
 }
 
-uint64_t zobrist(struct board_t *board)
-{
-	uint64_t hash = 0ULL;
-
-	// hashing pieces
-	for (int i = 0; i < 2; i++) {
-		for (uint64_t p =
-			 (board->bb[1] & ~board->bb[2] & ~board->bb[3]) &
-			 board->bb[0];
-		     p; p &= p - 1) {
-			hash ^= piece_hash[i][PAWN][bsf(p)];
-		}
-		for (uint64_t p =
-			 (~board->bb[1] & board->bb[2] & ~board->bb[3]) &
-			 board->bb[0];
-		     p; p &= p - 1) {
-			hash ^= piece_hash[i][KNIGHT][bsf(p)];
-		}
-		for (uint64_t p = (board->bb[1] & board->bb[2]) & board->bb[0];
-		     p; p &= p - 1) {
-			hash ^= piece_hash[i][BISHOP][bsf(p)];
-		}
-		for (uint64_t p =
-			 (~board->bb[1] & ~board->bb[2] & board->bb[3]) &
-			 board->bb[0];
-		     p; p &= p - 1) {
-			hash ^= piece_hash[i][ROOK][bsf(p)];
-		}
-		for (uint64_t p = (board->bb[1] & board->bb[3]) & board->bb[0];
-		     p; p &= p - 1) {
-			hash ^= piece_hash[i][QUEEN][bsf(p)];
-		}
-		uint64_t ksq =
-		    bsf((board->bb[2] & board->bb[3]) & board->bb[0]);
-		hash ^= piece_hash[i][KING][ksq];
-		flip(board);
-	}
-
-	// hashing ep square
-	hash ^= ep_hash[board->ep];
-
-	// hash castling
-	hash ^= ca_hash[board->ca];
-
-	return hash;
-}
-
 void parse(struct board_t *board, const char *fen)
 {
 	// reset the board
@@ -204,13 +157,13 @@ void parse(struct board_t *board, const char *fen)
 		fen += 2;
 	}
 
-	// calculate hash
-	board->hash = zobrist(board);
-
 	// flip the board to the side to move
 	if (stm == BLACK) {
 		flip(board);
 	}
+
+	// calculate hash
+	board->hash = zobrist(board);
 }
 
 void flip(struct board_t *board)
@@ -224,7 +177,6 @@ void flip(struct board_t *board)
 	bb[1] = vflip(bb[1]);
 	bb[2] = vflip(bb[2]);
 	bb[3] = vflip(bb[3]);
-	board->hash = vflip(board->hash);
 	*stm ^= BLACK;
 	*ca = (board->ca >> 4) | (board->ca << 4);
 }

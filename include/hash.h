@@ -32,6 +32,7 @@ struct entry_t {
 };
 
 void init_hash();
+uint64_t zobrist(struct board_t *board);
 void init_table(int size);
 void store(uint64_t hash, int depth, int nodes, int score, uint16_t move,
 	   int flag);
