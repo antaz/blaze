@@ -6,12 +6,8 @@
 #include "move.h"
 #include "uci.h"
 #include <pthread.h>
-#include <signal.h>
 #include <stdio.h>
 #include <time.h>
-
-// signal interrupt
-extern volatile sig_atomic_t interrupt;
 
 struct search_t driver;
 static uint64_t movetime; // how long should we search
@@ -179,7 +175,7 @@ void *deepen(void *args)
 		max_depth = tc_data.depth;
 
 	// iterative deepening
-	while (driver.depth <= max_depth && !interrupt) {
+	while (driver.depth <= max_depth) {
 
 		struct pv_t pv = {0};
 		score = search(board, alpha, beta, driver.depth);

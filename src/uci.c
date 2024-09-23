@@ -5,13 +5,9 @@
 #include "perft.h"
 #include "search.h"
 #include <pthread.h>
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-// signal interrupt
-extern volatile sig_atomic_t interrupt;
 
 // search thread
 static pthread_t worker;
@@ -72,7 +68,7 @@ void loop(struct board_t *board)
 	setvbuf(stdin, NULL, _IONBF, 0);
 	setvbuf(stdout, NULL, _IONBF, 0);
 
-	while (!interrupt) {
+	for (;;) {
 		if (!fgets(buf, BUF_SIZE, stdin)) {
 			break;
 		}
