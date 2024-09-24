@@ -7,6 +7,7 @@
 #include "uci.h"
 #include <pthread.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 
 struct search_t driver;
@@ -86,6 +87,7 @@ static int quiesce(struct board_t *board, int alpha, int beta)
 static int search(struct board_t *board, int alpha, int beta, int depth)
 {
 	int score = 0;
+	int best = -INF;
 	int oldalpha = alpha;
 	int active = 0;
 	struct move_t bestmove;
@@ -103,6 +105,18 @@ static int search(struct board_t *board, int alpha, int beta, int depth)
 		return 0;
 	}
 
+	struct entry_t *entry = probe(board->hash);
+	if (entry != NULL) {
+		if (entry->depth >= depth) {
+			if (entry->flag == EXACT)
+				return entry->score;
+			if ((entry->flag == LOBOUND) && (entry->score <= alpha))
+				return alpha;
+			if ((entry->flag == UPBOUND) && (entry->score >= beta))
+				return beta;
+		}
+	}
+
 	struct move_t moves[256];
 	int count = gen(board, moves);
 
@@ -116,13 +130,19 @@ static int search(struct board_t *board, int alpha, int beta, int depth)
 		take(board, moves[i].data);
 
 		if (driver.stop)
-			break;
+			return 0;
 
-		if (score > alpha) {
-			if (score >= beta)
-				return beta;
-			alpha = score;
+		if (score > best) {
+			best = score;
 			bestmove = moves[i];
+			if (score > alpha) {
+				if (score >= beta) {
+					store(board->hash, depth, driver.nodes,
+					      beta, bestmove.data, UPBOUND);
+					return beta;
+				}
+				alpha = score;
+			}
 		}
 	}
 
@@ -141,6 +161,9 @@ static int search(struct board_t *board, int alpha, int beta, int depth)
 	if (alpha != oldalpha) {
 		store(board->hash, depth, driver.nodes, score, bestmove.data,
 		      EXACT);
+	} else {
+		store(board->hash, depth, driver.nodes, score, bestmove.data,
+		      LOBOUND);
 	}
 	return alpha;
 }
