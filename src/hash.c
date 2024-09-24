@@ -96,13 +96,21 @@ void init_table(int size)
 	free(table);
 
 	size_tt = (size / sizeof(struct entry_t)) - 1;
-	table = (struct entry_t *)malloc(size);
+	table = (struct entry_t *)malloc(size_tt * sizeof(struct entry_t));
+	if (table) {
+		for (int i = 0; i < size_tt; i++) {
+			table[i] = (struct entry_t){0};
+		}
+	}
 }
 
 void store(uint64_t hash, int depth, int nodes, int score, uint16_t move,
 	   int flag)
 {
-	struct entry_t *entry = &table[hash & size_tt];
+	assert(size_tt != 0);
+	int index = hash % size_tt;
+	assert(index >= 0 && index <= (size_tt - 1));
+	struct entry_t *entry = &table[index];
 
 	entry->hash = hash;
 	entry->depth = depth;
@@ -114,7 +122,10 @@ void store(uint64_t hash, int depth, int nodes, int score, uint16_t move,
 
 struct entry_t *probe(uint64_t hash)
 {
-	struct entry_t *entry = &table[hash & size_tt];
+	assert(size_tt != 0);
+	int index = hash % size_tt;
+	assert(index >= 0 && index <= (size_tt - 1));
+	struct entry_t *entry = &table[index];
 
 	if (entry->hash == hash)
 		return entry;
@@ -124,6 +135,7 @@ struct entry_t *probe(uint64_t hash)
 
 int probepv(struct board_t *board, struct pv_t *pv, int depth)
 {
+	assert(depth > 0);
 	struct entry_t *entry;
 	struct move_t moves[256];
 
