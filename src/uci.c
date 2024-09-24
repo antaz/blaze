@@ -35,22 +35,25 @@ int pvinfo(struct search_t *data, struct pv_t *pv, int score)
 	long long nps = time > 0 ? (data->nodes * 1000) / time : 0;
 
 	int s = data->stm;
-	char pv_str[4096] = "";
+	char pv_str[4096] = {0}; // Initialize to empty string
 
 	for (int i = 0; i < pv->count; i++) {
-		strcat(pv_str, m2uci(pv->moves[i], s));
-		strcat(pv_str, " ");
+		strncat(pv_str, m2uci(pv->moves[i], s),
+			sizeof(pv_str) - strlen(pv_str) - 1);
+		strncat(pv_str, " ", sizeof(pv_str) - strlen(pv_str) - 1);
 		s ^= BLACK;
 	}
 
-	char score_str[10] = "";
+	char score_str[10] = {0};
 	if (abs(score) < INF - 2000) {
-		sprintf(score_str, "cp %d", score);
+		snprintf(score_str, sizeof(score_str), "cp %d", score);
 	} else {
 		if (score > 0) {
-			sprintf(score_str, "mate %d", (INF - score) / 2 + 1);
+			snprintf(score_str, sizeof(score_str), "mate %d",
+				 (INF - score) / 2 + 1);
 		} else {
-			sprintf(score_str, "mate %d", -(INF + score) / 2 - 1);
+			snprintf(score_str, sizeof(score_str), "mate %d",
+				 -(INF + score) / 2 - 1);
 		}
 	}
 
