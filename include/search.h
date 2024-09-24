@@ -22,6 +22,7 @@ extern struct tc_t {
 	uint64_t nodes;
 	uint64_t movetime;
 	int movestogo;
+	int timeset;
 } tc_data;
 
 // search engine parameters

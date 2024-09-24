@@ -18,7 +18,7 @@ int size_tt;
 static void halt()
 {
 	// check if we should stop searching
-	if (movetime) {
+	if (movetime != 0) {
 		struct timespec now;
 		clock_gettime(CLOCK_MONOTONIC, &now);
 		uint64_t elapsed = (now.tv_sec - driver.start.tv_sec) * 1e3 +
@@ -162,16 +162,19 @@ void *deepen(void *args)
 	// initialize time management
 	clock_gettime(CLOCK_MONOTONIC, &driver.start);
 
-	if (!tc_data.movetime) {
-		movetime = tc_data.time[board->stm] / tc_data.movestogo +
-			   tc_data.inc[board->stm];
-		if (movetime > 20)
-			movetime -= 20;
-	} else {
-		movetime = tc_data.movetime;
+	if (tc_data.timeset != -1) {
+		if (!tc_data.movetime) {
+			movetime =
+			    tc_data.time[board->stm] / tc_data.movestogo +
+			    tc_data.inc[board->stm];
+			if (movetime > 20)
+				movetime -= 20;
+		} else {
+			movetime = tc_data.movetime;
+		}
 	}
 
-	if (tc_data.depth)
+	if (tc_data.depth != -1)
 		max_depth = tc_data.depth;
 
 	// iterative deepening

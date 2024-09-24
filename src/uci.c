@@ -119,6 +119,8 @@ void loop(struct board_t *board)
 				}
 			}
 		} else if (!strncmp("go", buf, 2)) {
+			tc_data.depth = -1;
+			tc_data.timeset = -1;
 			char *token = NULL;
 
 			if ((token = strstr(buf, "infinite"))) {
@@ -129,9 +131,11 @@ void loop(struct board_t *board)
 			}
 			if ((token = strstr(buf, "wtime"))) {
 				tc_data.time[WHITE] = atoi(token + 6);
+				tc_data.timeset = 1;
 			}
 			if ((token = strstr(buf, "btime"))) {
 				tc_data.time[BLACK] = atoi(token + 6);
+				tc_data.timeset = 1;
 			}
 			if ((token = strstr(buf, "winc"))) {
 				tc_data.inc[WHITE] = atoi(token + 5);
@@ -150,6 +154,7 @@ void loop(struct board_t *board)
 			}
 			if ((token = strstr(buf, "movetime"))) {
 				tc_data.movetime = atoi(token + 9);
+				tc_data.timeset = 1;
 			}
 
 			if (pthread_create(&worker, NULL, deepen,
