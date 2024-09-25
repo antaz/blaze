@@ -120,6 +120,18 @@ static int search(struct board_t *board, int alpha, int beta, int depth)
 	struct move_t moves[256];
 	int count = gen(board, moves);
 
+	// order the hash move to be searched first
+	if (entry != NULL) {
+		for (int i = 0; i < count; i++) {
+			if (moves[i].data == entry->move) {
+				struct move_t temp = moves[0];
+				moves[0] = moves[i];
+				moves[i] = temp;
+				break;
+			}
+		}
+	}
+
 	for (int i = 0; i < count; i++) {
 		if (legal(board, moves[i].data))
 			continue;
