@@ -105,6 +105,7 @@ static int search(struct board_t *board, int alpha, int beta, int depth)
 		return 0;
 	}
 
+	// probe hash table for hash move
 	struct entry_t *entry = probe(board->hash);
 	if (entry != NULL) {
 		if (entry->depth >= depth) {
