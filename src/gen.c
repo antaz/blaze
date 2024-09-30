@@ -74,7 +74,7 @@ int quiet(const struct board_t *board, struct move_t *moves)
 	// castling
 	// TODO: refactor this
 	uint8_t ca = board->ca;
-	if ((ca & 0x02) && !(all & 0x60)) {
+	if ((ca & K) && !(all & 0x60)) {
 		uint64_t pawn =
 		    (board->bb[1] & ~board->bb[2] & ~board->bb[3]) & theirs;
 		uint64_t knight =
@@ -107,7 +107,7 @@ int quiet(const struct board_t *board, struct move_t *moves)
 			count++;
 		}
 	}
-	if ((ca & 0x01) && !(all & 0x0e)) {
+	if ((ca & Q) && !(all & 0x0e)) {
 		uint64_t pawn =
 		    (board->bb[1] & ~board->bb[2] & ~board->bb[3]) & theirs;
 		uint64_t knight =

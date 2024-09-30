@@ -23,10 +23,10 @@ enum { NOPC, PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING };
 
 /* castling permissions */
 enum {
-	WK = 0x02, // White king side
-	WQ = 0x01, // White queen side
-	BK = 0x20, // Black king side
-	BQ = 0x10  // Black queen side
+	K = 1,	// White king side
+	Q = 2,	// White queen side
+	OK = 4, // Black king side
+	OQ = 8	// Black queen side
 };
 
 /* non-recoverable information */

@@ -131,16 +131,16 @@ void parse(struct board_t *board, const char *fen)
 		for (; *fen != ' '; fen++) {
 			switch (*fen) {
 			case 'K':
-				board->ca |= WK;
+				board->ca |= K;
 				break;
 			case 'Q':
-				board->ca |= WQ;
+				board->ca |= Q;
 				break;
 			case 'k':
-				board->ca |= BK;
+				board->ca |= OK;
 				break;
 			case 'q':
-				board->ca |= BQ;
+				board->ca |= OQ;
 				break;
 			}
 		}
@@ -178,7 +178,7 @@ void flip(struct board_t *board)
 	bb[2] = vflip(bb[2]);
 	bb[3] = vflip(bb[3]);
 	*stm ^= BLACK;
-	*ca = (board->ca >> 4) | (board->ca << 4);
+	*ca = (*ca >> 2) ^ ((*ca & 3) << 2);
 }
 
 void make(struct board_t *board, const uint16_t move)
@@ -218,9 +218,9 @@ void make(struct board_t *board, const uint16_t move)
 
 		// reset castling if one of the rooks was captured
 		if (to == 63)
-			board->ca &= 0xDF;
+			board->ca &= 11;
 		else if (to == 56)
-			board->ca &= 0xEF;
+			board->ca &= 7;
 
 		// reset 50 move counter
 		board->fifty = 0;
@@ -260,9 +260,9 @@ void make(struct board_t *board, const uint16_t move)
 
 			// reset castling permissions if one of the rooks moved
 			if (from == 7)
-				board->ca &= 0xFD;
+				board->ca &= 14;
 			else if (from == 0)
-				board->ca &= 0xFE;
+				board->ca &= 13;
 			break;
 		case QUEEN:
 			bb[0] ^= fb | tb;
@@ -276,8 +276,7 @@ void make(struct board_t *board, const uint16_t move)
 			bb[3] ^= fb | tb;
 
 			// reset castling permissions
-			board->ca &= 0xFD;
-			board->ca &= 0xFE;
+			board->ca &= 12;
 			break;
 		}
 		break;
@@ -341,8 +340,7 @@ void make(struct board_t *board, const uint16_t move)
 		bb[3] ^= 0x00000000000000A0ULL;
 
 		// reset castling permissions
-		board->ca &= 0xFD;
-		board->ca &= 0xFE;
+		board->ca &= 12;
 		break;
 	case OOO:
 		// move the king
@@ -355,8 +353,7 @@ void make(struct board_t *board, const uint16_t move)
 		bb[3] ^= 0x0000000000000009ULL;
 
 		// reset castling permissions
-		board->ca &= 0xFD;
-		board->ca &= 0xFE;
+		board->ca &= 12;
 		break;
 	default:
 		return;
