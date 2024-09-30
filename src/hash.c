@@ -131,12 +131,12 @@ void init_table(int size)
 	free(table);
 
 	size_tt = (size / sizeof(struct entry_t)) - 1;
-	table = (struct entry_t *)malloc(size_tt * sizeof(struct entry_t));
-	if (table) {
-		for (int i = 0; i < size_tt; i++) {
-			table[i] = (struct entry_t){0};
-		}
-	}
+	table = (struct entry_t *)calloc(size_tt + 1, sizeof(struct entry_t));
+
+#ifdef DEBUG
+	printf("Size of entry is: %lu\n", sizeof(struct entry_t));
+	printf("Initialized hashtable with %d entries\n", size_tt);
+#endif
 }
 
 void store(uint64_t hash, int depth, int nodes, int score, uint16_t move,
