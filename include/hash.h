@@ -5,9 +5,6 @@
 #include "search.h"
 #include <stdint.h>
 
-// invalid tt hit
-#define INVALID -445
-
 // hash move flags
 enum { EXACT, UPBOUND, LOBOUND };
 
@@ -18,8 +15,6 @@ extern uint64_t stm_hash;
 
 extern struct entry_t *table;
 extern int size_tt;
-extern int collisions;
-extern int insertions;
 
 // hash table entry
 struct entry_t {

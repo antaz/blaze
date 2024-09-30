@@ -6,11 +6,6 @@
 #include <stdint.h>
 #include <string.h>
 
-uint64_t piece_hash[2][PC][SQ];
-uint64_t ep_hash[9];
-uint64_t ca_hash[52];
-uint64_t stm_hash;
-
 static void reset(struct board_t *board)
 {
 	memset(board->bb, 0, sizeof board->bb);
