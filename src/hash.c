@@ -9,6 +9,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+static uint64_t piece_hash[PC][SQ];
+static uint64_t ep_hash[9];
+static uint64_t ca_hash[52];
+static uint64_t stm_hash;
+
 static uint64_t prng()
 {
 	static uint64_t state = 0x123456789ABCDEF;
@@ -20,11 +25,9 @@ static uint64_t prng()
 
 void init_hash()
 {
-	for (int i = 0; i < 2; i++) {
-		for (int j = 0; j < PC; j++) {
-			for (int k = 0; k < SQ; k++) {
-				piece_hash[i][j][k] = prng();
-			}
+	for (int i = 0; i < PC; i++) {
+		for (int j = 0; j < SQ; j++) {
+			piece_hash[i][j] = prng();
 		}
 	}
 
@@ -32,7 +35,7 @@ void init_hash()
 		ep_hash[i] = prng();
 	}
 
-	for (int i = 0; i < 52; i++) {
+	for (int i = 0; i < 16; i++) {
 		ca_hash[i] = prng();
 	}
 
@@ -43,38 +46,69 @@ uint64_t zobrist(struct board_t *board)
 {
 	uint64_t hash = 0ULL;
 
+	uint64_t all = board->bb[1] | board->bb[2] | board->bb[3];
+	uint64_t ours = board->bb[0];
+	uint64_t theirs = all ^ ours;
+
 	// hashing pieces
-	for (int i = 0; i < 2; i++) {
-		for (uint64_t p =
-			 (board->bb[1] & ~board->bb[2] & ~board->bb[3]) &
-			 board->bb[0];
-		     p; p &= p - 1) {
-			hash ^= piece_hash[board->stm][PAWN][bsf(p)];
-		}
-		for (uint64_t p =
-			 (~board->bb[1] & board->bb[2] & ~board->bb[3]) &
-			 board->bb[0];
-		     p; p &= p - 1) {
-			hash ^= piece_hash[i][KNIGHT][bsf(p)];
-		}
-		for (uint64_t p = (board->bb[1] & board->bb[2]) & board->bb[0];
-		     p; p &= p - 1) {
-			hash ^= piece_hash[i][BISHOP][bsf(p)];
-		}
-		for (uint64_t p =
-			 (~board->bb[1] & ~board->bb[2] & board->bb[3]) &
-			 board->bb[0];
-		     p; p &= p - 1) {
-			hash ^= piece_hash[i][ROOK][bsf(p)];
-		}
-		for (uint64_t p = (board->bb[1] & board->bb[3]) & board->bb[0];
-		     p; p &= p - 1) {
-			hash ^= piece_hash[i][QUEEN][bsf(p)];
-		}
-		uint64_t ksq =
-		    bsf((board->bb[2] & board->bb[3]) & board->bb[0]);
-		hash ^= piece_hash[i][KING][ksq];
-		flip(board);
+	// theirs
+	for (uint64_t p =
+		 (board->bb[1] & ~board->bb[2] & ~board->bb[3]) & theirs;
+	     p; p &= p - 1) {
+		hash ^= piece_hash[PAWN][bsf(p)];
+	}
+	for (uint64_t p =
+		 (~board->bb[1] & board->bb[2] & ~board->bb[3]) & theirs;
+	     p; p &= p - 1) {
+		hash ^= piece_hash[KNIGHT][bsf(p)];
+	}
+	for (uint64_t p = (board->bb[1] & board->bb[2]) & theirs; p;
+	     p &= p - 1) {
+		hash ^= piece_hash[BISHOP][bsf(p)];
+	}
+	for (uint64_t p =
+		 (~board->bb[1] & ~board->bb[2] & board->bb[3]) & theirs;
+	     p; p &= p - 1) {
+		hash ^= piece_hash[ROOK][bsf(p)];
+	}
+	for (uint64_t p = (board->bb[1] & board->bb[3]) & theirs; p;
+	     p &= p - 1) {
+		hash ^= piece_hash[QUEEN][bsf(p)];
+	}
+	for (uint64_t p = (board->bb[2] & board->bb[3]) & theirs; p;
+	     p &= p - 1) {
+		hash ^= piece_hash[KING][bsf(p)];
+	}
+
+	hash = vflip(hash);
+
+	// ours
+	for (uint64_t p =
+		 (board->bb[1] & ~board->bb[2] & ~board->bb[3]) & board->bb[0];
+	     p; p &= p - 1) {
+		hash ^= piece_hash[PAWN][bsf(p)];
+	}
+	for (uint64_t p =
+		 (~board->bb[1] & board->bb[2] & ~board->bb[3]) & board->bb[0];
+	     p; p &= p - 1) {
+		hash ^= piece_hash[KNIGHT][bsf(p)];
+	}
+	for (uint64_t p = (board->bb[1] & board->bb[2]) & board->bb[0]; p;
+	     p &= p - 1) {
+		hash ^= piece_hash[BISHOP][bsf(p)];
+	}
+	for (uint64_t p =
+		 (~board->bb[1] & ~board->bb[2] & board->bb[3]) & board->bb[0];
+	     p; p &= p - 1) {
+		hash ^= piece_hash[ROOK][bsf(p)];
+	}
+	for (uint64_t p = (board->bb[1] & board->bb[3]) & board->bb[0]; p;
+	     p &= p - 1) {
+		hash ^= piece_hash[QUEEN][bsf(p)];
+	}
+	for (uint64_t p = (board->bb[2] & board->bb[3]) & board->bb[0]; p;
+	     p &= p - 1) {
+		hash ^= piece_hash[KING][bsf(p)];
 	}
 
 	// hashing ep square
@@ -83,10 +117,9 @@ uint64_t zobrist(struct board_t *board)
 	// hash castling
 	hash ^= ca_hash[board->ca];
 
-	if (board->stm == BLACK) {
+	// hash for color reversed
+	if (board->stm == BLACK)
 		hash ^= stm_hash;
-		hash = vflip(hash);
-	}
 
 	return hash;
 }

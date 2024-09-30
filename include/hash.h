@@ -5,16 +5,10 @@
 #include "search.h"
 #include <stdint.h>
 
+extern struct entry_t *table;
+
 // hash move flags
 enum { EXACT, UPBOUND, LOBOUND };
-
-extern uint64_t piece_hash[2][PC][SQ];
-extern uint64_t ep_hash[9];
-extern uint64_t ca_hash[52];
-extern uint64_t stm_hash;
-
-extern struct entry_t *table;
-extern int size_tt;
 
 // hash table entry
 struct entry_t {
