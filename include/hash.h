@@ -13,11 +13,11 @@ enum { EXACT, UPBOUND, LOBOUND };
 // hash table entry
 struct entry_t {
 	uint64_t hash;
-	int depth;
-	int nodes;
-	int score;
-	int flag;
+	uint16_t nodes; // TODO: this is not enough for node count
+	int16_t score;
 	uint16_t move;
+	uint8_t depth;
+	uint8_t flag;
 };
 
 void init_hash();
