@@ -142,10 +142,7 @@ void init_table(int size)
 void store(uint64_t hash, int depth, int nodes, int score, uint16_t move,
 	   int flag)
 {
-	assert(size_tt != 0);
-	int index = hash % size_tt;
-	assert(index >= 0 && index <= (size_tt - 1));
-	struct entry_t *entry = &table[index];
+	struct entry_t *entry = &table[hash & size_tt];
 
 	entry->hash = hash;
 	entry->depth = depth;
@@ -157,10 +154,7 @@ void store(uint64_t hash, int depth, int nodes, int score, uint16_t move,
 
 struct entry_t *probe(uint64_t hash)
 {
-	assert(size_tt != 0);
-	int index = hash % size_tt;
-	assert(index >= 0 && index <= (size_tt - 1));
-	struct entry_t *entry = &table[index];
+	struct entry_t *entry = &table[hash & size_tt];
 
 	if (entry->hash == hash)
 		return entry;
