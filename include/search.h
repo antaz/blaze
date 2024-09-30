@@ -4,7 +4,7 @@
 #include <inttypes.h>
 #include <time.h>
 
-#define INF 99999
+#define INF 9999
 #define MOVESTOGO 24
 #define MAX_DEPTH 64
 
