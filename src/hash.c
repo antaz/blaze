@@ -19,11 +19,10 @@ static int size_tt;
 
 static uint64_t prng()
 {
-	static uint64_t state = 0x123456789ABCDEF;
-	state ^= state >> 12;
-	state ^= state << 25;
-	state ^= state >> 27;
-	return state * 0x2545F4914F6CDD1D;
+	static uint64_t next = 1;
+
+	next = next * 1103515245 + 12345;
+	return next;
 }
 
 void init_hash()
