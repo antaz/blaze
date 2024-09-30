@@ -363,11 +363,11 @@ void make(struct board_t *board, const uint16_t move)
 	board->ply++;
 	board->hply++;
 
-	// calculate hash
-	board->hash = zobrist(board);
-
 	// flip the board
 	flip(board);
+
+	// calculate hash
+	board->hash = zobrist(board);
 }
 
 void take(struct board_t *board, const uint16_t move)
