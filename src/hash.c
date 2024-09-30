@@ -14,6 +14,9 @@ static uint64_t ep_hash[9];
 static uint64_t ca_hash[52];
 static uint64_t stm_hash;
 
+struct entry_t *table;
+static int size_tt;
+
 static uint64_t prng()
 {
 	static uint64_t state = 0x123456789ABCDEF;

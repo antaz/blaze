@@ -7,14 +7,10 @@
 #include "uci.h"
 #include <pthread.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <time.h>
 
 struct search_t driver;
 static uint64_t movetime; // how long should we search
-
-struct entry_t *table;
-int size_tt;
 
 static void halt()
 {
