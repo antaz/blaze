@@ -105,8 +105,15 @@ static int search(struct board_t *board, int alpha, int beta, int depth)
 	struct entry_t *entry = probe(board->hash);
 	if (entry != NULL) {
 		if (entry->depth >= depth) {
+			// adjust mate score
+			score = entry->score;
+			if (entry->score >= INF - 64)
+				score = entry->score - board->ply;
+			if (entry->score <= -INF + 64)
+				score = entry->score + board->ply;
+
 			if (entry->flag == EXACT)
-				return entry->score;
+				return score;
 			if ((entry->flag == LOBOUND) && (entry->score <= alpha))
 				return alpha;
 			if ((entry->flag == UPBOUND) && (entry->score >= beta))
@@ -146,8 +153,15 @@ static int search(struct board_t *board, int alpha, int beta, int depth)
 			bestmove = moves[i];
 			if (score > alpha) {
 				if (score >= beta) {
+					// adjust mate score
+					score = beta;
+					if (beta >= INF - 64)
+						score = beta + board->ply;
+					if (beta <= -INF + 64)
+						score = beta - board->ply;
+
 					store(board->hash, depth, driver.nodes,
-					      beta, bestmove.data, UPBOUND);
+					      score, bestmove.data, UPBOUND);
 					return beta;
 				}
 				alpha = score;
@@ -168,9 +182,21 @@ static int search(struct board_t *board, int alpha, int beta, int depth)
 	}
 
 	if (alpha != oldalpha) {
+		// adjust mate score
+		score = best;
+		if (best >= INF - 64)
+			score = best + board->ply;
+		if (best <= -INF + 64)
+			score = best - board->ply;
 		store(board->hash, depth, driver.nodes, score, bestmove.data,
 		      EXACT);
 	} else {
+		// adjust mate score
+		score = alpha;
+		if (alpha >= INF - 64)
+			score = alpha + board->ply;
+		if (alpha <= -INF + 64)
+			score = alpha - board->ply;
 		store(board->hash, depth, driver.nodes, score, bestmove.data,
 		      LOBOUND);
 	}
