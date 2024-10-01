@@ -10,7 +10,7 @@ int main()
 	init_hash();
 	init_table(0x100000 * 16);
 	struct board_t board = {
-	    .bb = {0}, .stm = WHITE, .ep = NOSQ, .ca = 0, .hist = {0}};
+	    .bb = {0}, .stm = WHITE, .ep = NOSQ, .ca = 0, .hist = {{0}}};
 	parse(&board,
 	      "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	loop(&board);
