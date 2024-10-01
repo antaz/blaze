@@ -58,7 +58,7 @@ int quiet(const struct board_t *board, struct move_t *moves)
 	// pawn push
 	for (p = ((pawn & ~R7) << 8) & ~all; p; p &= p - 1) {
 		int to = bsf(p);
-		moves->data = MOVE(to - 8, to, QUIET);
+		moves->data = MOVE((to - 8), to, QUIET);
 		moves++;
 		count++;
 	}
@@ -66,7 +66,7 @@ int quiet(const struct board_t *board, struct move_t *moves)
 	// double pawn push
 	for (p = (pawn << 8 & ~all) << 8 & R4 & ~all; p; p &= p - 1) {
 		int to = bsf(p);
-		moves->data = MOVE(to - 16, to, DPP);
+		moves->data = MOVE((to - 16), to, DPP);
 		moves++;
 		count++;
 	}
@@ -195,14 +195,14 @@ int noisy(const struct board_t *board, struct move_t *moves)
 	// pawn captures
 	for (p = ((pawn & ~R7) << 7) & ~FH & theirs; p; p &= p - 1) {
 		int to = bsf(p);
-		moves->data = MOVE(to - 7, to, CAPTURE);
+		moves->data = MOVE((to - 7), to, CAPTURE);
 		moves++;
 		count++;
 	}
 
 	for (p = ((pawn & ~R7) << 9) & ~FA & theirs; p; p &= p - 1) {
 		int to = bsf(p);
-		moves->data = MOVE(to - 9, to, CAPTURE);
+		moves->data = MOVE((to - 9), to, CAPTURE);
 		moves++;
 		count++;
 	}
@@ -210,26 +210,26 @@ int noisy(const struct board_t *board, struct move_t *moves)
 	// capture promotion
 	for (p = ((pawn & R7) << 7) & ~FH & theirs; p; p &= p - 1) {
 		int to = bsf(p);
-		moves->data = MOVE(to - 7, to, NPC);
+		moves->data = MOVE((to - 7), to, NPC);
 		moves++;
-		moves->data = MOVE(to - 7, to, BPC);
+		moves->data = MOVE((to - 7), to, BPC);
 		moves++;
-		moves->data = MOVE(to - 7, to, RPC);
+		moves->data = MOVE((to - 7), to, RPC);
 		moves++;
-		moves->data = MOVE(to - 7, to, QPC);
+		moves->data = MOVE((to - 7), to, QPC);
 		moves++;
 		count = count + 4;
 	}
 
 	for (p = ((pawn & R7) << 9) & ~FA & theirs; p; p &= p - 1) {
 		int to = bsf(p);
-		moves->data = MOVE(to - 9, to, NPC);
+		moves->data = MOVE((to - 9), to, NPC);
 		moves++;
-		moves->data = MOVE(to - 9, to, BPC);
+		moves->data = MOVE((to - 9), to, BPC);
 		moves++;
-		moves->data = MOVE(to - 9, to, RPC);
+		moves->data = MOVE((to - 9), to, RPC);
 		moves++;
-		moves->data = MOVE(to - 9, to, QPC);
+		moves->data = MOVE((to - 9), to, QPC);
 		moves++;
 		count = count + 4;
 	}
@@ -237,13 +237,13 @@ int noisy(const struct board_t *board, struct move_t *moves)
 	// non-capturing promotion
 	for (p = (pawn & R7) << 8 & ~all; p; p &= p - 1) {
 		int to = bsf(p);
-		moves->data = MOVE(to - 8, to, NP);
+		moves->data = MOVE((to - 8), to, NP);
 		moves++;
-		moves->data = MOVE(to - 8, to, BP);
+		moves->data = MOVE((to - 8), to, BP);
 		moves++;
-		moves->data = MOVE(to - 8, to, RP);
+		moves->data = MOVE((to - 8), to, RP);
 		moves++;
-		moves->data = MOVE(to - 8, to, QP);
+		moves->data = MOVE((to - 8), to, QP);
 		moves++;
 		count = count + 4;
 	}
@@ -255,7 +255,7 @@ int noisy(const struct board_t *board, struct move_t *moves)
 		for (p = pawn & (((1ULL << (ep + 24)) << 7 & ~FH) |
 				 ((1ULL << (ep + 24)) << 9 & ~FA));
 		     p; p &= p - 1) {
-			moves->data = MOVE(bsf(p), 40 + ep, EP);
+			moves->data = MOVE(bsf(p), (40 + ep), EP);
 			moves++;
 			count++;
 		}
@@ -280,26 +280,26 @@ int capture(const struct board_t *board, struct move_t *moves)
 	// capture promotion
 	for (p = ((pawn & R7) << 7) & ~FH & theirs; p; p &= p - 1) {
 		int to = bsf(p);
-		moves->data = MOVE(to - 7, to, NPC);
+		moves->data = MOVE((to - 7), to, NPC);
 		moves++;
-		moves->data = MOVE(to - 7, to, BPC);
+		moves->data = MOVE((to - 7), to, BPC);
 		moves++;
-		moves->data = MOVE(to - 7, to, RPC);
+		moves->data = MOVE((to - 7), to, RPC);
 		moves++;
-		moves->data = MOVE(to - 7, to, QPC);
+		moves->data = MOVE((to - 7), to, QPC);
 		moves++;
 		count = count + 4;
 	}
 
 	for (p = ((pawn & R7) << 9) & ~FA & theirs; p; p &= p - 1) {
 		int to = bsf(p);
-		moves->data = MOVE(to - 9, to, NPC);
+		moves->data = MOVE((to - 9), to, NPC);
 		moves++;
-		moves->data = MOVE(to - 9, to, BPC);
+		moves->data = MOVE((to - 9), to, BPC);
 		moves++;
-		moves->data = MOVE(to - 9, to, RPC);
+		moves->data = MOVE((to - 9), to, RPC);
 		moves++;
-		moves->data = MOVE(to - 9, to, QPC);
+		moves->data = MOVE((to - 9), to, QPC);
 		moves++;
 		count = count + 4;
 	}
@@ -307,14 +307,14 @@ int capture(const struct board_t *board, struct move_t *moves)
 	// pawn captures
 	for (p = ((pawn & ~R7) << 7) & ~FH & theirs; p; p &= p - 1) {
 		int to = bsf(p);
-		moves->data = MOVE(to - 7, to, CAPTURE);
+		moves->data = MOVE((to - 7), to, CAPTURE);
 		moves++;
 		count++;
 	}
 
 	for (p = ((pawn & ~R7) << 9) & ~FA & theirs; p; p &= p - 1) {
 		int to = bsf(p);
-		moves->data = MOVE(to - 9, to, CAPTURE);
+		moves->data = MOVE((to - 9), to, CAPTURE);
 		moves++;
 		count++;
 	}
@@ -326,7 +326,7 @@ int capture(const struct board_t *board, struct move_t *moves)
 		for (p = pawn & (((1ULL << (ep + 24)) << 7 & ~FH) |
 				 ((1ULL << (ep + 24)) << 9 & ~FA));
 		     p; p &= p - 1) {
-			moves->data = MOVE(bsf(p), 40 + ep, EP);
+			moves->data = MOVE(bsf(p), (40 + ep), EP);
 			moves++;
 			count++;
 		}
