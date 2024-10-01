@@ -1,62 +1,29 @@
 VERSION		= 0.1
 
 # toolchain
-CC		= clang
-LD		= clang
+CC		= cc
 TAR		= tar
 TAG		= etags
 
 # vpath
-VPATH		= src:test
+VPATH		= src
 
-# include dir
-INCLUDE     = include
+debug: build/debug/blaze
+release: build/release/blaze
 
-# build dir
-BDIR		= build
+build/debug/blaze: build/debug/blaze.o $(filter-out %/blaze.o,$(patsubst src/%.c,build/debug/%.o,$(wildcard src/*.c)))
+	$(CC) -fsanitize=address $^ -o $@
 
-# Flags
-CFLAGS		= -Wall -Wextra
-CPPFLAGS	= -I$(INCLUDE)
-LDFLAGS		=
-
-# architecture
-ARCH		= -march=native
-
-# build mode
-ifneq ($(DEBUG), )
-	CFLAGS  	+= -g -O0 -fsanitize=address
-	CPPFLAGS	+= -DDEBUG
-	BDIR	 	= build/debug
-else
-	CFLAGS  	+= -Ofast -static -flto -Werror
-	CPPFLAGS	+= -DNDEBUG
-	BDIR	 	= build/release
-endif
-
-all: $(BDIR)/blaze
-
-$(BDIR)/blaze: $(BDIR)/blaze.o $(filter-out %/blaze.o,$(patsubst src/%.c,$(BDIR)/%.o,$(wildcard src/*.c)))
-	$(LD) $(LDFLAGS) $(CFLAGS) $^ $(LDLIBS) -o $@
-
-$(BDIR)/test/perft: $(BDIR)/test/perft.o $(BDIR)/blaze.a
-	$(LD) $(LDFLAGS) $^ $(LDLIBS) -o $@
-
-$(BDIR)/%.o: %.c $(BDIR)/%.d
+build/debug/%.o: %.c
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) $(ARCH) $(CPPFLAGS) -c -o $@ $<
+	$(CC) -c -Wall -Wextra -g3 -O0 -fsanitize=address -fno-omit-frame-pointer -Iinclude -DDEBUG $< -o $@
 
-$(BDIR)/%.d: %.c
+build/release/blaze: build/release/blaze.o $(filter-out %/blaze.o,$(patsubst src/%.c,build/release/%.o,$(wildcard src/*.c)))
+	$(CC) -flto -pthread $^ -o $@
+
+build/release/%.o: %.c
 	@mkdir -p $(@D)
-	@set -e; rm -f $@; \
-	$(CC) -M $(CPPFLAGS) $< > $@.$$$$; \
-	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
-
-.PRECIOUS: $(BDIR)/%.d
-
-# alternatively supress errors with `-include`
-include $(wildcard $(patsubst src/%.c, $(BDIR)/%.d, $(wildcard src/*.c)))
+	$(CC) -c -Wall -Wextra -Werror -Ofast -static -flto -Iinclude -DNDEBUG $< -o $@
 
 dist:
 	@mkdir blaze-$(VERSION)
