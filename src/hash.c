@@ -139,20 +139,20 @@ void init_table(int size)
 #endif
 }
 
-void store(uint64_t hash, int depth, int nodes, int score, uint16_t move,
-	   int flag)
+void save(uint64_t hash, uint8_t draft, uint16_t nodes, int16_t score,
+	  uint16_t move, uint8_t flag)
 {
 	struct entry_t *entry = &table[hash & size_tt];
 
 	entry->hash = hash;
-	entry->depth = depth;
+	entry->draft = draft;
 	entry->nodes = nodes;
 	entry->score = score;
 	entry->flag = flag;
 	entry->move = move;
 }
 
-struct entry_t *probe(uint64_t hash)
+struct entry_t *poll(uint64_t hash)
 {
 	struct entry_t *entry = &table[hash & size_tt];
 
@@ -169,7 +169,7 @@ int probepv(struct board_t *board, struct pv_t *pv, int depth)
 	struct move_t moves[256];
 
 	for (int i = 1; i <= depth; i++) {
-		if ((entry = probe(board->hash)) == NULL)
+		if ((entry = poll(board->hash)) == NULL)
 			break;
 
 		int count = gen(board, moves);

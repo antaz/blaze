@@ -21,17 +21,19 @@ uint64_t perft(struct board_t *board, int depth)
 	else if (depth == 0)
 		return 1;
 
-	struct entry_t *entry = probe(board->hash);
-	if (entry != NULL && entry->depth == depth)
+	struct entry_t *entry = poll(board->hash);
+	if (entry != NULL && entry->draft == depth)
 		return entry->nodes;
 
 	for (int i = 0; i < count; ++i) {
 		make(board, moves[i].data);
+
 		nodes += perft(board, depth - 1);
+
 		take(board, moves[i].data);
 	}
 
-	store(board->hash, depth, nodes, 0, 0, 0);
+	save(board->hash, depth, nodes, 0, 0, 0);
 
 	return nodes;
 }
